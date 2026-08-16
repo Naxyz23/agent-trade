@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-08-16T15:50:01+00:00",
+  "run_date": "2026-08-16",
+  "spec_version": "cngoal-5.1",
+  "group": "gold",
+  "universe_size": 1,
+  "signals": [],
+  "open_positions": [],
+  "halts": [],
+  "snapshot": [
+    {
+      "symbol": "XAU",
+      "name": "Gold Futures",
+      "class": "metal",
+      "close": 4437.2998,
+      "chg_5d_pct": 2.23,
+      "chg_20d_pct": 10.58,
+      "rsi14": 67.53,
+      "regime": "bear",
+      "above_ema20": true,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    }
+  ],
+  "errors": []
+}
