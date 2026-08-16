@@ -16,6 +16,8 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    env:
+      DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -36,9 +38,7 @@ jobs:
           git pull --rebase --autostash || true
           git push
       - name: Notify Discord
-        if: ${{ secrets.DISCORD_WEBHOOK != '' }}
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        if: ${{ env.DISCORD_WEBHOOK != '' }}
         run: python -m engine.notify --group gold
       - name: Upload brief
         if: always()
