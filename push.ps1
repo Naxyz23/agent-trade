@@ -74,6 +74,18 @@ if ($remotes -contains "origin") {
     Check-Step "git remote add"
 }
 
+Write-Host "`n=== Sync with GitHub (pull any changes made on the website) ===" -ForegroundColor Cyan
+git fetch origin main
+Check-Step "git fetch"
+git pull --rebase --autostash origin main
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "FAILED: git pull --rebase (exit code $LASTEXITCODE)" -ForegroundColor Red
+    Write-Host "This usually means the SAME lines were edited both locally and on GitHub." -ForegroundColor Red
+    Write-Host "Do not guess - stop here and tell Claude what happened." -ForegroundColor Red
+    Read-Host "Press Enter to close"
+    exit 1
+}
+
 Write-Host "`n=== Push to GitHub ===" -ForegroundColor Cyan
 Write-Host "A browser or credential prompt may pop up - log in if asked."
 git push -u origin main
