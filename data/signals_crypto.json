@@ -1,0 +1,126 @@
+{
+  "generated_at": "2026-08-16T15:48:21+00:00",
+  "run_date": "2026-08-16",
+  "spec_version": "cngoal-5.1",
+  "group": "crypto",
+  "universe_size": 4,
+  "signals": [
+    {
+      "symbol": "BTC",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "short",
+      "score": 40,
+      "price": 63024.3203125,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง SHORT — ยังขาด: candle bearish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 63024.3203,
+        "open": 62974.3359,
+        "high": 63119.1328,
+        "low": 62850.9609,
+        "ema20": 63827.9909,
+        "ema50": 64356.3776,
+        "ema200": 71747.8188,
+        "rsi14": 43.1248,
+        "atr14": 1235.3133,
+        "atr_pct": 1.9601,
+        "swing_low10": 62487.6992,
+        "swing_high10": 65401.6914,
+        "ret_5d": -1.3867,
+        "ret_20d": -3.5445,
+        "regime": "bear",
+        "candle": "-",
+        "spec": "cngoal-5.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันลง",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด < EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI < 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bearish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-08-15",
+      "asset_class": "crypto"
+    }
+  ],
+  "open_positions": [],
+  "halts": [],
+  "snapshot": [
+    {
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "class": "crypto",
+      "close": 63024.3203,
+      "chg_5d_pct": -1.39,
+      "chg_20d_pct": -3.54,
+      "rsi14": 43.12,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-15"
+    },
+    {
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "class": "crypto",
+      "close": 1880.9083,
+      "chg_5d_pct": 0.51,
+      "chg_20d_pct": -3.71,
+      "rsi14": 51.06,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-15"
+    },
+    {
+      "symbol": "SOL",
+      "name": "Solana",
+      "class": "crypto",
+      "close": 75.2723,
+      "chg_5d_pct": -0.89,
+      "chg_20d_pct": -1.74,
+      "rsi14": 50.75,
+      "regime": "bear",
+      "above_ema20": true,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-15"
+    },
+    {
+      "symbol": "BNB",
+      "name": "BNB",
+      "class": "crypto",
+      "close": 607.1042,
+      "chg_5d_pct": 1.41,
+      "chg_20d_pct": 5.67,
+      "rsi14": 61.17,
+      "regime": "bear",
+      "above_ema20": true,
+      "candle": "bearish pin bar",
+      "in_position": false,
+      "bar_date": "2026-08-15"
+    }
+  ],
+  "errors": []
+}
