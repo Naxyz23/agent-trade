@@ -1,0 +1,59 @@
+# Watchlist — แก้ไฟล์นี้ไฟล์เดียวพอ ไม่ต้องแตะโค้ด
+# source: yahoo (ฟรี ไม่จำกัด) | kraken (สำรอง crypto/ทอง ไม่ต้องใช้ key)
+# leverage_cap: x5 ทุกสินทรัพย์ ตาม cngoal v5.1 Machine Spec
+#               หุ้น US เทรดผ่าน margin/CFD จึงชอร์ตได้และใช้ x5 เท่ากัน
+# long_only:    ไม่ตั้ง = เข้าได้ทั้ง long และ short (ค่าเริ่มต้น)
+#               ตั้ง true เฉพาะตัวที่โบรกไม่ให้ชอร์ต
+
+assets:
+  # ---------------- Crypto (Binance Futures — leverage x5) ----------------
+  - { symbol: BTC, fetch_symbol: "BTC-USD", class: crypto, name: "Bitcoin",  leverage_cap: 5 }
+  - { symbol: ETH, fetch_symbol: "ETH-USD", class: crypto, name: "Ethereum", leverage_cap: 5 }
+  - { symbol: SOL, fetch_symbol: "SOL-USD", class: crypto, name: "Solana",   leverage_cap: 5 }
+  - { symbol: BNB, fetch_symbol: "BNB-USD", class: crypto, name: "BNB",      leverage_cap: 5 }
+
+  # ---------------- ทองคำ ----------------
+  - { symbol: XAU, fetch_symbol: "GC=F",    class: metal,  name: "Gold Futures", leverage_cap: 5 }
+
+  # ---------------- หุ้น US (margin/CFD — ชอร์ตได้ leverage x5) ----------------
+  - { symbol: NVDA, fetch_symbol: "NVDA", class: stock, name: "NVIDIA",           leverage_cap: 5 }
+  - { symbol: MSFT, fetch_symbol: "MSFT", class: stock, name: "Microsoft",        leverage_cap: 5 }
+  - { symbol: AAPL, fetch_symbol: "AAPL", class: stock, name: "Apple",            leverage_cap: 5 }
+  - { symbol: GOOG, fetch_symbol: "GOOG", class: stock, name: "Alphabet C",       leverage_cap: 5 }
+  - { symbol: META, fetch_symbol: "META", class: stock, name: "Meta Platforms",   leverage_cap: 5 }
+  - { symbol: AMD,  fetch_symbol: "AMD",  class: stock, name: "AMD",              leverage_cap: 5 }
+  - { symbol: TSM,  fetch_symbol: "TSM",  class: stock, name: "TSMC ADR",         leverage_cap: 5 }
+  - { symbol: TSLA, fetch_symbol: "TSLA", class: stock, name: "Tesla",            leverage_cap: 5 }
+  - { symbol: ORCL, fetch_symbol: "ORCL", class: stock, name: "Oracle",           leverage_cap: 5 }
+  - { symbol: NFLX, fetch_symbol: "NFLX", class: stock, name: "Netflix",          leverage_cap: 5 }
+  - { symbol: JPM,  fetch_symbol: "JPM",  class: stock, name: "JPMorgan Chase",   leverage_cap: 5 }
+  - { symbol: LLY,  fetch_symbol: "LLY",  class: stock, name: "Eli Lilly",        leverage_cap: 5 }
+  - { symbol: WMT,  fetch_symbol: "WMT",  class: stock, name: "Walmart",          leverage_cap: 5 }
+
+  # SPCX (SpaceX) — IPO 12 มิ.ย. 2026 มีข้อมูลแค่ ~46 แท่ง
+  # ต้องมี 221 แท่งถึงคำนวณ EMA200 + slope ได้ → เปิดใช้ได้ราวเดือน เม.ย. 2027
+  # - { symbol: SPCX, fetch_symbol: "SPCX", class: stock, name: "SpaceX", leverage_cap: 5 }
+
+  # ---------------- บริบทตลาด (ไม่ส่งสัญญาณเข้า ใช้ดูภาพรวมอย่างเดียว) ----------------
+  - { symbol: SPY, fetch_symbol: "SPY",      class: context, name: "S&P 500 ETF",   signals: false }
+  - { symbol: QQQ, fetch_symbol: "QQQ",      class: context, name: "Nasdaq 100 ETF", signals: false }
+  - { symbol: DXY, fetch_symbol: "DX-Y.NYB", class: context, name: "US Dollar Index", signals: false }
+
+# ---------------- Risk (ตรงกับ CNgoal v5.1 Machine Spec) ----------------
+risk:
+  spec_version: "cngoal-5.1"
+  pct_per_trade: 1.0          # ห้ามขึ้นเกินนี้ — risk sweep พบ maxDD ต่างกัน 5 เท่า
+  default_leverage_cap: 5
+  equity_usdt: 100            # ทุนโดยประมาณ ใช้แปลง % เป็นจำนวนเงินจริง
+  pause_after_losses: 3       # แพ้ติด 3 ไม้ → พัก 3 วัน
+  halt_drawdown_pct: 15       # พอร์ตลดจาก peak 15% → หยุดทบทวนกฎ
+  max_concurrent_positions: 3 # risk รวมไม่เกิน 3% ในเวลาเดียวกัน
+
+filters:
+  include_watch: true         # ส่งสัญญาณ watch (3/4 ข้อ, ผันผวน) ด้วยไหม
+  max_watch_per_run: 6        # สัญญาณ entry/exit ส่งครบเสมอ อันนี้จำกัดแค่ watch
+
+# ---------------- แจ้งเตือน Discord ----------------
+notify:
+  on_empty: false   # false = ส่งเฉพาะวันที่มี entry/exit/halt/error จริง
+                    # true  = ส่งทุกรอบแม้ไม่มีอะไร (จะได้ ~60 ข้อความ/เดือน แล้วจะเลิกอ่าน)

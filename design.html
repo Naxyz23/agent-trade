@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8">
+<title>แผนออกแบบ AI Trading Signal Agent v0.3</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#fbfbfa;--fg:#1a1a19;--mut:#6b6b68;--line:#e6e5e1;--card:#fff;
+ --acc:#0f766e;--warn:#b45309;--bad:#b91c1c;--chip:#f2f1ee}
+@media (prefers-color-scheme:dark){:root{--bg:#191918;--fg:#f0efec;--mut:#a1a09b;
+ --line:#33322e;--card:#222220;--acc:#5eead4;--warn:#fbbf24;--bad:#fca5a5;--chip:#2b2a27}}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 20px 64px;background:var(--bg);color:var(--fg);max-width:880px;
+ margin-inline:auto;font:16px/1.75 ui-sans-serif,-apple-system,"Segoe UI",system-ui,"Noto Sans Thai",sans-serif;
+ -webkit-font-smoothing:antialiased}
+h1{font-size:27px;line-height:1.3;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:20px;margin:44px 0 10px;padding-top:22px;border-top:1px solid var(--line);letter-spacing:-.01em}
+h3{font-size:16px;margin:24px 0 6px}
+p{margin:10px 0}
+.lede{color:var(--mut);font-size:15px;margin-bottom:8px}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:.88em;
+ font-family:ui-monospace,"SF Mono",Menlo,monospace}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+ overflow-x:auto;font-size:12.5px;line-height:1.6;font-family:ui-monospace,"SF Mono",Menlo,monospace}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-weight:550;font-size:12.5px;letter-spacing:.02em;text-transform:uppercase}
+tbody tr:last-child td{border-bottom:none}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.ok{color:var(--acc);font-weight:600}.no{color:var(--bad);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0}
+.callout{border-left:3px solid var(--acc);background:var(--card);border-radius:0 10px 10px 0;
+ padding:12px 16px;margin:16px 0}
+.callout.w{border-left-color:var(--warn)}.callout.b{border-left-color:var(--bad)}
+.tag{display:inline-block;font-size:11px;font-weight:650;padding:2px 8px;border-radius:999px;
+ letter-spacing:.04em;background:var(--chip);color:var(--mut)}
+.tag.s{background:#ccfbf1;color:#0f766e}.tag.w{background:#fef3c7;color:#b45309}
+.tag.x{background:#fee2e2;color:#b91c1c}
+ul,ol{margin:10px 0;padding-left:22px}li{margin:5px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stat span{color:var(--mut);font-size:12.5px}
+.phase{display:flex;gap:14px;margin:18px 0}
+.phase .n{flex:0 0 30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;
+ display:flex;align-items:center;justify-content:center;font-weight:650;font-size:14px}
+@media(prefers-color-scheme:dark){.phase .n{color:#111}}
+.phase .b{flex:1}.phase h3{margin:2px 0 4px}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+</style>
+
+<h1>AI Trading Signal Agent — แผนออกแบบ v0.3</h1>
+<p class="lede">21 สินทรัพย์ · เครื่องยนต์ = CNgoal v5.1 · สแกนวันละ 2 รอบ ·
+คนเป็นคนตัดสินใจ · อัปเดต 16 ส.ค. 2026</p>
+
+<div class="callout">
+<b>หลักการเดียวที่ทั้งระบบยึด</b><br>
+Agent ตัวนี้ <b>ไม่ทำนายราคา</b> และ <b>ไม่สั่งซื้อขาย</b> — หน้าที่เดียวคือ
+<i>"ลดจำนวนกราฟที่ Nana ต้องเปิดดูเองในแต่ละวัน จาก 21 ตัว เหลือ 0-2 ตัว"</i>
+</div>
+
+<h2>1. สิ่งที่เปลี่ยนจาก v0.1 — และทำไม</h2>
+<p>v0.1 ผมเขียนกฎขึ้นเองจากหลักการทั่วไป พอได้อ่าน <b>CNgoal v5.1</b> ที่ผ่าน backtest
+แบบหักค่าธรรมเนียม 0.05%/ข้าง + slippage 0.02% และแบ่ง in-sample/out-of-sample มาแล้ว
+พบว่า <b>กฎของผม 3 ข้อ อยู่ในตาราง "ทดสอบแล้วไม่ผ่าน" ของ v5.1 พอดี</b></p>
+
+<table>
+<thead><tr><th>กฎเดิมใน v0.1</th><th>v5.1 บอกว่า</th><th>ทำอะไรกับมัน</th></tr></thead>
+<tbody>
+<tr><td><code>trend_pullback</code> (รอย่อ EMA20)</td>
+<td>ผลตอบแทนต่ำกว่า และไม่ซ้ำข้ามสินทรัพย์</td><td class="no">ถอดออก</td></tr>
+<tr><td><code>breakout_squeeze</code> (Donchian 20/55)</td>
+<td>มีแค่ 5-10 ไม้ ตัวอย่างน้อยเกินกว่าจะสรุป</td><td class="no">ถอดออก</td></tr>
+<tr><td><code>_regime()</code> ใช้ "ราคา &gt; EMA200"</td>
+<td>แพ้ "EMA200 หันขึ้น" ทั้ง BTC ETH BNB</td><td class="no">เปลี่ยนนิยาม</td></tr>
+<tr><td><code>momentum_exhaustion</code> (RSI &gt; 75)</td>
+<td>ใกล้เคียง "RSI band เพดาน 72" ที่ตัดไม้เทรนด์แรงทิ้ง</td><td>ลดเป็น watch</td></tr>
+</tbody>
+</table>
+
+<div class="callout b">
+<b>เมื่อมีหลักฐานขัดกัน ให้เชื่อหลักฐานที่ทดสอบมาแล้ว ไม่ใช่กฎที่ฟังดูดี</b><br>
+v0.2 จึงยึด CNgoal v5.1 Machine Spec เป็นเครื่องยนต์หลัก และลดกฎเดิมทั้งหมดเป็น
+<span class="tag">เฝ้าดู</span> ที่ไม่นับเป็นสัญญาณเข้า
+</div>
+
+<h2>2. ข้อจำกัดที่ทดสอบแล้ว (กำหนด architecture)</h2>
+<table>
+<thead><tr><th>แหล่งข้อมูล</th><th>shell ใน Cowork</th><th>WebFetch</th><th>สรุป</th></tr></thead>
+<tbody>
+<tr><td>Yahoo, Stooq, Binance, CoinGecko, Twelve Data</td><td class="no">403</td><td class="no">robots.txt</td><td>ใช้ไม่ได้</td></tr>
+<tr><td>Kraken, Coinbase, Alpha Vantage, Finnhub</td><td class="no">403</td><td class="ok">ได้</td><td>ได้แต่ข้อมูลถูกตัด</td></tr>
+<tr><td><code>raw.githubusercontent.com</code></td><td class="ok">ได้</td><td class="ok">ได้</td><td><b>ทางออก</b></td></tr>
+</tbody>
+</table>
+<p>และ WebFetch ไม่ใช่ท่อข้อมูล — ทดลองขอแท่งเทียน BTC 60 แท่ง <b>ได้กลับมาจริง 4 แท่ง</b>
+ซึ่งอันตราย เพราะ EMA200 + slope 20 แท่ง ต้องใช้ <b>221 แท่ง</b> ถ้าฝืนทำตัวเลขจะเพี้ยนเงียบ ๆ</p>
+
+<pre>  ┌─ ชั้นที่ 1: เก็บ + คำนวณ ─────────────┐   GitHub Actions (ฟรี ไม่ต้องเปิดคอม)
+  │  cron 06:10 UTC = 13:10 ไทย  (จ-ศ)   │
+  │  cron 21:10 UTC = 04:10 ไทย  (อ-ส)   │
+  │  fetch → indicators → CNgoal v5.1     │
+  │  ติดตามไม้ที่เปิดอยู่ใน state.json      │
+  └──────────────┬────────────────────────┘
+                 │ git push
+        ┌────────▼─────────┐
+        │ data/signals.json│  ~10 KB
+        │ data/state.json  │
+        └────────┬─────────┘
+                 │ HTTPS GET (raw.githubusercontent)
+  ┌──────────────▼────────────────────────┐   Cowork scheduled task
+  │  Claude อ่าน + เขียนอธิบาย + หา earnings │
+  │  เรนเดอร์ HTML → แชท + Gmail            │
+  └───────────────────────────────────────┘</pre>
+<p><b>สิ่งที่ต้องแม่นและทำซ้ำได้ → โค้ดทำ · สิ่งที่ต้องอธิบายเป็นภาษาคน → LLM ทำ</b>
+ถ้าให้ LLM คำนวณ RSI เอง จะได้เลขไม่เท่ากันทุกครั้ง และย้อนตรวจไม่ได้ว่าวันนั้นตัวเลขเท่าไร</p>
+
+<h2>3. กฎที่ใช้จริง — CNgoal v5.1</h2>
+<h3>Entry — 4 เงื่อนไข ต้องผ่านครบทุกข้อ</h3>
+<table>
+<thead><tr><th>#</th><th>Long</th><th>Short</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>EMA200 วันนี้ &gt; EMA200 เมื่อ 20 แท่งก่อน</td><td>กลับด้าน</td></tr>
+<tr><td>2</td><td>ปิด Daily &gt; EMA20</td><td>ปิด &lt; EMA20</td></tr>
+<tr><td>3</td><td>RSI(14) &gt; 50</td><td>RSI &lt; 50</td></tr>
+<tr><td>4</td><td>pin bar หรือ engulfing ฝั่งขึ้น</td><td>ฝั่งลง</td></tr>
+</tbody>
+</table>
+<p>ข้อ 1 คือหัวใจของ v5.1 — ดู <b>ทิศทางของเส้น</b> ไม่ใช่ตำแหน่งราคา
+เพราะราคาใช้เวลานานกว่าจะขึ้นไปยืนเหนือ EMA200 ทำให้เข้าช้าและพลาดต้นเทรนด์
+ตัดสินที่ <b>แท่ง Daily ที่ปิดแล้วเท่านั้น</b> — โค้ดตัดแท่งวันนี้ที่ยังวิ่งอยู่ทิ้งก่อนเสมอ</p>
+
+<h3>Stop Loss + Position Size</h3>
+<pre>SL long  = min(swing low 10 แท่ง, EMA50) ที่ "ใกล้ราคากว่า"  แล้ว −0.1% buffer
+ถ้า SL ห่าง &lt; 0.5%  →  ข้าม trade  (ระบบออกเป็น watch ไม่ใช่ entry)
+
+Risk     = พอร์ต × 1%
+Position = Risk ÷ SL%
+Position = min(Position, พอร์ต × leverage_cap)</pre>
+<p><code>leverage_cap</code> = <b>5 ทุกสินทรัพย์</b> ตาม Machine Spec · ทุกตัวเข้าได้ทั้ง long และ short
+ถ้าตัวไหนโบรกไม่ให้ชอร์ต ใส่ <code>long_only: true</code> ในบรรทัดนั้นของ <code>watchlist.yml</code></p>
+
+<h3>Exit + เพดานความเสี่ยง</h3>
+<ul>
+<li>ปิดเมื่อราคาปิด Daily สวน EMA20 <b>หรือ</b> ชน SL — ไม่มีเงื่อนไข "เฉพาะตอนกำไร"</li>
+<li>แพ้ติดกัน 3 ไม้ → ขึ้นแบนเนอร์แดง "พัก 3 วัน" บนหัว brief และห้ามเสนอ entry รอบนั้น</li>
+<li>เปิดพร้อมกันได้ไม่เกิน 3 ไม้ (risk รวม 3%) — เกินแล้วสัญญาณใหม่ถูกลดเป็น watch</li>
+</ul>
+
+<h2>4. Watchlist — 21 ตัว</h2>
+<table>
+<thead><tr><th>กลุ่ม</th><th>สินทรัพย์</th><th>Leverage</th><th>ทิศทาง</th></tr></thead>
+<tbody>
+<tr><td>Crypto</td><td>BTC · ETH · SOL · BNB</td><td>x5</td><td>long + short</td></tr>
+<tr><td>ทองคำ</td><td>XAU (<code>GC=F</code>)</td><td>x5</td><td>long + short</td></tr>
+<tr><td>หุ้น US (13)</td><td>NVDA · MSFT · AAPL · GOOG · META · AMD · TSM · TSLA · ORCL · NFLX · JPM · LLY · WMT</td><td>x5</td><td>long + short</td></tr>
+<tr><td>บริบท</td><td>SPY · QQQ · DXY</td><td>—</td><td>ไม่ส่งสัญญาณ ดูภาพรวมอย่างเดียว</td></tr>
+</tbody>
+</table>
+<div class="callout w">
+<b>3 เรื่องที่ปรับจากลิสต์ที่ส่งมา</b>
+<ol style="margin:6px 0">
+<li><b>TSM ซ้ำ 2 ครั้ง</b> → เหลือตัวเดียว</li>
+<li><b>SPCX ยังใช้ไม่ได้</b> — SpaceX IPO 12 มิ.ย. 2026 มีข้อมูลแค่ ~46 แท่ง
+แต่ระบบต้องการ 221 แท่ง (EMA200 + slope 20) → ใส่ไว้ในไฟล์แบบคอมเมนต์ เปิดใช้ได้ราว <b>เม.ย. 2027</b></li>
+<li><b>หุ้น US เข้าได้ทั้ง 2 ฝั่ง</b> — เทรดผ่าน margin/CFD จึงชอร์ตได้ ใช้ leverage x5 เท่ากับ crypto
+(v0.2 ผมตั้ง long-only ไว้ผิด — <code>cngoal_backtest.py</code> รองรับ <code>dir = ±1</code> มาตั้งแต่ต้น
+แปลว่าฝั่ง short เป็นส่วนหนึ่งของระบบที่ทดสอบมาแล้ว)</li>
+</ol>
+</div>
+
+<h2>5. ความถี่ที่คาดหวัง</h2>
+<div class="grid">
+<div class="stat"><b>1.30</b><span>เทรด/เดือน/สินทรัพย์ วัดจาก simulation ของโค้ดนี้</span></div>
+<div class="stat"><b>0.7–1</b><span>เทรด/เดือน ที่ v5.1 วัดจากข้อมูลจริง</span></div>
+<div class="stat"><b>17/17</b><span>เทสต์ผ่าน · ตรวจสัญญาณ entry 1,176 ครั้ง</span></div>
+<div class="stat"><b>0–2</b><span>สัญญาณ/วัน จากทั้ง watchlist 18 ตัวที่ส่งสัญญาณ</span></div>
+</div>
+<p>ตัวเลข 1.30 วัดจาก random walk สังเคราะห์ซึ่ง mean-revert มากกว่าตลาดจริง จึงสูงกว่าเล็กน้อย
+ประเด็นคือมันอยู่ในระดับเดียวกัน ไม่ได้หลุดไปคนละโลก — แปลว่าโค้ดทำตามสเปกจริง</p>
+<p><b>วันส่วนใหญ่ brief จะว่าง และนั่นถูกต้องแล้ว</b> v5.1 ระบุเองว่า
+"~0.7-1 เทรด/เดือน คือฟีเจอร์ ไม่ใช่บั๊ก" — ถ้าเห็นสัญญาณทุกวัน แปลว่าตั้งค่าผิด</p>
+
+<h2>6. สิ่งที่ทดสอบแล้วในโค้ดนี้</h2>
+<table>
+<thead><tr><th>เทสต์</th><th>ตรวจอะไร</th></tr></thead>
+<tbody>
+<tr><td>RSI vs Wilder</td><td>คำนวณมือ (70.464) + implementation ที่สองที่ไม่ใช้ pandas — ตรงกันทุกจุดถึง 1e-9</td></tr>
+<tr><td>Candle patterns</td><td>pin bar / engulfing ตรงตามนิยามเชิงตัวเลขของ v5.1 <b>รวมเคสที่ต้องไม่ผ่าน</b></td></tr>
+<tr><td>EMA200 slope</td><td>ยืนยันว่าให้ผลต่างจาก "ราคา &gt; EMA200" จริง ไม่ใช่กฎเดียวกันเขียนคนละแบบ</td></tr>
+<tr><td>Entry 4 ข้อ</td><td>1,176 สัญญาณ ทุกตัวผ่านครบ 4 ข้อ และ SL อยู่ถูกฝั่งเสมอ</td></tr>
+<tr><td>Position size</td><td>risk 1% / SL 5% = 20 USDT · เคสชนเพดาน x5 · เคสหุ้น cap x1</td></tr>
+<tr><td>Exit</td><td>ปิดทั้งตอนกำไรและขาดทุน · หักค่าธรรมเนียมไป-กลับถูกต้อง</td></tr>
+</tbody>
+</table>
+<div class="callout w">
+<b>เทสต์พวกนี้ตรวจว่า "โค้ดทำตามสเปกถูกไหม" ไม่ได้ตรวจว่า "สเปกทำเงินไหม"</b><br>
+อย่างหลัง v5.1 ทดสอบมาแล้วบางส่วน และระบุเองว่า <b>BTC เป็นตัวเดียวที่มีหลักฐานฝั่งบวก</b> —
+ETH/BNB/XAU ยังไม่มี และ <b>หุ้น US 13 ตัวในลิสต์นี้ไม่เคยผ่าน backtest ของ v5.1 เลย</b>
+(v5.1 ทดสอบแค่ NVDA) นี่คืองานของเฟส 3
+</div>
+
+<h2>7. แผนทำเป็นเฟส</h2>
+<div class="phase"><div class="n">1</div><div class="b">
+<h3>เดินได้ก่อน — สัปดาห์นี้</h3>
+<p>สร้าง repo <code>Naxyz23/agent-trade</code> · push โค้ด · เปิด Actions · ตั้ง Cowork task 2 รอบ
+<br><b>เกณฑ์ผ่าน:</b> ได้ brief เข้าแชททุกวันแบบไม่ต้องแตะอะไร ติดกัน 5 วัน</p></div></div>
+
+<div class="phase"><div class="n">2</div><div class="b">
+<h3>ดูของจริง — สัปดาห์ที่ 2-4</h3>
+<p>ยังไม่ต้องเทรดตาม · ดูว่าสัญญาณที่ออกมาตรงกับที่ Nana จะทำเองไหม ·
+เทียบตัวเลขในไฟล์กับ TradingView สัก 3-4 ตัวเพื่อยืนยันว่า EMA/RSI ตรงกัน
+<br><b>เกณฑ์ผ่าน:</b> ตัวเลขในระบบตรงกับกราฟที่เปิดดูเอง</p></div></div>
+
+<div class="phase"><div class="n">3</div><div class="b">
+<h3>วัดผลจริง — เดือนที่ 2</h3>
+<p>เขียน backtest บนข้อมูลจริง 5 ปี <b>สำหรับหุ้น US 13 ตัวที่ v5.1 ยังไม่เคยทดสอบ</b> ·
+ถ้าตัวไหน expectancy ติดลบ ให้เอาออกจาก watchlist ไม่ใช่เก็บไว้เพราะคุ้นชื่อ
+<br><b>เกณฑ์ผ่าน:</b> ทุกตัวที่เหลือมีตัวเลขรองรับ</p></div></div>
+
+<div class="phase"><div class="n">4</div><div class="b">
+<h3>เก็บสถิติสด — เดือนที่ 3+</h3>
+<p>v5.1 เขียนเองว่า "ขั้นตอนต่อไปคือเก็บสถิติจากการเทรดจริง 30-50 ไม้ — ข้อมูลสดมีค่ากว่า
+backtest รอบที่ 81" ระบบนี้บันทึกทุกไม้ลง <code>state.json</code> อยู่แล้ว จึงกลายเป็น
+trade journal อัตโนมัติที่ป้อนกลับเข้า cngoal เวอร์ชันถัดไปได้</p></div></div>
+
+<h2>8. ข้อควรระวัง</h2>
+<div class="grid">
+<div class="stat"><b>ทดสอบมาแล้ว 80+ ชุด</b><span>v5.1 เตือนเอง — ยิ่งลองเยอะ ยิ่งมีโอกาสที่ชุดที่ดูดีจะดีเพราะบังเอิญ</span></div>
+<div class="stat"><b>ตัวอย่างยังน้อย</b><span>Daily เทรด ~0.7 ครั้ง/เดือน 4 ปีได้แค่ 50-70 ไม้</span></div>
+<div class="stat"><b>แพ้ buy &amp; hold ในขาขึ้น</b><span>BNB ถือเฉย ๆ +1,744% ระบบได้ +87.9% — รับข้อแลกเปลี่ยนนี้ได้ไหม</span></div>
+<div class="stat"><b>เชื่อ agent เกินไป</b><span>สัญญาณคือ "ไปดูกราฟหน่อย" ไม่ใช่ "ซื้อเลย"</span></div>
+</div>
+<p><b>เรื่องเงินจริง:</b> เฟส 1-2 ให้ใช้เป็นตัวช่วยคัดกราฟอย่างเดียว
+โดยเฉพาะหุ้น US 13 ตัวที่ยังไม่เคยผ่าน backtest — อย่าเพิ่งเทรดตามจนกว่าจะผ่านเฟส 3</p>
+
+<h2>9. ขั้นตอนถัดไป</h2>
+<ol>
+<li>สร้าง repo ชื่อ <code>agent-trade</code> บน GitHub (private ได้ แต่ public ทำให้ Cowork อ่านง่ายกว่า)</li>
+<li>แตกไฟล์ zip แล้ว push ขึ้นไป (คำสั่งอยู่ในแชท)</li>
+<li>Actions → Run workflow ด้วยมือ 1 ครั้ง เพื่อดูว่าดึงข้อมูลครบ 21 ตัวไหม</li>
+<li>บอกผมว่า push เสร็จแล้ว → ผมตั้ง Cowork scheduled task 2 รอบให้</li>
+</ol>
+
+<footer>
+เครื่องยนต์: CNgoal v5.1 Machine Spec · โค้ดผ่านเทสต์ 17/17 · risk 1%/ไม้<br>
+เอกสารนี้เป็นการออกแบบระบบซอฟต์แวร์ ไม่ใช่คำแนะนำการลงทุน
+</footer>
+</html>

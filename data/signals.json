@@ -1,0 +1,746 @@
+{
+  "generated_at": "2026-08-16T06:10:00+00:00",
+  "run_date": "2026-08-16",
+  "spec_version": "cngoal-5.1",
+  "universe_size": 21,
+  "signals": [
+    {
+      "symbol": "BTC",
+      "rule": "cngoal_exit",
+      "kind": "exit",
+      "direction": "long",
+      "score": 95,
+      "price": 62955.0,
+      "reasons": [
+        "ปิดไม้ LONG — ปิดต่ำกว่า EMA20 (63,480)",
+        "เข้าที่ 58,200 เมื่อ 2026-07-21 · ปัจจุบัน 62,955 → +8.17% ก่อนค่าธรรมเนียม",
+        "กฎ v5.1 ปิดทั้งตอนกำไรและตอนขาดทุน — ไม่มีเงื่อนไข 'เฉพาะตอนกำไร'"
+      ],
+      "levels": {
+        "entry": 58200.0,
+        "exit": 62955.0,
+        "pnl_pct_gross": 8.17,
+        "pnl_pct_net": 8.03,
+        "reason": "ema20_cross"
+      },
+      "evidence": {},
+      "checklist": [],
+      "bar_date": "2026-08-14",
+      "asset_class": "crypto"
+    },
+    {
+      "symbol": "BNB",
+      "rule": "cngoal_entry",
+      "kind": "entry",
+      "direction": "long",
+      "score": 85,
+      "price": 880.0,
+      "reasons": [
+        "ครบทั้ง 4 เงื่อนไข CNgoal v5.1 ฝั่ง LONG",
+        "EMA200 หันขึ้น (618.3 เทียบ 565.1 เมื่อ 20 แท่งก่อน)",
+        "ปิด 880 เหนือ EMA20 847.3 · RSI14 60.8",
+        "candle ยืนยัน: bullish engulfing",
+        "SL อิง swing_low10 → 816.2 (ห่าง 7.25%)"
+      ],
+      "levels": {
+        "entry": 880.0,
+        "stop": 816.2044,
+        "sl_distance_pct": 7.25,
+        "leverage_cap": 5,
+        "round_trip_cost_pct": 0.14,
+        "position_pct_of_equity": 13.8,
+        "capped_by_leverage": false,
+        "risk_amount": 1.0,
+        "position_size": 13.79,
+        "units": 0.015675,
+        "stop_source": "swing_low10"
+      },
+      "evidence": {
+        "close": 880.0,
+        "open": 854.9773,
+        "high": 885.0825,
+        "low": 854.9773,
+        "ema20": 847.3156,
+        "ema50": 797.079,
+        "ema200": 618.2799,
+        "rsi14": 60.8361,
+        "atr14": 23.76,
+        "atr_pct": 2.7,
+        "swing_low10": 817.0214,
+        "swing_high10": 896.1506,
+        "ret_5d": 6.69,
+        "ret_20d": 3.3593,
+        "regime": "bull",
+        "candle": "bullish engulfing",
+        "spec": "cngoal-5.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true,
+          "detail": "EMA200 = 618.3 vs 20 แท่งก่อน 565.1"
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true,
+          "detail": "close 880 vs EMA20 847.3"
+        },
+        {
+          "n": 3,
+          "name": "RSI14 > 50",
+          "pass": true,
+          "detail": "RSI14 = 60.8"
+        },
+        {
+          "n": 4,
+          "name": "candle ยืนยัน",
+          "pass": true,
+          "detail": "bullish engulfing"
+        }
+      ],
+      "bar_date": "2026-08-14",
+      "asset_class": "crypto"
+    },
+    {
+      "symbol": "XAU",
+      "rule": "cngoal_entry",
+      "kind": "entry",
+      "direction": "long",
+      "score": 85,
+      "price": 4395.139851117399,
+      "reasons": [
+        "ครบทั้ง 4 เงื่อนไข CNgoal v5.1 ฝั่ง LONG",
+        "EMA200 หันขึ้น (3382 เทียบ 3257 เมื่อ 20 แท่งก่อน)",
+        "ปิด 4395 เหนือ EMA20 4021 · RSI14 73.5",
+        "candle ยืนยัน: bullish engulfing",
+        "SL อิง swing_low10 → 3862 (ห่าง 12.14%)"
+      ],
+      "levels": {
+        "entry": 4395.1399,
+        "stop": 3861.6977,
+        "sl_distance_pct": 12.137,
+        "leverage_cap": 5,
+        "round_trip_cost_pct": 0.14,
+        "position_pct_of_equity": 8.2,
+        "capped_by_leverage": false,
+        "risk_amount": 1.0,
+        "position_size": 8.24,
+        "units": 0.001875,
+        "stop_source": "swing_low10"
+      },
+      "evidence": {
+        "close": 4395.1399,
+        "open": 4299.6988,
+        "high": 4451.2487,
+        "low": 4299.6988,
+        "ema20": 4021.3045,
+        "ema50": 3774.9106,
+        "ema200": 3381.9063,
+        "rsi14": 73.46,
+        "atr14": 106.9476,
+        "atr_pct": 2.4333,
+        "swing_low10": 3865.5632,
+        "swing_high10": 4473.4523,
+        "ret_5d": 5.9327,
+        "ret_20d": 26.4661,
+        "regime": "bull",
+        "candle": "bullish engulfing",
+        "spec": "cngoal-5.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true,
+          "detail": "EMA200 = 3382 vs 20 แท่งก่อน 3257"
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true,
+          "detail": "close 4395 vs EMA20 4021"
+        },
+        {
+          "n": 3,
+          "name": "RSI14 > 50",
+          "pass": true,
+          "detail": "RSI14 = 73.5"
+        },
+        {
+          "n": 4,
+          "name": "candle ยืนยัน",
+          "pass": true,
+          "detail": "bullish engulfing"
+        }
+      ],
+      "bar_date": "2026-08-14",
+      "asset_class": "metal"
+    },
+    {
+      "symbol": "NVDA",
+      "rule": "cngoal_entry",
+      "kind": "entry",
+      "direction": "short",
+      "score": 85,
+      "price": 184.74520499433206,
+      "reasons": [
+        "ครบทั้ง 4 เงื่อนไข CNgoal v5.1 ฝั่ง SHORT",
+        "EMA200 หันลง (212.5 เทียบ 217.1 เมื่อ 20 แท่งก่อน)",
+        "ปิด 184.7 ใต้ EMA20 189.7 · RSI14 43.0",
+        "candle ยืนยัน: bearish engulfing",
+        "SL อิง ema50 → 187.7 (ห่าง 1.58%)"
+      ],
+      "levels": {
+        "entry": 184.7452,
+        "stop": 187.6633,
+        "sl_distance_pct": 1.58,
+        "leverage_cap": 5,
+        "round_trip_cost_pct": 0.14,
+        "position_pct_of_equity": 63.3,
+        "capped_by_leverage": false,
+        "risk_amount": 1.0,
+        "position_size": 63.31,
+        "units": 0.342691,
+        "stop_source": "ema50"
+      },
+      "evidence": {
+        "close": 184.7452,
+        "open": 189.1189,
+        "high": 189.1189,
+        "low": 182.6225,
+        "ema20": 189.7152,
+        "ema50": 187.4758,
+        "ema200": 212.5216,
+        "rsi14": 43.0245,
+        "atr14": 3.7603,
+        "atr_pct": 2.0354,
+        "swing_low10": 182.6225,
+        "swing_high10": 193.6271,
+        "ret_5d": -2.2717,
+        "ret_20d": -5.3874,
+        "regime": "bear",
+        "candle": "bearish engulfing",
+        "spec": "cngoal-5.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันลง",
+          "pass": true,
+          "detail": "EMA200 = 212.5 vs 20 แท่งก่อน 217.1"
+        },
+        {
+          "n": 2,
+          "name": "ปิด < EMA20",
+          "pass": true,
+          "detail": "close 184.7 vs EMA20 189.7"
+        },
+        {
+          "n": 3,
+          "name": "RSI14 < 50",
+          "pass": true,
+          "detail": "RSI14 = 43.0"
+        },
+        {
+          "n": 4,
+          "name": "candle ยืนยัน",
+          "pass": true,
+          "detail": "bearish engulfing"
+        }
+      ],
+      "bar_date": "2026-08-14",
+      "asset_class": "stock"
+    },
+    {
+      "symbol": "BTC",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 62955.0,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 62955.0,
+        "open": 61677.1183,
+        "high": 64929.3586,
+        "low": 61677.1183,
+        "ema20": 57729.5589,
+        "ema50": 55061.0868,
+        "ema200": 45013.6655,
+        "rsi14": 70.5957,
+        "atr14": 1817.9605,
+        "atr_pct": 2.8877,
+        "swing_low10": 52215.5322,
+        "swing_high10": 64929.3586,
+        "ret_5d": 7.0678,
+        "ret_20d": 17.0648,
+        "regime": "bull",
+        "candle": "-",
+        "spec": "cngoal-5.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-08-14",
+      "asset_class": "crypto"
+    },
+    {
+      "symbol": "ETH",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "short",
+      "score": 40,
+      "price": 2860.0,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง SHORT — ยังขาด: candle bearish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 2860.0,
+        "open": 2933.0846,
+        "high": 2933.0846,
+        "low": 2842.9288,
+        "ema20": 3069.3268,
+        "ema50": 3092.2016,
+        "ema200": 3161.5195,
+        "rsi14": 35.8149,
+        "atr14": 93.8029,
+        "atr_pct": 3.2798,
+        "swing_low10": 2842.9288,
+        "swing_high10": 3249.176,
+        "ret_5d": -8.9084,
+        "ret_20d": -12.968,
+        "regime": "bear",
+        "candle": "-",
+        "spec": "cngoal-5.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันลง",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด < EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI < 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bearish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-08-14",
+      "asset_class": "crypto"
+    },
+    {
+      "symbol": "SOL",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "short",
+      "score": 40,
+      "price": 168.0,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง SHORT — ยังขาด: candle bearish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 168.0,
+        "open": 165.5822,
+        "high": 170.0448,
+        "low": 165.5822,
+        "ema20": 173.543,
+        "ema50": 177.9835,
+        "ema200": 198.9678,
+        "rsi14": 40.0202,
+        "atr14": 4.5759,
+        "atr_pct": 2.7237,
+        "swing_low10": 164.9215,
+        "swing_high10": 184.4034,
+        "ret_5d": -2.0142,
+        "ret_20d": -2.8912,
+        "regime": "bear",
+        "candle": "-",
+        "spec": "cngoal-5.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันลง",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด < EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI < 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bearish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-08-14",
+      "asset_class": "crypto"
+    }
+  ],
+  "open_positions": [
+    {
+      "symbol": "BNB",
+      "side": "long",
+      "entry": 880.0,
+      "stop": 816.2044,
+      "opened": "2026-08-14"
+    },
+    {
+      "symbol": "XAU",
+      "side": "long",
+      "entry": 4395.1399,
+      "stop": 3861.6977,
+      "opened": "2026-08-14"
+    },
+    {
+      "symbol": "NVDA",
+      "side": "short",
+      "entry": 184.7452,
+      "stop": 187.6633,
+      "opened": "2026-08-14"
+    }
+  ],
+  "halts": [],
+  "snapshot": [
+    {
+      "symbol": "BTC",
+      "name": "Bitcoin",
+      "class": "crypto",
+      "close": 62955.0,
+      "chg_5d_pct": 7.07,
+      "chg_20d_pct": 17.06,
+      "rsi14": 70.6,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "ETH",
+      "name": "Ethereum",
+      "class": "crypto",
+      "close": 2860.0,
+      "chg_5d_pct": -8.91,
+      "chg_20d_pct": -12.97,
+      "rsi14": 35.81,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "SOL",
+      "name": "Solana",
+      "class": "crypto",
+      "close": 168.0,
+      "chg_5d_pct": -2.01,
+      "chg_20d_pct": -2.89,
+      "rsi14": 40.02,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "BNB",
+      "name": "BNB",
+      "class": "crypto",
+      "close": 880.0,
+      "chg_5d_pct": 6.69,
+      "chg_20d_pct": 3.36,
+      "rsi14": 60.84,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "bullish engulfing",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "XAU",
+      "name": "Gold Futures",
+      "class": "metal",
+      "close": 4374.0,
+      "chg_5d_pct": 0.9,
+      "chg_20d_pct": 21.94,
+      "rsi14": 69.88,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "class": "stock",
+      "close": 178.0,
+      "chg_5d_pct": 0.59,
+      "chg_20d_pct": -8.48,
+      "rsi14": 39.67,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "MSFT",
+      "name": "Microsoft",
+      "class": "stock",
+      "close": 512.0,
+      "chg_5d_pct": -2.88,
+      "chg_20d_pct": -11.97,
+      "rsi14": 28.16,
+      "regime": "bull",
+      "above_ema20": false,
+      "candle": "bullish pin bar",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "AAPL",
+      "name": "Apple",
+      "class": "stock",
+      "close": 244.0,
+      "chg_5d_pct": -1.44,
+      "chg_20d_pct": 0.91,
+      "rsi14": 45.41,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "GOOG",
+      "name": "Alphabet C",
+      "class": "stock",
+      "close": 205.0,
+      "chg_5d_pct": -0.22,
+      "chg_20d_pct": -2.25,
+      "rsi14": 42.5,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "META",
+      "name": "Meta Platforms",
+      "class": "stock",
+      "close": 735.0,
+      "chg_5d_pct": -3.01,
+      "chg_20d_pct": -11.82,
+      "rsi14": 34.56,
+      "regime": "bull",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "AMD",
+      "name": "AMD",
+      "class": "stock",
+      "close": 168.0,
+      "chg_5d_pct": 4.36,
+      "chg_20d_pct": 1.0,
+      "rsi14": 60.99,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "TSM",
+      "name": "TSMC ADR",
+      "class": "stock",
+      "close": 242.0,
+      "chg_5d_pct": -4.28,
+      "chg_20d_pct": -2.2,
+      "rsi14": 42.11,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "TSLA",
+      "name": "Tesla",
+      "class": "stock",
+      "close": 330.0,
+      "chg_5d_pct": 0.37,
+      "chg_20d_pct": 2.85,
+      "rsi14": 57.66,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "bullish pin bar",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "ORCL",
+      "name": "Oracle",
+      "class": "stock",
+      "close": 238.0,
+      "chg_5d_pct": -3.79,
+      "chg_20d_pct": -7.27,
+      "rsi14": 40.6,
+      "regime": "bull",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "NFLX",
+      "name": "Netflix",
+      "class": "stock",
+      "close": 1180.0,
+      "chg_5d_pct": -0.23,
+      "chg_20d_pct": -3.66,
+      "rsi14": 49.56,
+      "regime": "bear",
+      "above_ema20": true,
+      "candle": "bullish pin bar",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "JPM",
+      "name": "JPMorgan Chase",
+      "class": "stock",
+      "close": 296.0,
+      "chg_5d_pct": 0.12,
+      "chg_20d_pct": -4.99,
+      "rsi14": 45.18,
+      "regime": "bull",
+      "above_ema20": false,
+      "candle": "bullish engulfing",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "LLY",
+      "name": "Eli Lilly",
+      "class": "stock",
+      "close": 880.0,
+      "chg_5d_pct": -0.54,
+      "chg_20d_pct": -1.35,
+      "rsi14": 40.63,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "WMT",
+      "name": "Walmart",
+      "class": "stock",
+      "close": 108.0,
+      "chg_5d_pct": 2.66,
+      "chg_20d_pct": 1.04,
+      "rsi14": 65.18,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "bearish pin bar",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "SPY",
+      "name": "S&P 500 ETF",
+      "class": "context",
+      "close": 655.0,
+      "chg_5d_pct": 1.81,
+      "chg_20d_pct": 2.46,
+      "rsi14": 59.34,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "bullish engulfing",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "QQQ",
+      "name": "Nasdaq 100 ETF",
+      "class": "context",
+      "close": 585.0,
+      "chg_5d_pct": -3.16,
+      "chg_20d_pct": -5.28,
+      "rsi14": 42.11,
+      "regime": "bull",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    },
+    {
+      "symbol": "DXY",
+      "name": "US Dollar Index",
+      "class": "context",
+      "close": 98.0,
+      "chg_5d_pct": -1.5,
+      "chg_20d_pct": -14.39,
+      "rsi14": 25.5,
+      "regime": "bear",
+      "above_ema20": false,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-14"
+    }
+  ],
+  "errors": []
+}

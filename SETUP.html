@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8">
+<title>คู่มือติดตั้ง — Trading Signal Agent</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root{--bg:#fbfbfa;--fg:#1a1a19;--mut:#6b6b68;--line:#e6e5e1;--card:#fff;
+ --acc:#0f766e;--warn:#b45309;--bad:#b91c1c;--chip:#f2f1ee}
+@media (prefers-color-scheme:dark){:root{--bg:#191918;--fg:#f0efec;--mut:#a1a09b;
+ --line:#33322e;--card:#222220;--acc:#5eead4;--warn:#fbbf24;--bad:#fca5a5;--chip:#2b2a27}}
+*{box-sizing:border-box}
+body{margin:0;padding:28px 20px 64px;background:var(--bg);color:var(--fg);max-width:840px;
+ margin-inline:auto;font:16px/1.75 ui-sans-serif,-apple-system,"Segoe UI",system-ui,"Noto Sans Thai",sans-serif}
+h1{font-size:27px;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:19px;margin:0 0 4px;letter-spacing:-.01em}
+h3{font-size:15px;margin:18px 0 4px}
+.lede{color:var(--mut);font-size:15px;margin-bottom:24px}
+code{background:var(--chip);padding:1px 5px;border-radius:4px;font-size:.88em;
+ font-family:ui-monospace,"SF Mono",Menlo,monospace}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;
+ overflow-x:auto;font-size:12.5px;line-height:1.65;font-family:ui-monospace,"SF Mono",Menlo,monospace}
+pre.sm{font-size:11.5px;max-height:420px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:14px 0}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mut);font-weight:550;font-size:12.5px;text-transform:uppercase;letter-spacing:.02em}
+tbody tr:last-child td{border-bottom:none}
+.step{display:flex;gap:16px;margin:0 0 8px}
+.step .n{flex:0 0 34px;height:34px;border-radius:50%;background:var(--acc);color:#fff;
+ display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+@media(prefers-color-scheme:dark){.step .n{color:#111}}
+.step .b{flex:1;min-width:0}
+.wrap{border-top:1px solid var(--line);padding-top:22px;margin-top:26px}
+.wrap:first-of-type{border-top:none}
+.callout{border-left:3px solid var(--acc);background:var(--card);border-radius:0 10px 10px 0;
+ padding:12px 16px;margin:14px 0}
+.callout.w{border-left-color:var(--warn)}.callout.b{border-left-color:var(--bad)}
+.time{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;
+ background:var(--chip);color:var(--mut);margin-left:8px;vertical-align:2px}
+.opt{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:999px;
+ background:var(--chip);color:var(--acc);margin-left:8px;vertical-align:2px}
+ul,ol{margin:8px 0;padding-left:22px}li{margin:5px 0}
+.chk{list-style:none;padding-left:0}
+.chk li{padding-left:26px;position:relative}
+.chk li:before{content:"☐";position:absolute;left:4px;color:var(--mut)}
+.ok{color:var(--acc);font-weight:600}.no{color:var(--bad);font-weight:600}
+footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
+</style>
+
+<h1>คู่มือติดตั้ง — Trading Signal Agent</h1>
+<p class="lede">4 ขั้นตอนหลัก · ใช้เวลารวมประมาณ 12 นาที · ไม่มีค่าใช้จ่าย ·
+repo แบบ public + Cowork อ่านอัตโนมัติ (Discord เป็นตัวเสริม แยกไว้ท้ายเอกสาร)</p>
+
+<div class="callout">
+<b>ทำไมเปลี่ยนกลับมาเป็น public</b><br>
+รอบก่อนตั้งเป็น private เพื่อความเป็นส่วนตัว แต่ผลคือผม (Claude) อ่านไฟล์ผลสแกนไม่ได้เลย
+ต้องพึ่ง Discord อย่างเดียว ซึ่งเห็นผลช้าเพราะ v5.1 เทรดแค่ ~0.7-1 ครั้ง/เดือน<br>
+รอบนี้ตั้งเป็น <b>public</b> แทน — ผมอ่าน <code>signals.json</code> ได้ตรง ๆ ทุกครั้งที่สแกน
+แล้วสรุปเป็นภาษาคนส่งเข้าแชทให้ทันที <b>เห็นได้ว่าระบบทำงานจริงตั้งแต่รอบแรก</b>
+ไม่ต้องรอให้มีสัญญาณเทรดก่อน
+</div>
+<div class="callout w">
+<b>ข้อแลกเปลี่ยนที่ต้องรู้ก่อนตัดสินใจ:</b> public แปลว่าใครก็เห็น <code>data/state.json</code> ได้
+— มีไม้ที่เปิดอยู่ ราคาเข้า/ออก และกำไร-ขาดทุนสะสม (คำนวณจากพอร์ตสมมติ 100 USDT ใน config
+ไม่ใช่ยอดเงินจริงในบัญชี) ไม่มีชื่อ ไม่มีข้อมูลบัญชี แต่เป็นสถิติการเทรดของคุณที่เปิดให้ทุกคนดูได้<br>
+ถ้าไม่สบายใจเรื่องนี้ บอกได้ทุกเมื่อ แล้วกลับไปใช้แบบ private + Discord อย่างเดียวได้เหมือนเดิม
+</div>
+
+<div class="wrap"><div class="step"><div class="n">1</div><div class="b">
+<h2>สร้าง repo แบบ public <span class="time">2 นาที</span></h2>
+<ol>
+<li>ไปที่ <code>github.com/new</code></li>
+<li>Repository name: <code>agent-trade</code></li>
+<li>เลือก <b>Public</b></li>
+<li><b>อย่าติ๊ก</b> Add a README / .gitignore / license — โฟลเดอร์เรามีอยู่แล้ว
+ถ้าติ๊กจะชนกันตอน push</li>
+<li>กด <b>Create repository</b></li>
+</ol>
+</div></div></div>
+
+<div class="wrap"><div class="step"><div class="n">2</div><div class="b">
+<h2>Push ขึ้น GitHub <span class="time">3 นาที</span></h2>
+<p>เปิด Command Prompt หรือ PowerShell แล้วรันทีละบรรทัด:</p>
+<pre>cd /d "E:\agent tread\agent-trade"
+
+git init
+git add -A
+git commit -m "Trading signal agent v0.5"
+git branch -M main
+git remote add origin https://github.com/Naxyz23/agent-trade.git
+git push -u origin main</pre>
+<p>ครั้งแรกจะมีหน้าต่างให้ล็อกอิน GitHub ขึ้นมา ล็อกอินตามปกติ</p>
+<table>
+<thead><tr><th>ถ้าเจอ error นี้</th><th>แปลว่า / แก้ยังไง</th></tr></thead>
+<tbody>
+<tr><td><code>git is not recognized</code></td><td>ยังไม่ได้ติดตั้ง Git → โหลดจาก <code>git-scm.com</code> กด Next รวด ๆ แล้วเปิด Command Prompt ใหม่</td></tr>
+<tr><td><code>remote origin already exists</code></td><td>เคยรัน <code>git remote add</code> ไปแล้ว → ใช้ <code>git remote set-url origin https://github.com/Naxyz23/agent-trade.git</code> แทน</td></tr>
+<tr><td><code>failed to push some refs</code></td><td>repo ฝั่ง GitHub มีไฟล์อยู่แล้ว (เผลอติ๊ก README) → <code>git pull --rebase origin main</code> แล้ว push ใหม่</td></tr>
+<tr><td><code>Authentication failed</code></td><td>รหัสผ่านธรรมดาใช้ไม่ได้แล้ว → ต้องใช้ Personal Access Token หรือติดตั้ง GitHub CLI แล้ว <code>gh auth login</code></td></tr>
+</tbody>
+</table>
+</div></div></div>
+
+<div class="wrap"><div class="step"><div class="n">3</div><div class="b">
+<h2>รันครั้งแรกด้วยมือ <span class="time">4 นาที</span></h2>
+<ol>
+<li>เข้า repo บนเว็บ → แท็บ <b>Actions</b></li>
+<li>ถ้าขึ้นถามว่าจะเปิด workflow ไหม กด <b>I understand my workflows, go ahead and enable them</b></li>
+<li>เมนูซ้าย → <b>daily-signals</b> → ปุ่ม <b>Run workflow</b> (ขวามือ) → <b>Run workflow</b></li>
+<li>รอ 2-3 นาที แล้วกดเข้าไปดูใน job ที่ชื่อ <code>scan</code></li>
+</ol>
+<h3>สิ่งที่ต้องเห็น</h3>
+<table>
+<thead><tr><th>ขั้นตอน</th><th>ผลที่ถูกต้อง</th></tr></thead>
+<tbody>
+<tr><td>Self-test</td><td><code>22/22 passed</code> — ถ้าไม่ครบ อย่าเชื่อสัญญาณ ส่ง log มาให้ผมดู</td></tr>
+<tr><td>Run scanner</td><td><code>... from 21/21 assets</code> — ถ้าเลขหน้าน้อยกว่า 21 แปลว่ามีตัวดึงข้อมูลไม่ได้</td></tr>
+<tr><td>Commit results</td><td>มีไฟล์ <code>data/signals.json</code> โผล่ใน repo (เข้าไปดูในแท็บ <b>Code</b> ได้เลย)</td></tr>
+<tr><td>Notify Discord</td><td><code>DISCORD_WEBHOOK ไม่ได้ตั้งไว้ — ข้ามการแจ้งเตือน</code> — ปกติ เพราะยังไม่ได้ตั้ง secret (ดูส่วนเสริมท้ายเอกสารถ้าอยากเปิดใช้)</td></tr>
+</tbody>
+</table>
+<p>เช็คว่าไฟล์อ่านได้จริงจากข้างนอก โดยเปิดลิงก์นี้ในเบราว์เซอร์:</p>
+<pre>https://raw.githubusercontent.com/Naxyz23/agent-trade/main/data/signals.json</pre>
+<p>ถ้าเห็นตัวหนังสือ JSON เป็นก้อน ๆ (ไม่ใช่หน้า 404) แปลว่าพร้อมให้ผมอ่านได้แล้ว</p>
+</div></div></div>
+
+<div class="wrap"><div class="step"><div class="n">4</div><div class="b">
+<h2>บอกผมว่า push เสร็จแล้ว</h2>
+<p>กลับมาที่แชทนี้ พิมพ์ว่า "push เสร็จแล้ว" ผมจะ:</p>
+<ol>
+<li>ดึง <code>signals.json</code> มาดูจริง เพื่อยืนยันว่าอ่านได้</li>
+<li>ตั้ง Cowork scheduled task 2 รอบ (13:10 และ 04:10 น. ไทย ตรงกับที่ GitHub Actions สแกน)</li>
+<li>รอบแรกจะส่งสรุปเข้าแชทให้ดู <b>ไม่ว่าจะมีสัญญาณหรือไม่</b> — ช่วงทดสอบนี้อยากให้เห็นว่า
+ระบบทำงานทุกรอบจริง ๆ ก่อน แล้วค่อยปรับให้เงียบเฉพาะตอนไม่มีสัญญาณทีหลัง</li>
+</ol>
+</div></div></div>
+
+<h2 style="margin-top:44px">หลังติดตั้งเสร็จ — 2 สัปดาห์แรกควรทำอะไร</h2>
+<ul class="chk">
+<li><b>อย่าเพิ่งเทรดตาม</b> โดยเฉพาะหุ้น US 13 ตัวที่ยังไม่เคยผ่าน backtest ของ v5.1</li>
+<li>เปิด <code>signals.json</code> เทียบตัวเลข EMA20 / EMA200 / RSI14 กับ TradingView สัก 3-4 ตัว
+ถ้าตรงกัน แปลว่าชั้นข้อมูลเชื่อได้</li>
+<li>ดูว่าสัญญาณที่ออกมา ตรงกับที่คุณจะเข้าเองไหม ถ้าไม่ตรง จดไว้ว่าต่างตรงไหน</li>
+<li>เช็คว่า Action รันครบทุกวันไหม (แท็บ Actions จะมีจุดเขียวเรียงกัน)</li>
+<li>พอมั่นใจแล้ว บอกผมให้เปลี่ยนโหมดสรุปจาก "ส่งทุกรอบ" เป็น "ส่งเฉพาะมีสัญญาณ" —
+กัน brief รกแชทตอนไม่มีอะไรเกิดขึ้น</li>
+</ul>
+
+<h2 style="margin-top:36px">แก้ปัญหาที่พบบ่อย</h2>
+<table>
+<thead><tr><th>อาการ</th><th>สาเหตุ / วิธีแก้</th></tr></thead>
+<tbody>
+<tr><td>Action ขึ้นสีแดงตรง Self-test</td><td>โค้ดมีปัญหา — ส่ง log มาให้ผม อย่าเชื่อสัญญาณจาก run นั้น</td></tr>
+<tr><td>เปิดลิงก์ raw แล้วเจอ 404</td><td>ยังไม่ push หรือ workflow ยังไม่รันสำเร็จสักครั้ง → เช็คแท็บ Actions ก่อน</td></tr>
+<tr><td>สแกนได้ไม่ครบ 21 ตัว</td><td>yfinance ล่มชั่วคราว — ถ้าเป็นตัวเดิมซ้ำหลายวัน บอกผมจะเปลี่ยนไปใช้ Kraken แทน</td></tr>
+<tr><td>Action หยุดรันเอง</td><td>GitHub ปิด schedule ของ repo ที่ไม่มีความเคลื่อนไหว 60 วัน — เข้าไปกด Run workflow 1 ครั้งจะกลับมาทำงาน</td></tr>
+<tr><td>อยากเปลี่ยนเวลา</td><td>แก้ cron ใน <code>.github/workflows/daily.yml</code> · เวลาใน cron เป็น UTC เสมอ ไทย = UTC+7</td></tr>
+<tr><td>Cowork scheduled task ไม่ส่งอะไรมา</td><td>เช็คว่า repo ยัง public อยู่ไหม และ Action รันสำเร็จรอบล่าสุดหรือเปล่า</td></tr>
+</tbody>
+</table>
+
+<h2 style="margin-top:36px">ส่วนเสริม — เปิด Discord แจ้งเตือนด้วย <span class="opt">ไม่บังคับ</span></h2>
+<p>ระบบมี Discord notify เตรียมไว้ในโค้ดอยู่แล้ว (<code>engine/notify.py</code>) ถ้าอยากได้แจ้งเตือน
+เด้งเข้ามือถือทันทีที่มีสัญญาณ โดยไม่ต้องรอ Cowork เปิดแอป ทำตามนี้เพิ่มได้:</p>
+<ol>
+<li>เปิด Discord บนคอมพิวเตอร์ → สร้างเซิร์ฟเวอร์/ห้อง <code>signals</code> ถ้ายังไม่มี</li>
+<li>เฟือง (Edit Channel) → <b>Integrations</b> → <b>Webhooks</b> → <b>New Webhook</b> → <b>Copy Webhook URL</b></li>
+<li><b>อย่าวาง URL นี้ลงในแชทนี้</b> — ใครได้ไปก็โพสต์เข้าห้องคุณได้ ถ้าเผลอหลุดไปแล้ว
+กลับไปกด <b>Delete Webhook</b> สร้างใหม่ได้ทันที</li>
+<li>ทดสอบด้วย PowerShell (แทน URL ของจริงในบรรทัดแรก):
+<pre>$hook = "วาง_URL_ที่นี่"
+Invoke-RestMethod -Uri $hook -Method Post -ContentType "application/json" -Body '{"content":"test"}'</pre>
+เงียบ = สำเร็จ เช็คที่ห้อง Discord ว่ามีคำว่า <code>test</code> เด้งขึ้น</li>
+<li>เข้า repo → <b>Settings → Secrets and variables → Actions → New repository secret</b><br>
+Name: <code>DISCORD_WEBHOOK</code> (ตัวใหญ่ทั้งหมด ต้องตรงเป๊ะ) · Secret: วาง URL</li>
+<li>รัน workflow ใหม่ 1 ครั้ง — รอบต่อไปที่มีสัญญาณ entry/exit จะเด้งเข้า Discord ทันที
+(ค่าเริ่มต้นส่งเฉพาะวันที่มีสัญญาณจริง ปรับได้ที่ <code>notify.on_empty</code> ใน <code>watchlist.yml</code>)</li>
+</ol>
+
+<footer>
+เวอร์ชัน v0.5 · เครื่องยนต์ CNgoal v5.1 · เทสต์ 22/22 ผ่าน · repo: public + Cowork อ่านตรง<br>
+ระบบนี้ช่วยคัดกราฟ ไม่ได้ตัดสินใจแทน · เอกสารนี้เป็นคู่มือติดตั้งซอฟต์แวร์ ไม่ใช่คำแนะนำการลงทุน
+</footer>
+</html>
