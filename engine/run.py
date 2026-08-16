@@ -1,9 +1,18 @@
-"""Orchestrator — ดึงข้อมูล → คำนวณ → รัน CNgoal v5.1 → ติดตามไม้ที่เปิดอยู่ → signals.json
+"""Orchestrator — ดึงข้อมูล → คำนวณ → รัน CNgoal v5.1 → ติดตามไม้ที่เปิดอยู่ → signals_<group>.json
 
-รันที่ GitHub Actions:  python -m engine.run
+ทำไมแยกเป็น group (crypto / gold / stock)
+------------------------------------------
+เดิมสแกนทั้ง 21 ตัวรวมกันเป็นก้อนเดียว 2 รอบ/วัน ตามเวลาที่ประนีประนอมระหว่าง
+crypto/gold/stock — ผลคือหลายรอบสแกนซ้ำแท่ง Daily เดิมที่ยังไม่ปิดใหม่ (เปลืองและ
+ไม่ได้สัญญาณอะไรเพิ่ม) แยกเป็น 3 workflow ให้แต่ละสายรันแค่ตอนแท่งของมันปิดจริง
+ๆ ครั้งเดียว/วัน และมี state (ไม้ที่เปิดอยู่ + consecutive_losses) แยกกันเอง เพราะ
+ผลเทรดของ crypto ไม่ควรทำให้ agent หุ้นหยุดพักตาม — คนละพฤติกรรมตลาด
+
+รันที่ GitHub Actions:  python -m engine.run --group crypto|gold|stock
 """
 from __future__ import annotations
 
+import argparse
 import json
 import pathlib
 import sys
@@ -17,8 +26,18 @@ from . import fetch, indicators, rules
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DATA.mkdir(exist_ok=True)
-STATE_FILE = DATA / "state.json"
-OUT_FILE = DATA / "signals.json"
+
+# class ใน watchlist.yml -> group ที่ agent นี้รับผิดชอบ
+GROUP_CLASSES = {
+    "crypto": {"crypto"},
+    "gold": {"metal"},
+    "stock": {"stock", "context"},   # SPY/QQQ/DXY เป็นบริบทของหุ้น US เอาไว้ด้วยกัน
+}
+
+
+def assets_for_group(cfg: dict, group: str) -> list[dict]:
+    classes = GROUP_CLASSES[group]
+    return [a for a in cfg["assets"] if a.get("class") in classes]
 
 
 def json_safe(o):
@@ -33,9 +52,9 @@ def json_safe(o):
     raise TypeError(f"not JSON serializable: {type(o)}")
 
 
-def load_state() -> dict:
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
+def load_state(state_file: pathlib.Path) -> dict:
+    if state_file.exists():
+        return json.loads(state_file.read_text())
     return {"positions": {}, "closed": [], "consecutive_losses": 0}
 
 
@@ -47,17 +66,20 @@ def drop_unclosed_bar(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def main() -> int:
+def main(group: str) -> int:
     cfg = yaml.safe_load((ROOT / "watchlist.yml").read_text())
     risk_cfg = cfg.get("risk", {})
     filt = cfg.get("filters", {})
-    state = load_state()
+    assets = assets_for_group(cfg, group)
+    state_file = DATA / f"state_{group}.json"
+    out_file = DATA / f"signals_{group}.json"
+    state = load_state(state_file)
     positions: dict = state.setdefault("positions", {})
     equity = risk_cfg.get("equity_usdt")
 
     entries, exits, watches, snapshot, errors = [], [], [], [], []
 
-    for item in cfg["assets"]:
+    for item in assets:
         sym = item["symbol"]
         try:
             raw = fetch.load(item.get("fetch_symbol", sym), source=item.get("source", "yahoo"))
@@ -137,20 +159,24 @@ def main() -> int:
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "run_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "spec_version": rules.SPEC_VERSION,
-        "universe_size": len(cfg["assets"]),
+        "group": group,
+        "universe_size": len(assets),
         "signals": exits + entries + watches,     # ออกก่อน เข้าทีหลัง เฝ้าดูท้ายสุด
         "open_positions": [{"symbol": k, **v} for k, v in positions.items()],
         "halts": halts,
         "snapshot": snapshot,
         "errors": errors,
     }
-    OUT_FILE.write_text(json.dumps(out, ensure_ascii=False, indent=2, default=json_safe))
-    STATE_FILE.write_text(json.dumps(state, ensure_ascii=False, indent=2, default=json_safe))
-    print(f"{len(exits)} exits, {len(entries)} entries, {len(watches)} watches "
-          f"from {len(snapshot)}/{len(cfg['assets'])} assets"
+    out_file.write_text(json.dumps(out, ensure_ascii=False, indent=2, default=json_safe))
+    state_file.write_text(json.dumps(state, ensure_ascii=False, indent=2, default=json_safe))
+    print(f"[{group}] {len(exits)} exits, {len(entries)} entries, {len(watches)} watches "
+          f"from {len(snapshot)}/{len(assets)} assets"
           + (f", {len(errors)} errors" if errors else ""))
     return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--group", required=True, choices=sorted(GROUP_CLASSES))
+    args = ap.parse_args()
+    sys.exit(main(args.group))

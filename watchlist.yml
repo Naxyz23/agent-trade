@@ -40,14 +40,18 @@ assets:
   - { symbol: DXY, fetch_symbol: "DX-Y.NYB", class: context, name: "US Dollar Index", signals: false }
 
 # ---------------- Risk (ตรงกับ CNgoal v5.1 Machine Spec) ----------------
+# ทุน equity_usdt=100 ก้อนเดียวใช้ร่วมกันทั้ง 3 agent (crypto/gold/stock)
+# แต่ตอนนี้แต่ละ agent เก็บ state (ไม้เปิดอยู่, consecutive_losses) แยกกันเอง
+# ไม่รู้จักกัน — เพื่อคุม risk รวมให้เท่าเดิม (ไม่เกิน 3 ไม้ = 3% พร้อมกันทั้งพอร์ต)
+# จึงลด max_concurrent_positions ต่อ agent ลงเหลือ 1 (3 agent x 1 = 3 เท่าเดิม)
 risk:
   spec_version: "cngoal-5.1"
   pct_per_trade: 1.0          # ห้ามขึ้นเกินนี้ — risk sweep พบ maxDD ต่างกัน 5 เท่า
   default_leverage_cap: 5
   equity_usdt: 100            # ทุนโดยประมาณ ใช้แปลง % เป็นจำนวนเงินจริง
-  pause_after_losses: 3       # แพ้ติด 3 ไม้ → พัก 3 วัน
+  pause_after_losses: 3       # แพ้ติด 3 ไม้ (เฉพาะสายนั้น) → agent นั้นพัก 3 วัน
   halt_drawdown_pct: 15       # พอร์ตลดจาก peak 15% → หยุดทบทวนกฎ
-  max_concurrent_positions: 3 # risk รวมไม่เกิน 3% ในเวลาเดียวกัน
+  max_concurrent_positions: 1 # ต่อ agent — ดูคอมเมนต์ด้านบน
 
 filters:
   include_watch: true         # ส่งสัญญาณ watch (3/4 ข้อ, ผันผวน) ด้วยไหม

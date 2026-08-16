@@ -10,6 +10,7 @@ import pandas as pd
 from engine import indicators as ind
 from engine import rules
 from engine import notify
+from engine import run as engine_run
 
 WILDER = [44.34, 44.09, 44.15, 43.61, 44.33, 44.83, 45.10, 45.42, 45.84, 46.08,
           45.89, 46.03, 45.61, 46.28, 46.28, 46.00, 46.03, 46.41, 46.22, 45.64,
@@ -272,6 +273,46 @@ def test_trade_frequency_matches_cngoal_expectation():
     assert 0.3 <= rate <= 3.0, f"หลุดกรอบที่คาดไว้มาก: {rate:.2f}/เดือน"
 
 
+# ------------------------------------------------------ agent group split
+
+def test_group_split_covers_every_asset_exactly_once():
+    """แยก crypto/gold/stock ต้องครอบคลุมทุกตัวใน watchlist ครบ ไม่ซ้ำ ไม่ขาด"""
+    import yaml as _yaml
+    cfg = _yaml.safe_load((pathlib.Path(__file__).resolve().parent.parent
+                           / "watchlist.yml").read_text())
+    seen = []
+    for group in engine_run.GROUP_CLASSES:
+        seen += [a["symbol"] for a in engine_run.assets_for_group(cfg, group)]
+    all_symbols = [a["symbol"] for a in cfg["assets"]]
+    assert sorted(seen) == sorted(all_symbols), \
+        "ทุกตัวใน watchlist ต้องอยู่ใน group ใด group หนึ่งเท่านั้น ไม่ตกหล่นหรือซ้ำ"
+
+
+def test_crypto_group_is_only_crypto_class():
+    import yaml as _yaml
+    cfg = _yaml.safe_load((pathlib.Path(__file__).resolve().parent.parent
+                           / "watchlist.yml").read_text())
+    got = engine_run.assets_for_group(cfg, "crypto")
+    assert got and all(a["class"] == "crypto" for a in got)
+
+
+def test_gold_group_is_only_metal_class():
+    import yaml as _yaml
+    cfg = _yaml.safe_load((pathlib.Path(__file__).resolve().parent.parent
+                           / "watchlist.yml").read_text())
+    got = engine_run.assets_for_group(cfg, "gold")
+    assert got and all(a["class"] == "metal" for a in got)
+
+
+def test_stock_group_includes_context_symbols():
+    """SPY/QQQ/DXY (signals:false) ต้องอยู่กับ agent หุ้น ไม่ใช่ลอยไปกลุ่มอื่น"""
+    import yaml as _yaml
+    cfg = _yaml.safe_load((pathlib.Path(__file__).resolve().parent.parent
+                           / "watchlist.yml").read_text())
+    got = {a["symbol"] for a in engine_run.assets_for_group(cfg, "stock")}
+    assert {"SPY", "QQQ", "DXY"} <= got
+
+
 # ------------------------------------------------------------ discord notify
 
 def _payload_ok(pl):
@@ -341,14 +382,25 @@ def test_notify_respects_discord_limits_under_load():
     _payload_ok(pl)
 
 
-def test_notify_real_sample_file():
+def test_notify_handles_current_live_signals_shape():
+    """เช็คว่า schema จริงจาก engine.run ล่าสุด (ทุก group) เข้ากับ notify.py ได้ไม่ throw
+
+    ตั้งใจไม่ยืนยันว่าต้อง "มี entry/exit" เพราะวันส่วนใหญ่ควรว่างเปล่าโดยดีไซน์
+    (กัน alert fatigue) — เทสต์นี้จับแค่ schema mismatch ระหว่าง run.py กับ notify.py
+    """
     import json as _j
-    p = pathlib.Path(__file__).resolve().parent.parent / "data" / "signals.json"
-    pl = notify.build_payload(_j.loads(p.read_text()))
-    assert pl is not None, "ไฟล์ตัวอย่างมี entry/exit จึงต้องส่ง"
-    _payload_ok(pl)
-    print(f"    payload ตัวอย่าง {len(_j.dumps(pl, ensure_ascii=False))} bytes, "
-          f"{len(pl['embeds'])} embeds")
+    root = pathlib.Path(__file__).resolve().parent.parent
+    checked = 0
+    for group in engine_run.GROUP_CLASSES:
+        f = root / "data" / f"signals_{group}.json"
+        if not f.exists():
+            continue
+        data = _j.loads(f.read_text())
+        pl = notify.build_payload(data)   # ต้องไม่ throw ไม่ว่าจะมีสัญญาณหรือไม่
+        if pl is not None:
+            _payload_ok(pl)
+        checked += 1
+    print(f"    ตรวจ live signals_<group>.json ที่มีอยู่จริง {checked} ไฟล์")
 
 
 if __name__ == "__main__":

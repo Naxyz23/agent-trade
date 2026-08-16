@@ -143,9 +143,23 @@ def send(webhook: str, payload: dict, timeout: int = 20) -> int:
         return r.status
 
 
+GROUP_LABEL = {"crypto": "Crypto", "gold": "Gold", "stock": "US Stock"}
+
+
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--group", required=True, choices=sorted(GROUP_LABEL))
+    ap.add_argument("--dry-run", action="store_true")
+    args, _ = ap.parse_known_args()
+
     root = pathlib.Path(__file__).resolve().parent.parent
-    p = json.loads((root / "data" / "signals.json").read_text())
+    f = root / "data" / f"signals_{args.group}.json"
+    if not f.exists():
+        print(f"{f} ไม่มี — engine.run ยังไม่เคยรัน group นี้สำเร็จ ข้ามการแจ้งเตือน")
+        return 0
+    p = json.loads(f.read_text())
+    label = GROUP_LABEL[args.group]
 
     import yaml
     cfg = yaml.safe_load((root / "watchlist.yml").read_text()).get("notify", {}) or {}
@@ -155,10 +169,12 @@ def main() -> int:
         if not cfg.get("on_empty", False):
             print("no actionable signals — ไม่ส่ง (ตั้ง notify.on_empty: true ถ้าอยากได้ทุกวัน)")
             return 0
-        payload = {"content": f"**{p.get('run_date','')}** — ไม่มีสัญญาณเข้าเกณฑ์วันนี้",
+        payload = {"content": f"**[{label}] {p.get('run_date','')}** — ไม่มีสัญญาณเข้าเกณฑ์วันนี้",
                    "allowed_mentions": {"parse": []}, "username": "CNgoal Signals"}
+    else:
+        payload["content"] = f"[{label}] " + payload["content"]
 
-    if "--dry-run" in sys.argv:
+    if args.dry_run:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0
 
