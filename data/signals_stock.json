@@ -1,9 +1,11 @@
 {
-  "generated_at": "2026-08-16T15:51:02+00:00",
-  "run_date": "2026-08-16",
+  "generated_at": "2026-08-17T15:07:52+00:00",
+  "run_date": "2026-08-17",
   "spec_version": "cngoal-5.1",
+  "engine_version": "0.7",
   "group": "stock",
-  "universe_size": 16,
+  "universe_size": 13,
+  "context_size": 3,
   "signals": [
     {
       "symbol": "NVDA",
@@ -24,7 +26,7 @@
         "low": 224.5,
         "ema20": 213.5919,
         "ema50": 208.7591,
-        "ema200": 194.167,
+        "ema200": 194.1667,
         "rsi14": 63.0326,
         "atr14": 6.9264,
         "atr_pct": 3.0762,
@@ -80,7 +82,7 @@
         "low": 493.92,
         "ema20": 462.0211,
         "ema50": 431.3131,
-        "ema200": 429.3847,
+        "ema200": 429.382,
         "rsi14": 70.9156,
         "atr14": 13.803,
         "atr_pct": 2.7862,
@@ -136,7 +138,7 @@
         "low": 589.29,
         "ema20": 594.946,
         "ema50": 601.625,
-        "ema200": 625.622,
+        "ema200": 625.6128,
         "rsi14": 47.6188,
         "atr14": 21.623,
         "atr_pct": 3.6658,
@@ -192,7 +194,7 @@
         "low": 483.2,
         "ema20": 494.1066,
         "ema50": 486.9065,
-        "ema200": 358.1503,
+        "ema200": 358.1465,
         "rsi14": 53.7333,
         "atr14": 32.3549,
         "atr_pct": 6.29,
@@ -304,7 +306,7 @@
         "low": 361.45,
         "ema20": 354.57,
         "ema50": 341.3423,
-        "ema200": 315.3908,
+        "ema200": 315.3896,
         "rsi14": 65.1598,
         "atr14": 6.3347,
         "atr_pct": 1.7459,
@@ -343,7 +345,153 @@
     }
   ],
   "open_positions": [],
+  "portfolio": {
+    "equity": 100.0,
+    "peak": 100.0,
+    "drawdown_pct": 0.0,
+    "halted": false,
+    "risk_pct_per_trade": 1.0
+  },
+  "risk_state": {
+    "consecutive_losses": 0,
+    "paused_until": null
+  },
   "halts": [],
+  "events": [],
+  "data_health": {
+    "oldest_bar_age_days": 3,
+    "stale_symbols": [],
+    "per_symbol": [
+      {
+        "symbol": "NVDA",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "MSFT",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "AAPL",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "GOOG",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "META",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "AMD",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "TSM",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "TSLA",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "ORCL",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "NFLX",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "JPM",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "LLY",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "WMT",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "SPY",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "QQQ",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "DXY",
+        "source": "yahoo",
+        "bar_date": "2026-08-14",
+        "bar_age_days": 3,
+        "max_age_days": 5,
+        "stale": false
+      }
+    ]
+  },
   "snapshot": [
     {
       "symbol": "NVDA",
@@ -357,7 +505,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "MSFT",
@@ -371,7 +522,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "AAPL",
@@ -385,7 +539,10 @@
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "GOOG",
@@ -399,7 +556,10 @@
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "META",
@@ -413,7 +573,10 @@
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "AMD",
@@ -427,7 +590,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "TSM",
@@ -441,7 +607,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "TSLA",
@@ -455,7 +624,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "ORCL",
@@ -469,7 +641,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "NFLX",
@@ -483,7 +658,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "JPM",
@@ -497,7 +675,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "LLY",
@@ -511,7 +692,10 @@
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "WMT",
@@ -525,7 +709,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "SPY",
@@ -539,7 +726,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "QQQ",
@@ -553,7 +743,10 @@
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     },
     {
       "symbol": "DXY",
@@ -567,7 +760,10 @@
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14"
+      "bar_date": "2026-08-14",
+      "bar_age_days": 3,
+      "source": "yahoo",
+      "stale": false
     }
   ],
   "errors": []

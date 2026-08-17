@@ -1,5 +1,7 @@
 {
   "positions": {},
   "closed": [],
-  "consecutive_losses": 0
+  "consecutive_losses": 0,
+  "paused_until": null,
+  "version": 3
 }
