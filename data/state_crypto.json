@@ -1,5 +1,18 @@
 {
-  "positions": {},
+  "positions": {
+    "BTC": {
+      "side": "short",
+      "entry": 62819.1,
+      "stop": 64360.5752,
+      "size": 40.75,
+      "risk_amount": 1.0,
+      "sl_distance_pct": 2.454,
+      "opened": "2026-08-16",
+      "price_basis": "close_of_signal_bar"
+    }
+  },
   "closed": [],
-  "consecutive_losses": 0
+  "consecutive_losses": 0,
+  "paused_until": null,
+  "version": 3
 }
