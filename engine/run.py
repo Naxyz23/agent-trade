@@ -1,12 +1,20 @@
-"""Orchestrator — ดึงข้อมูล → คำนวณ → รัน CNgoal v5.1 → ติดตามไม้ที่เปิดอยู่ → signals_<group>.json
+"""Orchestrator — ดึงข้อมูล → คำนวณ → รัน CNgoal v5.1 → ติดตามไม้ → signals_<group>.json
 
 ทำไมแยกเป็น group (crypto / gold / stock)
 ------------------------------------------
 เดิมสแกนทั้ง 21 ตัวรวมกันเป็นก้อนเดียว 2 รอบ/วัน ตามเวลาที่ประนีประนอมระหว่าง
-crypto/gold/stock — ผลคือหลายรอบสแกนซ้ำแท่ง Daily เดิมที่ยังไม่ปิดใหม่ (เปลืองและ
-ไม่ได้สัญญาณอะไรเพิ่ม) แยกเป็น 3 workflow ให้แต่ละสายรันแค่ตอนแท่งของมันปิดจริง
-ๆ ครั้งเดียว/วัน และมี state (ไม้ที่เปิดอยู่ + consecutive_losses) แยกกันเอง เพราะ
-ผลเทรดของ crypto ไม่ควรทำให้ agent หุ้นหยุดพักตาม — คนละพฤติกรรมตลาด
+crypto/gold/stock — ผลคือหลายรอบสแกนซ้ำแท่ง Daily เดิมที่ยังไม่ปิดใหม่ แยกเป็น 3
+workflow ให้แต่ละสายรันแค่ตอนแท่งของมันปิดจริง ๆ ครั้งเดียว/วัน
+
+สิ่งที่ v0.6 แก้
+----------------
+* halt/pause บล็อกการเปิดไม้ได้จริง ไม่ใช่แค่ข้อความ (ของเดิมเขียน position ต่อ
+  ทั้งที่ halts ไม่ว่าง) — สัญญาณที่ถูกบล็อกจะกลายเป็น kind "blocked" ไม่ใช่หายเงียบ
+* equity เดินตามผลเทรดจริง (compounding) และเช็ค drawdown 15% ตาม v5.1
+* เช็ค "ความสดของกราฟ" ไม่ใช่แค่เวลาที่รัน — ข้อมูลเก่าเกินเกณฑ์จะไม่ออกสัญญาณ
+
+v0.7: กลับเป็นโหมด auto — สัญญาณที่ผ่าน risk gate จะถูกนับเป็นไม้ทันที
+ไม่ต้องยืนยันใน manual.json แล้ว (เหลือไว้แค่ sync ยอดพอร์ตกับปลดล็อก halt)
 
 รันที่ GitHub Actions:  python -m engine.run --group crypto|gold|stock
 """
@@ -21,11 +29,14 @@ from datetime import datetime, timezone
 import pandas as pd
 import yaml
 
-from . import fetch, indicators, rules
+from . import fetch, indicators, portfolio, rules
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
 DATA.mkdir(exist_ok=True)
+
+MANUAL_FILE = DATA / "manual.json"
+PORTFOLIO_FILE = DATA / "portfolio.json"
 
 # class ใน watchlist.yml -> group ที่ agent นี้รับผิดชอบ
 GROUP_CLASSES = {
@@ -33,6 +44,10 @@ GROUP_CLASSES = {
     "gold": {"metal"},
     "stock": {"stock", "context"},   # SPY/QQQ/DXY เป็นบริบทของหุ้น US เอาไว้ด้วยกัน
 }
+
+# กราฟเก่าได้กี่วันถึงยังเชื่อถือได้ — crypto เทรด 7 วัน/สัปดาห์ จึงเข้มกว่า
+# หุ้น/ทองมีเสาร์อาทิตย์ + วันหยุดตลาด ต้องเผื่อ (จันทร์เช้าจะเห็นแท่งวันศุกร์ = 3 วัน)
+DEFAULT_MAX_AGE = {"crypto": 2, "metal": 5, "stock": 5, "context": 5}
 
 
 def assets_for_group(cfg: dict, group: str) -> list[dict]:
@@ -52,38 +67,55 @@ def json_safe(o):
     raise TypeError(f"not JSON serializable: {type(o)}")
 
 
-def load_state(state_file: pathlib.Path) -> dict:
-    if state_file.exists():
-        return json.loads(state_file.read_text())
-    return {"positions": {}, "closed": [], "consecutive_losses": 0}
-
-
-def drop_unclosed_bar(df: pd.DataFrame) -> pd.DataFrame:
+def drop_unclosed_bar(df: pd.DataFrame, now: datetime | None = None) -> pd.DataFrame:
     """cngoal v5.1: ตัดสินที่แท่ง Daily ที่ปิดแล้วเท่านั้น ห้ามใช้แท่งวันนี้ที่ยังวิ่งอยู่"""
-    today = pd.Timestamp(datetime.now(timezone.utc).date())
-    if len(df) and df.index[-1] >= today:
+    now = now or datetime.now(timezone.utc)
+    today = pd.Timestamp(now.date())
+    if len(df) and pd.Timestamp(df.index[-1]).normalize() >= today:
         return df.iloc[:-1]
     return df
 
 
-def main(group: str) -> int:
-    cfg = yaml.safe_load((ROOT / "watchlist.yml").read_text())
+def main(group: str, now: datetime | None = None) -> int:
+    now = now or datetime.now(timezone.utc)
+    today = now.date()
+
+    cfg = yaml.safe_load((ROOT / "watchlist.yml").read_text(encoding="utf-8"))
     risk_cfg = cfg.get("risk", {})
     filt = cfg.get("filters", {})
     assets = assets_for_group(cfg, group)
+    symbols = {a["symbol"] for a in assets}
+
+    risk_pct = float(risk_cfg.get("pct_per_trade", rules.RISK_PCT))
+    max_positions = int(risk_cfg.get("max_concurrent_positions", 1))
+    pause_after = int(risk_cfg.get("pause_after_losses", 3))
+    pause_days = int(risk_cfg.get("pause_days", 3))
+    dd_limit = float(risk_cfg.get("halt_drawdown_pct", 15))
+    gap_guard = float(risk_cfg.get("max_gap_loss_r", 5))
+
     state_file = DATA / f"state_{group}.json"
     out_file = DATA / f"signals_{group}.json"
-    state = load_state(state_file)
-    positions: dict = state.setdefault("positions", {})
-    equity = risk_cfg.get("equity_usdt")
+    state = portfolio.migrate_state(
+        portfolio.load_json(state_file, portfolio.default_state()))
+    pf = portfolio.load_json(
+        PORTFOLIO_FILE, portfolio.default_portfolio(risk_cfg.get("equity_usdt", 100)))
+    manual = portfolio.load_json(MANUAL_FILE, portfolio.MANUAL_TEMPLATE)
 
-    entries, exits, watches, snapshot, errors = [], [], [], [], []
+    events: list[str] = []
+
+    # 1) รับคำสั่งด้วยมือ (sync ยอดพอร์ต / ปลดล็อก halt) ก่อนเสมอ
+    notes, manual_touched = portfolio.apply_manual(state, pf, manual, symbols, today)
+    events += notes
+
+    entries, exits, watches, snapshot, errors, data_health = [], [], [], [], [], []
 
     for item in assets:
         sym = item["symbol"]
+        max_age = int(item.get("max_bar_age_days",
+                               DEFAULT_MAX_AGE.get(item.get("class"), 5)))
         try:
-            raw = fetch.load(item.get("fetch_symbol", sym), source=item.get("source", "yahoo"))
-            df = drop_unclosed_bar(indicators.enrich(raw))
+            raw, meta = fetch.load_best(item, max_age_days=max_age, now=now)
+            df = drop_unclosed_bar(indicators.enrich(raw), now)
         except Exception as e:
             errors.append({"symbol": sym, "error": str(e)[:200]})
             continue
@@ -92,7 +124,11 @@ def main(group: str) -> int:
             continue
 
         last = df.iloc[-1]
-        bar_date = str(df.index[-1].date())
+        bar_date = str(pd.Timestamp(df.index[-1]).date())
+        age = fetch.bar_age_days(df, now)
+        stale = age > max_age
+        data_health.append({"symbol": sym, "source": meta["source"], "bar_date": bar_date,
+                            "bar_age_days": age, "max_age_days": max_age, "stale": stale})
 
         def num(v):
             return None if v != v else round(float(v), 2)
@@ -104,19 +140,28 @@ def main(group: str) -> int:
             "rsi14": num(last["rsi14"]), "regime": rules._regime(last),
             "above_ema20": bool(last["close"] > last["ema20"]),
             "candle": rules._candle_name(last),
-            "in_position": sym in positions, "bar_date": bar_date,
+            "in_position": sym in state["positions"],
+            "bar_date": bar_date, "bar_age_days": age, "source": meta["source"],
+            "stale": stale,
         })
 
+        if stale:
+            # ข้อมูลเก่าเกินไป → ห้ามออกสัญญาณ ดีกว่าออกสัญญาณจากกราฟที่ตกยุค
+            errors.append({"symbol": sym, "error": f"ข้อมูลเก่า {age} วัน "
+                                                   f"(เกิน {max_age}) — ข้ามการออกสัญญาณ",
+                           "kind": "stale"})
+            continue
         if item.get("signals") is False:
             continue
 
-        pos = positions.get(sym)
+        pos = state["positions"].get(sym)
         sigs = rules.evaluate(
             sym, df,
             leverage_cap=item.get("leverage_cap", risk_cfg.get("default_leverage_cap", 5)),
-            equity=equity, position=pos,
+            equity=pf.get("equity"), position=pos,
             include_watch=filt.get("include_watch", True),
             long_only=item.get("long_only", False),
+            risk_pct=risk_pct,
         )
 
         for sig in sigs:
@@ -125,24 +170,27 @@ def main(group: str) -> int:
             d["asset_class"] = item.get("class", "other")
 
             if sig.kind == "exit":
-                pnl = d["levels"]["pnl_pct_net"]
-                state.setdefault("closed", []).append(
-                    {"symbol": sym, "closed": bar_date, "pnl_pct_net": pnl, **pos})
-                state["consecutive_losses"] = (
-                    state.get("consecutive_losses", 0) + 1 if pnl < 0 else 0)
-                positions.pop(sym, None)
+                events += portfolio.close_position(
+                    state, pf, sym, pos, float(d["levels"]["exit"]), bar_date,
+                    d["levels"]["reason"], today,
+                    fee_pct=rules.TAKER_FEE_PCT, slippage_pct=rules.SLIPPAGE_PCT,
+                    pause_after=pause_after, pause_days=pause_days,
+                    max_gap_loss_r=gap_guard)
+                portfolio.check_drawdown_halt(pf, dd_limit)
                 exits.append(d)
 
             elif sig.kind == "entry":
-                if len(positions) >= risk_cfg.get("max_concurrent_positions", 3):
-                    d["kind"] = "watch"
-                    d["reasons"].append(
-                        f"⚠ มีไม้เปิดอยู่ {len(positions)} ไม้แล้ว (เพดาน "
-                        f"{risk_cfg.get('max_concurrent_positions', 3)}) → ยังไม่เปิดเพิ่ม")
+                blockers = portfolio.entry_blockers(state, pf, today, max_positions)
+                if blockers:
+                    d["kind"] = "blocked"
+                    d["reasons"] += [f"⛔ ไม่เปิดไม้: {b}" for b in blockers]
                     watches.append(d)
                     continue
-                positions[sym] = {"side": sig.direction, "entry": d["levels"]["entry"],
-                                  "stop": d["levels"]["stop"], "opened": bar_date}
+                portfolio.open_position(state, sym, d, bar_date)
+                d["reasons"].append(
+                    f"📌 ระบบบันทึกเป็นไม้เปิดแล้ว (size {d['levels'].get('position_size')} · "
+                    f"เสี่ยง {d['levels'].get('risk_amount')} USDT) — จะติดตาม SL/EMA20 ให้อัตโนมัติ "
+                    f"ราคานี้อิงราคาปิดของแท่งที่ให้สัญญาณ ของจริงอาจต่างเล็กน้อย")
                 entries.append(d)
             else:
                 watches.append(d)
@@ -151,27 +199,54 @@ def main(group: str) -> int:
     watches = watches[: filt.get("max_watch_per_run", 6)]
 
     halts = []
-    if state.get("consecutive_losses", 0) >= risk_cfg.get("pause_after_losses", 3):
-        halts.append(f"แพ้ติดกัน {state['consecutive_losses']} ไม้ → กฎ v5.1 บอกให้พัก 3 วัน "
-                     f"และทบทวน setup ก่อนเข้าไม้ใหม่")
+    if pf.get("halted"):
+        halts.append(pf.get("halt_reason"))
+    if portfolio.is_paused(state, today):
+        halts.append(f"อยู่ในช่วงพักหลังแพ้ติดกัน {pause_after} ไม้ — "
+                     f"กลับมาเทรดได้ {state['paused_until']}")
+    stale_syms = [d["symbol"] for d in data_health if d["stale"]]
+    if stale_syms:
+        halts.append(f"ข้อมูลเก่าเกินเกณฑ์ ไม่ออกสัญญาณให้: {', '.join(stale_syms)}")
 
     out = {
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "run_date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "generated_at": now.isoformat(timespec="seconds"),
+        "run_date": now.strftime("%Y-%m-%d"),
         "spec_version": rules.SPEC_VERSION,
+        "engine_version": "0.7",
         "group": group,
-        "universe_size": len(assets),
+        "universe_size": len([a for a in assets if a.get("signals") is not False]),
+        "context_size": len([a for a in assets if a.get("signals") is False]),
         "signals": exits + entries + watches,     # ออกก่อน เข้าทีหลัง เฝ้าดูท้ายสุด
-        "open_positions": [{"symbol": k, **v} for k, v in positions.items()],
+        "open_positions": [{"symbol": k, **v} for k, v in state["positions"].items()],
+        "portfolio": {"equity": pf.get("equity"), "peak": pf.get("peak"),
+                      "drawdown_pct": round(portfolio.drawdown_pct(pf), 2),
+                      "halted": bool(pf.get("halted")),
+                      "risk_pct_per_trade": risk_pct},
+        "risk_state": {"consecutive_losses": state.get("consecutive_losses", 0),
+                       "paused_until": state.get("paused_until")},
         "halts": halts,
+        "events": events,
+        "data_health": {"oldest_bar_age_days": max([d["bar_age_days"] for d in data_health],
+                                                   default=None),
+                        "stale_symbols": stale_syms, "per_symbol": data_health},
         "snapshot": snapshot,
         "errors": errors,
     }
-    out_file.write_text(json.dumps(out, ensure_ascii=False, indent=2, default=json_safe))
-    state_file.write_text(json.dumps(state, ensure_ascii=False, indent=2, default=json_safe))
+    portfolio.save_json(out_file, out, default=json_safe)
+    portfolio.save_json(state_file, state, default=json_safe)
+    portfolio.save_json(PORTFOLIO_FILE, pf, default=json_safe)
+    if manual_touched or not MANUAL_FILE.exists():
+        merged = {**portfolio.MANUAL_TEMPLATE, **manual}
+        merged["_readme"] = portfolio.MANUAL_TEMPLATE["_readme"]
+        portfolio.save_json(MANUAL_FILE, merged, default=json_safe)
+
     print(f"[{group}] {len(exits)} exits, {len(entries)} entries, {len(watches)} watches "
           f"from {len(snapshot)}/{len(assets)} assets"
-          + (f", {len(errors)} errors" if errors else ""))
+          + (f", {len(errors)} errors" if errors else "")
+          + (f", stale: {','.join(stale_syms)}" if stale_syms else "")
+          + f" | equity {pf.get('equity')} (DD {portfolio.drawdown_pct(pf):.1f}%)")
+    for e in events:
+        print(f"  · {e}")
     return 0
 
 

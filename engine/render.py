@@ -8,6 +8,7 @@ import sys
 KIND = {
     "exit":  ("#b91c1c", "#fee2e2", "ปิดไม้"),
     "entry": ("#0f766e", "#ccfbf1", "เข้าไม้"),
+    "blocked": ("#92400e", "#fef3c7", "ถูกบล็อก"),
     "watch": ("#6b6b68", "#f2f1ee", "เฝ้าดู"),
 }
 
@@ -98,10 +99,24 @@ def render(p: dict) -> str:
     for h in p.get("halts", []):
         out.append(f"<div class=halt>⚠ {h}</div>")
 
-    for kind, title in [("exit", "ต้องปิดไม้"), ("entry", "สัญญาณเข้า"), ("watch", "เฝ้าดู")]:
+    for kind, title in [("exit", "ต้องปิดไม้"),
+                        ("entry", "สัญญาณเข้า"),
+                        ("blocked", "เข้าเงื่อนไขครบ แต่กฎ risk บล็อกไว้"),
+                        ("watch", "เฝ้าดู")]:
         items = by(kind)
         if items:
             out.append(f"<h2>{title}</h2>" + "".join(_sig_card(s) for s in items))
+
+    pfo = p.get("portfolio") or {}
+    if pfo:
+        out.append("<h2>สถานะพอร์ต</h2><table>"
+                   "<tr><th>ยอดปัจจุบัน</th><th>จุดสูงสุด</th><th>Drawdown</th>"
+                   "<th>Risk/ไม้</th><th>สถานะ</th></tr>"
+                   f"<tr><td>{(pfo.get('equity') or 0):,.2f}</td>"
+                   f"<td>{(pfo.get('peak') or 0):,.2f}</td>"
+                   f"<td>{pfo.get('drawdown_pct', 0):.2f}%</td>"
+                   f"<td>{pfo.get('risk_pct_per_trade', 1)}%</td>"
+                   f"<td>{'🛑 halted' if pfo.get('halted') else 'ปกติ'}</td></tr></table>")
 
     if not sigs:
         out.append("<div class=card>ไม่มีอะไรต้องทำวันนี้ — ไม่มีสินทรัพย์ตัวไหนเข้าเงื่อนไขครบ 4 ข้อ</div>")

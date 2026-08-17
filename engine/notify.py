@@ -28,7 +28,8 @@ MAX_TOTAL = 6000
 
 COLOR = {
     "exit":  0xB91C1C,   # แดง — ต้องทำอะไรบางอย่างกับไม้ที่ถืออยู่
-    "entry": 0x0F766E,   # เขียว — โอกาสใหม่
+    "entry": 0x0F766E,   # เขียว — เปิดไม้ใหม่
+    "blocked": 0x92400E, # ส้มเข้ม — เข้าเงื่อนไขครบ แต่กฎ risk ห้ามเปิดไม้
     "watch": 0x6B7280,   # เทา — แค่ให้รู้
     "halt":  0xDC2626,
 }
@@ -97,7 +98,8 @@ def signal_embed(s: dict) -> dict:
 def build_payload(p: dict) -> dict | None:
     """คืน None ถ้าไม่มีอะไรควรส่ง"""
     sigs = p.get("signals", [])
-    actionable = [s for s in sigs if s["kind"] in ("entry", "exit")]
+    # v0.6: "blocked" = เข้าเงื่อนไขครบแต่กฎ risk ห้ามเปิด — ต้องบอก ไม่ใช่เงียบ
+    actionable = [s for s in sigs if s["kind"] in ("entry", "exit", "blocked")]
     halts = p.get("halts", [])
     errors = p.get("errors", [])
 
@@ -106,7 +108,9 @@ def build_payload(p: dict) -> dict | None:
 
     n_e = sum(1 for s in actionable if s["kind"] == "entry")
     n_x = sum(1 for s in actionable if s["kind"] == "exit")
-    head = f"**Signal Brief {p.get('run_date','')}** — เข้า {n_e} · ออก {n_x}"
+    n_b = sum(1 for s in actionable if s["kind"] == "blocked")
+    head = (f"**Signal Brief {p.get('run_date','')}** — เข้า {n_e} · ออก {n_x}"
+            + (f" · ถูกบล็อก {n_b}" if n_b else ""))
     if halts:
         head = "🛑 " + head
 
@@ -115,7 +119,8 @@ def build_payload(p: dict) -> dict | None:
         embeds.append({"title": "หยุดเทรด", "description": _clip(h, MAX_DESC),
                        "color": COLOR["halt"]})
     # ออกก่อนเข้า — รักษาเงินต้นสำคัญกว่าหาไม้ใหม่
-    for s in sorted(actionable, key=lambda x: 0 if x["kind"] == "exit" else 1):
+    order = {"exit": 0, "entry": 1, "blocked": 2}
+    for s in sorted(actionable, key=lambda x: order.get(x["kind"], 3)):
         embeds.append(signal_embed(s))
     if errors:
         embeds.append({

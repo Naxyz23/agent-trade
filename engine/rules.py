@@ -68,15 +68,20 @@ def _candle_name(r: pd.Series) -> str:
     return "-"
 
 
-def _sizing(entry: float, stop: float, leverage_cap: float, equity: float | None) -> dict:
+def _sizing(entry: float, stop: float, leverage_cap: float, equity: float | None,
+            risk_pct: float = RISK_PCT) -> dict:
     """สูตร position size ของ cngoal v5.1
 
-    Risk     = equity x 1%
+    Risk     = equity x risk_pct%   (v5.1 = 1% และ compounding จาก equity ปัจจุบัน)
     Position = Risk / SL%
     Position = min(Position, equity x leverage_cap)
+
+    v0.6: risk_pct รับจาก watchlist.yml (`risk.pct_per_trade`) แทนที่จะ hardcode
+    ของเดิมแก้ yml แล้วไม่มีผลอะไรเลย เพราะโค้ดใช้ค่าคงที่ในโมดูล
     """
     sl_pct = abs(entry - stop) / entry * 100
     out = {
+        "risk_pct": risk_pct,
         "entry": round(entry, 4),
         "stop": round(stop, 4),
         "sl_distance_pct": round(sl_pct, 3),
@@ -85,11 +90,11 @@ def _sizing(entry: float, stop: float, leverage_cap: float, equity: float | None
         "round_trip_cost_pct": round(2 * TAKER_FEE_PCT + 2 * SLIPPAGE_PCT, 3),
     }
     # ถ้าไม่บอกขนาดพอร์ต ให้ตอบเป็น % ของพอร์ตแทนจำนวนเงิน
-    pos_pct = RISK_PCT / sl_pct * 100 if sl_pct > 0 else 0.0
+    pos_pct = risk_pct / sl_pct * 100 if sl_pct > 0 else 0.0
     out["position_pct_of_equity"] = round(min(pos_pct, leverage_cap * 100), 1)
     out["capped_by_leverage"] = bool(pos_pct > leverage_cap * 100)
     if equity:
-        risk_amt = equity * RISK_PCT / 100
+        risk_amt = equity * risk_pct / 100
         pos = min(risk_amt / (sl_pct / 100), equity * leverage_cap)
         out["risk_amount"] = round(risk_amt, 2)
         out["position_size"] = round(pos, 2)
@@ -114,7 +119,8 @@ def _evidence(r: pd.Series) -> dict:
 # --------------------------------------------------- CNgoal v5.1 entry rules
 
 def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
-                 equity: float | None = None, long_only: bool = False) -> Signal | None:
+                 equity: float | None = None, long_only: bool = False,
+                 risk_pct: float = RISK_PCT) -> Signal | None:
     """4 เงื่อนไข ทุกข้อต้องผ่าน — ข้อใดไม่ผ่านคือไม่เข้า ไม่มีข้อยกเว้น
 
     ตัดสินที่แท่ง Daily ที่ปิดแล้วเท่านั้น (run.py ตัดแท่งที่ยังไม่ปิดออกก่อนเรียก)
@@ -168,7 +174,7 @@ def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
                            "sl_distance_pct": round(sl_pct, 3)},
                           _evidence(r), checks)
 
-        lv = _sizing(px, stop, leverage_cap, equity)
+        lv = _sizing(px, stop, leverage_cap, equity, risk_pct)
         lv["stop_source"] = src
         reasons = [
             f"ครบทั้ง 4 เงื่อนไข CNgoal v5.1 ฝั่ง {side.upper()}",
@@ -188,31 +194,60 @@ def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
 def cngoal_exit(sym: str, df: pd.DataFrame, position: dict) -> Signal | None:
     """Exit = trail EMA20 บน Daily — ไม่มีเงื่อนไข 'เฉพาะตอนกำไร'
 
-    position = {"side","entry","stop","opened"} ที่ run.py เก็บไว้ใน state.json
+    position = {"side","entry","stop","opened"} ที่ run.py เก็บไว้ใน state_<group>.json
+
+    v0.6 แก้ 2 บั๊กที่ทำให้ state ไม่ตรงกับพอร์ตจริง
+    ------------------------------------------------
+    1) ของเดิมเช็ค SL ด้วย "ราคาปิด" (close <= stop) — แต่ SL order จริงบนกระดาน
+       ทำงานทันทีที่ "ไส้" ลงไปแตะ ถ้าวันนั้นไส้หลุด SL แล้วเด้งกลับมาปิดเหนือ SL
+       ระบบจะบอกว่ายังถืออยู่ ทั้งที่โดนตัดไปแล้วจริง → ใช้ low/high แทน
+    2) ของเดิมคิด P&L ตอนชน SL จากราคาปิด ทำให้ตัวเลขขาดทุนผิด (และไปเพี้ยนต่อ
+       ที่ consecutive_losses) → ตอนนี้ออกที่ราคา stop จริง และถ้าเปิดมา gap
+       ข้าม SL ไปแล้ว ให้ใช้ราคาเปิดซึ่งคือราคาที่ได้จริง (ฝั่งที่แย่กว่า)
     """
     r = df.iloc[-1]
     side = position["side"]
     entry = float(position["entry"])
-    px = float(r["close"])
-    pnl_pct = (px / entry - 1) * 100 * (1 if side == "long" else -1)
+    stop = float(position["stop"])
+    close = float(r["close"])
+    is_long = side == "long"
 
-    hit_stop = (px <= position["stop"]) if side == "long" else (px >= position["stop"])
-    cross = (px < r["ema20"]) if side == "long" else (px > r["ema20"])
+    hit_stop = (float(r["low"]) <= stop) if is_long else (float(r["high"]) >= stop)
+    cross = (close < r["ema20"]) if is_long else (close > r["ema20"])
     if not (hit_stop or cross):
         return None
 
-    why = ("ชน SL" if hit_stop else
-           f"ปิด {'ต่ำกว่า' if side == 'long' else 'สูงกว่า'} EMA20 ({r['ema20']:.4g})")
+    if hit_stop:
+        o = float(r["open"])
+        gapped = (o < stop) if is_long else (o > stop)
+        px = o if gapped else stop
+        why = "ชน SL (เปิด gap ข้าม SL — ได้ราคาเปิดจริง)" if gapped else "ชน SL"
+        reason_code = "stop_gap" if gapped else "stop"
+    else:
+        px = close
+        why = f"ปิด {'ต่ำกว่า' if is_long else 'สูงกว่า'} EMA20 ({r['ema20']:.4g})"
+        reason_code = "ema20_cross"
+
+    pnl_pct = (px / entry - 1) * 100 * (1 if is_long else -1)
     reasons = [
         f"ปิดไม้ {side.upper()} — {why}",
-        f"เข้าที่ {entry:.4g} เมื่อ {position['opened']} · ปัจจุบัน {px:.4g} → {pnl_pct:+.2f}% ก่อนค่าธรรมเนียม",
+        f"เข้าที่ {entry:.4g} เมื่อ {position['opened']} · ออกที่ {px:.4g} "
+        f"→ {pnl_pct:+.2f}% ก่อนค่าธรรมเนียม",
         "กฎ v5.1 ปิดทั้งตอนกำไรและตอนขาดทุน — ไม่มีเงื่อนไข 'เฉพาะตอนกำไร'",
     ]
+    if hit_stop and close > stop and is_long:
+        reasons.append(f"⚠ ไส้ล่างหลุด SL ({r['low']:.4g}) แล้วเด้งกลับปิดที่ {close:.4g} "
+                       f"— SL order บนกระดานตัดไปแล้ว ระบบจึงถือว่าไม้นี้ปิด")
+    if hit_stop and close < stop and not is_long:
+        reasons.append(f"⚠ ไส้บนหลุด SL ({r['high']:.4g}) แล้วย่อกลับปิดที่ {close:.4g} "
+                       f"— SL order บนกระดานตัดไปแล้ว ระบบจึงถือว่าไม้นี้ปิด")
+
     return Signal(sym, "cngoal_exit", "exit", side, 95, px, reasons,
                   {"entry": round(entry, 4), "exit": round(px, 4),
+                   "stop": round(stop, 4), "close": round(close, 4),
                    "pnl_pct_gross": round(pnl_pct, 2),
                    "pnl_pct_net": round(pnl_pct - 2 * TAKER_FEE_PCT - 2 * SLIPPAGE_PCT, 2),
-                   "reason": "stop" if hit_stop else "ema20_cross"},
+                   "reason": reason_code},
                   _evidence(r))
 
 
@@ -279,7 +314,7 @@ WATCH_RULES = [watch_setup_forming, watch_volatility, watch_drawdown]
 def evaluate(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
              equity: float | None = None, position: dict | None = None,
              include_watch: bool = True, long_only: bool = False,
-             min_bars: int = 221) -> list[Signal]:
+             min_bars: int = 221, risk_pct: float = RISK_PCT) -> list[Signal]:
     """min_bars 221 = EMA200 (200) + slope lookback (20) + 1"""
     if len(df) < min_bars:
         return []
@@ -292,7 +327,7 @@ def evaluate(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
         return []
 
     try:
-        s = cngoal_entry(sym, df, leverage_cap, equity, long_only)
+        s = cngoal_entry(sym, df, leverage_cap, equity, long_only, risk_pct)
         if s:
             out.append(s)
     except Exception as e:
