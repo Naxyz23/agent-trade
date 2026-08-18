@@ -47,11 +47,15 @@ https://raw.githubusercontent.com/Naxyz23/agent-trade/refs/heads/main/data/signa
 4. `halts` ไม่ว่าง → ขึ้นก่อนทุกอย่าง และห้ามเสนอ entry ใด ๆ ในรอบนั้น
 
 5. `exit` → บอก entry เดิม ราคาออก กำไร/ขาดทุนสุทธิ และเหตุผล
-   `reason` = `stop` (ชน SL) · `stop_gap` (เปิด gap ข้าม SL) · `ema20_cross` (trail ตัด)
+   `reason` = `stop` (ชน SL) · `stop_gap` (เปิด gap ข้าม SL) ·
+   `ema50_cross` (trail ตัด — v0.8 เปลี่ยนจาก `ema20_cross` เดิม)
+   ดูเส้นที่ใช้จริงได้จาก `rules_config.trail_ema` ในไฟล์ signals
    ถ้า `reason` เป็น stop แต่ `close` ยังอยู่ฝั่งดีของ `stop` ให้บอกว่า
    **"ไส้เทียนหลุด SL ระหว่างวัน — SL order บนกระดานตัดไปแล้ว"** ไม่ใช่ราคาปิด
 
 6. `entry` → ระบบเปิดไม้ให้แล้วอัตโนมัติ (v0.7) ไม่ต้องยืนยันอะไร
+   - `levels.stop_source` บอกที่มาของ SL: `atr2` = ATR14 x 2 (หุ้น US + XAU ตั้งแต่ v0.8)
+     · `swing_low10` / `swing_high10` / `ema50` = SL ตามชาร์ต (crypto ยังใช้แบบนี้)
    - checklist 4 ข้อ ผ่านเพราะอะไร (จาก `checklist[].detail`)
    - Entry / Stop / ระยะ SL% / Position size / Risk เป็นจำนวนเงิน
    - `capped_by_leverage` = true → บอกว่าโดนเพดาน x5

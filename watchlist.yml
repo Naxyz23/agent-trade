@@ -52,6 +52,28 @@ assets:
   - { symbol: QQQ, fetch_symbol: "QQQ",      class: context, name: "Nasdaq 100 ETF",  signals: false }
   - { symbol: DXY, fetch_symbol: "DX-Y.NYB", class: context, name: "US Dollar Index", signals: false }
 
+# ---------------- กฎการวาง SL และการ trail ออก (v0.8) ----------------
+# มาจากผล backtest 18 ส.ค. 2026 (หุ้น+ทอง 3,581 ไม้ 53 ปี · BTC 5,343 แท่ง)
+# รายงานเต็ม: backtest-report-v2.html
+#
+# trail_ema 50 (เดิม 20): กำไรของระบบมาจากหางยาว — ไม้ที่ได้เกิน 3R มีแค่ 6.9%
+#   แต่ทำได้ +1,030R ส่วนอีก 93% รวมกันติดลบ EMA20 ตัดกำไรเร็วไปจึงฆ่าหางยาวทิ้ง
+#   หุ้น+ทอง +0.053R -> +0.157R · BTC +1.947R -> +2.877R (ดีขึ้นทั้งสองตลาด)
+#
+# stop_mode แยกตาม class — อันนี้ห้ามใช้อันเดียวทั้งระบบ:
+#   หุ้น/ทอง atr2 ดีกว่า: +0.157R -> +0.178R และทนต่อ slippage ได้ถึง 0.40%
+#            (chart ติดลบตั้งแต่ 0.10%) · ดีขึ้น 12/15 สินทรัพย์
+#   crypto   chart ดีกว่า: +2.877R vs atr2 +2.084R บน BTC
+#            ตรงกับผลทดสอบ SL เมื่อ 17 ส.ค. ที่สรุปว่า SL ตามชาร์ตทนทานสุด
+rules:
+  trail_ema: 50               # 20 หรือ 50 เท่านั้น
+  stop_mode_default: chart    # chart = swing10/EMA50 (v5.1 เดิม) | atr2 = ATR14 x 2
+  stop_mode_by_class:
+    stock: atr2
+    metal: atr2               # XAU
+    crypto: chart             # ห้ามเปลี่ยน — BTC ทดสอบแล้วแย่ลง
+  # ตั้งรายตัวได้ด้วย field `stop_mode:` ในรายการสินทรัพย์ (ชนะค่าตาม class)
+
 # ---------------- Risk (ตรงกับ CNgoal v5.1 Machine Spec) ----------------
 # ยอดพอร์ตอยู่ใน data/portfolio.json ก้อนเดียว ใช้ร่วมกันทั้ง 3 agent
 # เพราะกฎ drawdown 15% ของ v5.1 พูดถึงพอร์ตทั้งก้อน ถ้าแยกตาม agent ตัวเลขจะไร้ความหมาย

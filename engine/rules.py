@@ -31,6 +31,12 @@ RISK_PCT = 1.0
 TAKER_FEE_PCT = 0.05
 SLIPPAGE_PCT = 0.02
 
+# --- v0.8: สองค่านี้ปรับได้ต่อสินทรัพย์ผ่าน watchlist.yml ---
+ATR_STOP_MULT = 2.0          # ตัวคูณ ATR14 เมื่อ stop_mode = "atr2"
+DEFAULT_STOP_MODE = "chart"  # "chart" = กฎ v5.1 เดิม | "atr2" = ATR14 x 2
+DEFAULT_TRAIL_EMA = 50       # เส้นที่ใช้ trail ออก (20 = กฎเดิม | 50 = v0.8)
+VALID_TRAIL_EMA = (20, 50)
+
 
 @dataclass
 class Signal:
@@ -102,6 +108,46 @@ def _sizing(entry: float, stop: float, leverage_cap: float, equity: float | None
     return out
 
 
+def _place_stop(side: str, r: pd.Series, stop_mode: str = DEFAULT_STOP_MODE):
+    """คืน (ราคา stop, ที่มา) หรือ None ถ้าวางไม่ได้
+
+    chart = กฎ v5.1 เดิม — swing10 หรือ EMA50 เลือกอันที่ "ใกล้ราคากว่า"
+    atr2  = ATR14 x 2 จากราคาปิด (v0.8 ใช้กับหุ้น US และ XAU เท่านั้น)
+
+    ทำไมแยกตามสินทรัพย์ ไม่ใช้อันเดียวทั้งระบบ — จาก backtest 18 ส.ค. 2026
+    -------------------------------------------------------------------
+    หุ้น+ทอง 15 ตัว (3,581 ไม้ 53 ปี)  chart +0.157R -> atr2 +0.178R
+        และที่สำคัญกว่าคือความทนทาน: ของเดิมติดลบตั้งแต่ slippage 0.10%
+        ส่วน atr2 ยังเสมอตัวที่ 0.40% · ดีขึ้น 12 จาก 15 สินทรัพย์
+    BTC (5,343 แท่ง 2012-2026)         chart +2.877R -> atr2 +2.084R
+        = ไม่มีเหตุผลให้เปลี่ยน crypto ตรงกับผลทดสอบ SL เมื่อ 17 ส.ค.
+          ที่สรุปว่า SL ตามชาร์ตทนทานที่สุดสำหรับ crypto
+
+    ถ้า ATR ใช้ไม่ได้ (ช่วง warm-up) จะถอยไปใช้กฎ chart แทนการทิ้งสัญญาณ
+    """
+    px = float(r["close"])
+    if stop_mode == "atr2":
+        a = r.get("atr14")
+        if a is not None and not (isinstance(a, float) and math.isnan(a)) and float(a) > 0:
+            dist = ATR_STOP_MULT * float(a)
+            return (px - dist, "atr2") if side == "long" else (px + dist, "atr2")
+
+    if side == "long":
+        cands = {"swing_low10": float(r["swing_low10"]), "ema50": float(r["ema50"])}
+        cands = {k: v for k, v in cands.items() if v < px}
+        if not cands:
+            return None
+        src = max(cands, key=cands.get)          # ใกล้ราคาที่สุด = สูงสุด
+        return cands[src] * (1 - SL_BUFFER_PCT / 100), src
+
+    cands = {"swing_high10": float(r["swing_high10"]), "ema50": float(r["ema50"])}
+    cands = {k: v for k, v in cands.items() if v > px}
+    if not cands:
+        return None
+    src = min(cands, key=cands.get)
+    return cands[src] * (1 + SL_BUFFER_PCT / 100), src
+
+
 def _evidence(r: pd.Series) -> dict:
     keys = ["close", "open", "high", "low", "ema20", "ema50", "ema200", "rsi14",
             "atr14", "atr_pct", "swing_low10", "swing_high10", "ret_5d", "ret_20d"]
@@ -120,7 +166,8 @@ def _evidence(r: pd.Series) -> dict:
 
 def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
                  equity: float | None = None, long_only: bool = False,
-                 risk_pct: float = RISK_PCT) -> Signal | None:
+                 risk_pct: float = RISK_PCT,
+                 stop_mode: str = DEFAULT_STOP_MODE) -> Signal | None:
     """4 เงื่อนไข ทุกข้อต้องผ่าน — ข้อใดไม่ผ่านคือไม่เข้า ไม่มีข้อยกเว้น
 
     ตัดสินที่แท่ง Daily ที่ปิดแล้วเท่านั้น (run.py ตัดแท่งที่ยังไม่ปิดออกก่อนเรียก)
@@ -148,22 +195,12 @@ def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
         if not all(c["pass"] for c in checks):
             continue
 
-        # ---- Stop loss: swing 10 แท่ง หรือ EMA50 เลือกอันที่ "ใกล้ราคากว่า"
+        # ---- Stop loss (v0.8: เลือกวิธีวางได้ตามสินทรัพย์ ดู _place_stop) ----
         px = float(r["close"])
-        if side == "long":
-            cands = {"swing_low10": float(r["swing_low10"]), "ema50": float(r["ema50"])}
-            cands = {k: v for k, v in cands.items() if v < px}
-            if not cands:
-                continue
-            src = max(cands, key=cands.get)                 # ใกล้ราคาที่สุด = สูงสุด
-            stop = cands[src] * (1 - SL_BUFFER_PCT / 100)
-        else:
-            cands = {"swing_high10": float(r["swing_high10"]), "ema50": float(r["ema50"])}
-            cands = {k: v for k, v in cands.items() if v > px}
-            if not cands:
-                continue
-            src = min(cands, key=cands.get)
-            stop = cands[src] * (1 + SL_BUFFER_PCT / 100)
+        placed = _place_stop(side, r, stop_mode)
+        if placed is None:
+            continue
+        stop, src = placed
 
         sl_pct = abs(px - stop) / px * 100
         if sl_pct < SL_MIN_DIST_PCT:
@@ -183,7 +220,8 @@ def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
             f"ปิด {r['close']:.4g} {'เหนือ' if side == 'long' else 'ใต้'} EMA20 {r['ema20']:.4g}"
             f" · RSI14 {r['rsi14']:.1f}",
             f"candle ยืนยัน: {_candle_name(r)}",
-            f"SL อิง {src} → {stop:.4g} (ห่าง {sl_pct:.2f}%)"
+            f"SL อิง {'ATR14 x 2' if src == 'atr2' else src} → {stop:.4g} "
+            f"(ห่าง {sl_pct:.2f}%)"
             + ("  ⚠ position ชนเพดาน leverage" if lv["capped_by_leverage"] else ""),
         ]
         return Signal(sym, "cngoal_entry", "entry", side, 85, px, reasons, lv,
@@ -191,19 +229,24 @@ def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
     return None
 
 
-def cngoal_exit(sym: str, df: pd.DataFrame, position: dict) -> Signal | None:
-    """Exit = trail EMA20 บน Daily — ไม่มีเงื่อนไข 'เฉพาะตอนกำไร'
+def cngoal_exit(sym: str, df: pd.DataFrame, position: dict,
+                trail_ema: int = DEFAULT_TRAIL_EMA) -> Signal | None:
+    """Exit = trail EMA บน Daily — ไม่มีเงื่อนไข "เฉพาะตอนกำไร"
 
     position = {"side","entry","stop","opened"} ที่ run.py เก็บไว้ใน state_<group>.json
 
-    v0.6 แก้ 2 บั๊กที่ทำให้ state ไม่ตรงกับพอร์ตจริง
-    ------------------------------------------------
-    1) ของเดิมเช็ค SL ด้วย "ราคาปิด" (close <= stop) — แต่ SL order จริงบนกระดาน
-       ทำงานทันทีที่ "ไส้" ลงไปแตะ ถ้าวันนั้นไส้หลุด SL แล้วเด้งกลับมาปิดเหนือ SL
-       ระบบจะบอกว่ายังถืออยู่ ทั้งที่โดนตัดไปแล้วจริง → ใช้ low/high แทน
-    2) ของเดิมคิด P&L ตอนชน SL จากราคาปิด ทำให้ตัวเลขขาดทุนผิด (และไปเพี้ยนต่อ
-       ที่ consecutive_losses) → ตอนนี้ออกที่ราคา stop จริง และถ้าเปิดมา gap
-       ข้าม SL ไปแล้ว ให้ใช้ราคาเปิดซึ่งคือราคาที่ได้จริง (ฝั่งที่แย่กว่า)
+    v0.8 — เปลี่ยนค่าเริ่มต้นจาก EMA20 เป็น EMA50
+    ------------------------------------------
+    backtest 18 ส.ค. 2026 พบว่ากำไรทั้งหมดของระบบมาจากหางยาว: ไม้ที่ได้เกิน 3R
+    มีแค่ 6.9% แต่ทำได้ +1,030R ขณะที่อีก 93% รวมกันติดลบ -581R
+    EMA20 ตัดกำไรเร็วเกินไปจึงฆ่าหางยาวนั้นทิ้ง เปลี่ยนเป็น EMA50 แล้ว:
+        หุ้น+ทอง 15 ตัว  +0.053R -> +0.157R  (ไม้ >3R เพิ่มจาก 5.6% เป็น 7.9%)
+        BTC 5,343 แท่ง   +1.947R -> +2.877R
+    ไปทางเดียวกันบนสินทรัพย์คนละประเภท = หลักฐานหนักแน่นกว่าผลจากกลุ่มเดียว
+
+    v0.6 แก้ 2 บั๊กที่ทำให้ state ไม่ตรงกับพอร์ตจริง (ยังคงไว้)
+    1) เช็ค SL ด้วย low/high ไม่ใช่ราคาปิด — SL order จริงทำงานทันทีที่ไส้แตะ
+    2) ออกที่ราคา stop จริง ถ้าเปิด gap ข้าม SL ใช้ราคาเปิด (ฝั่งที่แย่กว่า)
     """
     r = df.iloc[-1]
     side = position["side"]
@@ -212,8 +255,15 @@ def cngoal_exit(sym: str, df: pd.DataFrame, position: dict) -> Signal | None:
     close = float(r["close"])
     is_long = side == "long"
 
+    if trail_ema not in VALID_TRAIL_EMA:
+        raise ValueError(f"trail_ema ต้องเป็นหนึ่งใน {VALID_TRAIL_EMA} (ได้ {trail_ema})")
+    trail_col = f"ema{trail_ema}"
+    trail_val = float(r[trail_col])
+
     hit_stop = (float(r["low"]) <= stop) if is_long else (float(r["high"]) >= stop)
-    cross = (close < r["ema20"]) if is_long else (close > r["ema20"])
+    # ช่วง warm-up เส้นยังเป็น NaN — ถือว่ายังไม่มีสัญญาณ trail ดีกว่าปิดไม้มั่ว
+    cross = (not math.isnan(trail_val)) and (
+        (close < trail_val) if is_long else (close > trail_val))
     if not (hit_stop or cross):
         return None
 
@@ -225,8 +275,9 @@ def cngoal_exit(sym: str, df: pd.DataFrame, position: dict) -> Signal | None:
         reason_code = "stop_gap" if gapped else "stop"
     else:
         px = close
-        why = f"ปิด {'ต่ำกว่า' if is_long else 'สูงกว่า'} EMA20 ({r['ema20']:.4g})"
-        reason_code = "ema20_cross"
+        why = (f"ปิด {'ต่ำกว่า' if is_long else 'สูงกว่า'} "
+               f"EMA{trail_ema} ({trail_val:.4g})")
+        reason_code = f"ema{trail_ema}_cross"
 
     pnl_pct = (px / entry - 1) * 100 * (1 if is_long else -1)
     reasons = [
@@ -314,20 +365,27 @@ WATCH_RULES = [watch_setup_forming, watch_volatility, watch_drawdown]
 def evaluate(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
              equity: float | None = None, position: dict | None = None,
              include_watch: bool = True, long_only: bool = False,
-             min_bars: int = 221, risk_pct: float = RISK_PCT) -> list[Signal]:
-    """min_bars 221 = EMA200 (200) + slope lookback (20) + 1"""
+             min_bars: int = 221, risk_pct: float = RISK_PCT,
+             stop_mode: str = DEFAULT_STOP_MODE,
+             trail_ema: int = DEFAULT_TRAIL_EMA) -> list[Signal]:
+    """min_bars 221 = EMA200 (200) + slope lookback (20) + 1
+
+    v0.8: `stop_mode` และ `trail_ema` ตั้งได้ต่อสินทรัพย์จาก watchlist.yml
+    ค่าเริ่มต้นคือ chart + EMA50 · หุ้น US และ XAU ตั้งเป็น atr2 ใน watchlist
+    """
     if len(df) < min_bars:
         return []
     out: list[Signal] = []
 
     if position:
-        s = cngoal_exit(sym, df, position)
+        s = cngoal_exit(sym, df, position, trail_ema=trail_ema)
         if s:
             return [s]        # มีไม้เปิดอยู่ -> สนใจแค่การออก ไม่หาไม้ใหม่ในตัวเดียวกัน
         return []
 
     try:
-        s = cngoal_entry(sym, df, leverage_cap, equity, long_only, risk_pct)
+        s = cngoal_entry(sym, df, leverage_cap, equity, long_only, risk_pct,
+                         stop_mode=stop_mode)
         if s:
             out.append(s)
     except Exception as e:

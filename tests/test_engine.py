@@ -183,25 +183,137 @@ def test_sl_never_closer_than_min_distance():
     print(f"    เจอเคส SL แคบเกินและถูกข้ามถูกต้อง {len(got)} ครั้ง")
 
 
-def test_exit_closes_on_ema20_cross_both_directions():
-    """v5.1 ตัดเงื่อนไข 'เฉพาะตอนกำไร' ออก — ขาดทุนก็ต้องออก"""
+def test_exit_trails_the_requested_ema_and_never_silently_skips():
+    """v0.8: trail ได้ทั้ง EMA20 และ EMA50 — และเทสต์ต้องไม่ถูกข้ามเงียบ ๆ
+
+    ของเดิมครอบด้วย `if r["close"] < r["ema20"]` ซึ่งเป็นจริงบ้างไม่จริงบ้างตาม seed
+    พอ v0.8 เปลี่ยนค่าเริ่มต้นเป็น EMA50 เทสต์นี้ก็ยัง PASS ทั้งที่ไม่ได้ตรวจอะไรเลย
+    → เขียนใหม่ให้ "หาแท่งที่เข้าเงื่อนไขจริง" แล้วบังคับให้ต้องเจออย่างน้อย 1 แท่ง
+    """
+    for trail in (20, 50):
+        col = f"ema{trail}"
+        checked = 0
+        for seed in range(12):
+            df = ind.enrich(_synth(500, seed=seed, trend=0.0006))
+            r = df.iloc[-1]
+            if not (float(r["close"]) < float(r[col])):
+                continue
+            # ไม้ long ที่กำลังขาดทุน แต่ปิดต่ำกว่าเส้น trail -> ต้องออก
+            pos = {"side": "long", "entry": float(r["close"]) * 1.20,
+                   "stop": float(r["close"]) * 0.5, "opened": "2025-01-01"}
+            sig = rules.cngoal_exit("T", df, pos, trail_ema=trail)
+            assert sig and sig.kind == "exit", f"trail EMA{trail} ต้องออกไม้"
+            assert sig.levels["reason"] == f"ema{trail}_cross", sig.levels["reason"]
+            assert sig.levels["pnl_pct_gross"] < 0, "v5.1 ต้องออกแม้ขาดทุน"
+            checked += 1
+        assert checked > 0, f"ไม่เจอแท่งที่ปิดใต้ EMA{trail} เลย — เทสต์นี้ไม่ได้ตรวจอะไร"
+        print(f"    trail EMA{trail}: ตรวจจริง {checked} เคส")
+
+
+def test_exit_hits_stop_regardless_of_trail_setting():
+    """ชน SL ต้องออกเสมอ ไม่ว่าจะตั้ง trail เป็นเส้นไหน"""
     df = ind.enrich(_synth(500, seed=9, trend=0.001))
     r = df.iloc[-1]
-    # ไม้ long ที่กำลังขาดทุน แต่ปิดต่ำกว่า EMA20 -> ต้องออก
-    if r["close"] < r["ema20"]:
-        pos = {"side": "long", "entry": float(r["close"]) * 1.20,
-               "stop": float(r["close"]) * 0.5, "opened": "2025-01-01"}
-        s = rules.cngoal_exit("T", df, pos)
-        assert s and s.kind == "exit" and s.levels["pnl_pct_gross"] < 0
-        assert s.levels["reason"] == "ema20_cross"
-    # ชน stop ต้องออกเสมอ — วาง stop ไว้กลางแท่ง (ระหว่าง low กับ open) จึงไม่ใช่ gap
     stop = (float(r["low"]) + min(float(r["open"]), float(r["close"]))) / 2
-    pos2 = {"side": "long", "entry": float(r["close"]) * 0.9,
-            "stop": stop, "opened": "2025-01-01"}
-    s2 = rules.cngoal_exit("T", df, pos2)
-    assert s2 and s2.levels["reason"] == "stop", s2.levels if s2 else None
-    assert abs(s2.levels["exit"] - round(stop, 4)) < 1e-6, "ต้องออกที่ราคา stop ไม่ใช่ราคาปิด"
+    pos = {"side": "long", "entry": float(r["close"]) * 0.9,
+           "stop": stop, "opened": "2025-01-01"}
+    for trail in (20, 50):
+        sig = rules.cngoal_exit("T", df, pos, trail_ema=trail)
+        assert sig and sig.levels["reason"] == "stop", sig.levels["reason"]
+        # levels ปัดเป็น 4 ตำแหน่งก่อนเขียนลง JSON จึงเทียบแบบเผื่อการปัด
+        assert abs(sig.levels["exit"] - round(stop, 4)) < 1e-6, \
+            f"ต้องออกที่ราคา stop จริง ได้ {sig.levels['exit']} ควรเป็น {round(stop, 4)}"
 
+
+def test_trail_ema_rejects_unsupported_values():
+    """ตั้งค่าผิดต้องดังทันที ไม่ใช่เงียบแล้วไปพังทีหลัง"""
+    df = ind.enrich(_synth(300, seed=3))
+    r = df.iloc[-1]
+    pos = {"side": "long", "entry": float(r["close"]),
+           "stop": float(r["close"]) * 0.9, "opened": "2025-01-01"}
+    for bad in (10, 100, 0):
+        try:
+            rules.cngoal_exit("T", df, pos, trail_ema=bad)
+        except ValueError:
+            continue
+        raise AssertionError(f"trail_ema={bad} ควรถูกปฏิเสธ")
+
+
+def test_atr_stop_is_exactly_two_atr_from_close():
+    """v0.8: stop_mode="atr2" ต้องวาง SL ที่ ATR14 x 2 จากราคาปิดพอดี
+
+    ตรวจทั้งสองฝั่ง และตรวจว่า stop_source บอกที่มาถูกต้อง เพื่อให้ brief อธิบายได้
+    """
+    found = 0
+    for seed in range(40):
+        for trend in (0.0012, -0.0012):
+            df = ind.enrich(_synth(400, seed=seed, trend=trend))
+            sig = rules.cngoal_entry("T", df, stop_mode="atr2")
+            if sig is None or sig.kind != "entry":
+                continue
+            r = df.iloc[-1]
+            want = float(r["close"]) + (-1 if sig.direction == "long" else 1) \
+                   * rules.ATR_STOP_MULT * float(r["atr14"])
+            assert abs(sig.levels["stop"] - round(want, 4)) < 1e-3, \
+                f"{sig.direction}: ได้ {sig.levels['stop']} ควรเป็น {want}"
+            assert sig.levels["stop_source"] == "atr2"
+            found += 1
+    assert found >= 3, f"เจอสัญญาณ atr2 แค่ {found} ครั้ง — น้อยเกินกว่าจะเชื่อ"
+    print(f"    ตรวจ SL แบบ ATR x2 จริง {found} เคส")
+
+
+def test_chart_and_atr_stops_actually_differ():
+    """ถ้าสองโหมดให้ผลเหมือนกันหมด แปลว่า config ไม่ได้ถูกใช้จริง"""
+    diff = 0
+    for seed in range(40):
+        df = ind.enrich(_synth(400, seed=seed, trend=0.0012))
+        a = rules.cngoal_entry("T", df, stop_mode="chart")
+        b = rules.cngoal_entry("T", df, stop_mode="atr2")
+        if a and b and a.kind == b.kind == "entry":
+            if abs(a.levels["stop"] - b.levels["stop"]) > 1e-6:
+                diff += 1
+    assert diff > 0, "stop_mode ไม่มีผลต่อราคา SL เลย — น่าจะไม่ได้ถูกส่งเข้าไป"
+    print(f"    สองโหมดให้ SL ต่างกัน {diff} เคส")
+
+
+def test_atr_mode_falls_back_to_chart_when_atr_unavailable():
+    """ATR เป็น NaN ช่วง warm-up -> ต้องถอยไปใช้กฎเดิม ไม่ใช่ทิ้งสัญญาณ"""
+    df = ind.enrich(_synth(400, seed=5, trend=0.0012))
+    r = df.iloc[-1].copy()
+    r["atr14"] = float("nan")
+    got = rules._place_stop("long", r, "atr2")
+    assert got is not None, "ต้องถอยไปใช้ chart ไม่ใช่คืน None"
+    assert got[1] in ("swing_low10", "ema50"), got[1]
+
+
+def test_watchlist_gives_atr_to_stocks_and_gold_but_not_crypto():
+    """หัวใจของ v0.8 — ห้ามใช้ stop เดียวกันทั้งระบบ
+
+    backtest: หุ้น/ทอง atr2 ดีกว่า (+0.157R -> +0.178R, ทน slippage 0.40%)
+              BTC chart ดีกว่า (+2.877R vs +2.084R)
+    """
+    import yaml, pathlib
+    cfg = yaml.safe_load(
+        (pathlib.Path(__file__).resolve().parent.parent / "watchlist.yml")
+        .read_text(encoding="utf-8"))
+    rc = cfg["rules"]
+    assert rc["trail_ema"] == 50, "v0.8 ต้อง trail ด้วย EMA50"
+    by = rc["stop_mode_by_class"]
+    assert by["stock"] == "atr2" and by["metal"] == "atr2"
+    assert by["crypto"] == "chart", "crypto ต้องคง SL ตามชาร์ต — ทดสอบแล้วแย่ลง"
+
+
+def test_run_resolves_stop_mode_per_asset_class():
+    """ลำดับความสำคัญ: ตั้งรายตัว > ตั้งตาม class > ค่าเริ่มต้น"""
+    default, by = "chart", {"stock": "atr2", "metal": "atr2", "crypto": "chart"}
+    def resolve(item):
+        return item.get("stop_mode") or by.get(item.get("class", "other"), default)
+    assert resolve({"class": "stock"}) == "atr2"
+    assert resolve({"class": "metal"}) == "atr2"
+    assert resolve({"class": "crypto"}) == "chart"
+    assert resolve({"class": "context"}) == "chart"
+    assert resolve({"class": "stock", "stop_mode": "chart"}) == "chart", \
+        "ตั้งรายตัวต้องชนะค่าตาม class"
 
 def test_exit_costs_are_deducted():
     df = ind.enrich(_synth(500, seed=4))

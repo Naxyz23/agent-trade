@@ -87,6 +87,12 @@ def main(group: str, now: datetime | None = None) -> int:
     symbols = {a["symbol"] for a in assets}
 
     risk_pct = float(risk_cfg.get("pct_per_trade", rules.RISK_PCT))
+
+    # v0.8 — กฎวาง SL / เส้น trail อ่านจาก watchlist.yml ไม่ hardcode
+    rules_cfg = cfg.get("rules", {}) or {}
+    trail_ema = int(rules_cfg.get("trail_ema", rules.DEFAULT_TRAIL_EMA))
+    stop_default = str(rules_cfg.get("stop_mode_default", rules.DEFAULT_STOP_MODE))
+    stop_by_class = rules_cfg.get("stop_mode_by_class", {}) or {}
     max_positions = int(risk_cfg.get("max_concurrent_positions", 1))
     pause_after = int(risk_cfg.get("pause_after_losses", 3))
     pause_days = int(risk_cfg.get("pause_days", 3))
@@ -155,6 +161,9 @@ def main(group: str, now: datetime | None = None) -> int:
             continue
 
         pos = state["positions"].get(sym)
+        # ตั้งรายตัว > ตั้งตาม class > ค่าเริ่มต้น
+        stop_mode = item.get("stop_mode") or stop_by_class.get(
+            item.get("class", "other"), stop_default)
         sigs = rules.evaluate(
             sym, df,
             leverage_cap=item.get("leverage_cap", risk_cfg.get("default_leverage_cap", 5)),
@@ -162,6 +171,8 @@ def main(group: str, now: datetime | None = None) -> int:
             include_watch=filt.get("include_watch", True),
             long_only=item.get("long_only", False),
             risk_pct=risk_pct,
+            stop_mode=stop_mode,
+            trail_ema=trail_ema,
         )
 
         for sig in sigs:
@@ -189,7 +200,8 @@ def main(group: str, now: datetime | None = None) -> int:
                 portfolio.open_position(state, sym, d, bar_date)
                 d["reasons"].append(
                     f"📌 ระบบบันทึกเป็นไม้เปิดแล้ว (size {d['levels'].get('position_size')} · "
-                    f"เสี่ยง {d['levels'].get('risk_amount')} USDT) — จะติดตาม SL/EMA20 ให้อัตโนมัติ "
+                    f"เสี่ยง {d['levels'].get('risk_amount')} USDT) — "
+                    f"จะติดตาม SL/EMA{trail_ema} ให้อัตโนมัติ "
                     f"ราคานี้อิงราคาปิดของแท่งที่ให้สัญญาณ ของจริงอาจต่างเล็กน้อย")
                 entries.append(d)
             else:
@@ -212,7 +224,10 @@ def main(group: str, now: datetime | None = None) -> int:
         "generated_at": now.isoformat(timespec="seconds"),
         "run_date": now.strftime("%Y-%m-%d"),
         "spec_version": rules.SPEC_VERSION,
-        "engine_version": "0.7",
+        "engine_version": "0.8",
+        "rules_config": {"trail_ema": trail_ema,
+                         "stop_mode_default": stop_default,
+                         "stop_mode_by_class": stop_by_class},
         "group": group,
         "universe_size": len([a for a in assets if a.get("signals") is not False]),
         "context_size": len([a for a in assets if a.get("signals") is False]),
