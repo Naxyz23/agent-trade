@@ -1,8 +1,17 @@
 {
-  "generated_at": "2026-08-18T07:23:58+00:00",
+  "generated_at": "2026-08-18T14:56:39+00:00",
   "run_date": "2026-08-18",
   "spec_version": "cngoal-5.1",
-  "engine_version": "0.7",
+  "engine_version": "0.8",
+  "rules_config": {
+    "trail_ema": 50,
+    "stop_mode_default": "chart",
+    "stop_mode_by_class": {
+      "stock": "atr2",
+      "metal": "atr2",
+      "crypto": "chart"
+    }
+  },
   "group": "stock",
   "universe_size": 13,
   "context_size": 3,
