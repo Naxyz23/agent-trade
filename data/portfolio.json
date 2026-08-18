@@ -1,8 +1,16 @@
 {
   "version": 3,
-  "equity": 100.0,
+  "equity": 98.943,
   "peak": 100.0,
   "halted": false,
   "halt_reason": null,
-  "history": []
+  "history": [
+    {
+      "at": "2026-08-18T01:50:00+00:00",
+      "event": "pnl",
+      "amount": -1.057,
+      "equity": 98.943,
+      "note": "BTC stop"
+    }
+  ]
 }

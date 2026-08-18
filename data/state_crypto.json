@@ -1,18 +1,20 @@
 {
-  "positions": {
-    "BTC": {
+  "positions": {},
+  "closed": [
+    {
+      "symbol": "BTC",
       "side": "short",
       "entry": 62819.1,
-      "stop": 64360.5752,
-      "size": 40.75,
-      "risk_amount": 1.0,
-      "sl_distance_pct": 2.454,
+      "exit": 64360.5752,
       "opened": "2026-08-16",
-      "price_basis": "close_of_signal_bar"
+      "closed": "2026-08-17",
+      "size": 40.75,
+      "pnl_pct_net": -2.594,
+      "pnl_amount": -1.057,
+      "why": "stop"
     }
-  },
-  "closed": [],
-  "consecutive_losses": 0,
+  ],
+  "consecutive_losses": 1,
   "paused_until": null,
   "version": 3
 }
