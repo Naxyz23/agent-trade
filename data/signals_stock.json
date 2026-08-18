@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-17T15:07:52+00:00",
-  "run_date": "2026-08-17",
+  "generated_at": "2026-08-18T07:23:58+00:00",
+  "run_date": "2026-08-18",
   "spec_version": "cngoal-5.1",
   "engine_version": "0.7",
   "group": "stock",
@@ -26,7 +26,7 @@
         "low": 224.5,
         "ema20": 213.5919,
         "ema50": 208.7591,
-        "ema200": 194.1667,
+        "ema200": 194.1666,
         "rsi14": 63.0326,
         "atr14": 6.9264,
         "atr_pct": 3.0762,
@@ -82,7 +82,7 @@
         "low": 493.92,
         "ema20": 462.0211,
         "ema50": 431.3131,
-        "ema200": 429.382,
+        "ema200": 429.3818,
         "rsi14": 70.9156,
         "atr14": 13.803,
         "atr_pct": 2.7862,
@@ -138,7 +138,7 @@
         "low": 589.29,
         "ema20": 594.946,
         "ema50": 601.625,
-        "ema200": 625.6128,
+        "ema200": 625.6118,
         "rsi14": 47.6188,
         "atr14": 21.623,
         "atr_pct": 3.6658,
@@ -194,7 +194,7 @@
         "low": 483.2,
         "ema20": 494.1066,
         "ema50": 486.9065,
-        "ema200": 358.1465,
+        "ema200": 358.1471,
         "rsi14": 53.7333,
         "atr14": 32.3549,
         "atr_pct": 6.29,
@@ -250,7 +250,7 @@
         "low": 424.1,
         "ema20": 418.1616,
         "ema50": 416.8629,
-        "ema200": 367.1159,
+        "ema200": 367.1156,
         "rsi14": 54.3287,
         "atr14": 14.3548,
         "atr_pct": 3.3669,
@@ -306,7 +306,7 @@
         "low": 361.45,
         "ema20": 354.57,
         "ema50": 341.3423,
-        "ema200": 315.3896,
+        "ema200": 315.3898,
         "rsi14": 65.1598,
         "atr14": 6.3347,
         "atr_pct": 1.7459,
@@ -346,9 +346,9 @@
   ],
   "open_positions": [],
   "portfolio": {
-    "equity": 100.0,
+    "equity": 98.943,
     "peak": 100.0,
-    "drawdown_pct": 0.0,
+    "drawdown_pct": 1.06,
     "halted": false,
     "risk_pct_per_trade": 1.0
   },
@@ -359,14 +359,14 @@
   "halts": [],
   "events": [],
   "data_health": {
-    "oldest_bar_age_days": 3,
+    "oldest_bar_age_days": 4,
     "stale_symbols": [],
     "per_symbol": [
       {
         "symbol": "NVDA",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -374,7 +374,7 @@
         "symbol": "MSFT",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -382,7 +382,7 @@
         "symbol": "AAPL",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -390,7 +390,7 @@
         "symbol": "GOOG",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -398,7 +398,7 @@
         "symbol": "META",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -406,7 +406,7 @@
         "symbol": "AMD",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -414,7 +414,7 @@
         "symbol": "TSM",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -422,7 +422,7 @@
         "symbol": "TSLA",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -430,7 +430,7 @@
         "symbol": "ORCL",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -438,7 +438,7 @@
         "symbol": "NFLX",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -446,7 +446,7 @@
         "symbol": "JPM",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -454,7 +454,7 @@
         "symbol": "LLY",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -462,7 +462,7 @@
         "symbol": "WMT",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -470,7 +470,7 @@
         "symbol": "SPY",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -478,7 +478,7 @@
         "symbol": "QQQ",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -486,7 +486,7 @@
         "symbol": "DXY",
         "source": "yahoo",
         "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       }
@@ -506,7 +506,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -523,7 +523,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -540,7 +540,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -557,7 +557,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -574,7 +574,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -591,7 +591,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -608,7 +608,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -625,7 +625,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -642,7 +642,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -659,7 +659,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -676,7 +676,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -693,7 +693,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -710,7 +710,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -727,7 +727,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -744,7 +744,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -754,14 +754,14 @@
       "class": "context",
       "close": 99.67,
       "chg_5d_pct": 0.07,
-      "chg_20d_pct": -1.07,
-      "rsi14": 39.08,
+      "chg_20d_pct": -1.26,
+      "rsi14": 39.1,
       "regime": "bull",
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     }
