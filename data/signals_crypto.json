@@ -1,57 +1,21 @@
 {
-  "generated_at": "2026-08-18T01:50:00+00:00",
+  "generated_at": "2026-08-18T14:54:31+00:00",
   "run_date": "2026-08-18",
   "spec_version": "cngoal-5.1",
-  "engine_version": "0.7",
+  "engine_version": "0.8",
+  "rules_config": {
+    "trail_ema": 50,
+    "stop_mode_default": "chart",
+    "stop_mode_by_class": {
+      "stock": "atr2",
+      "metal": "atr2",
+      "crypto": "chart"
+    }
+  },
   "group": "crypto",
   "universe_size": 4,
   "context_size": 0,
-  "signals": [
-    {
-      "symbol": "BTC",
-      "rule": "cngoal_exit",
-      "kind": "exit",
-      "direction": "short",
-      "score": 95,
-      "price": 64360.5752,
-      "reasons": [
-        "ปิดไม้ SHORT — ชน SL",
-        "เข้าที่ 6.282e+04 เมื่อ 2026-08-16 · ออกที่ 6.436e+04 → -2.45% ก่อนค่าธรรมเนียม",
-        "กฎ v5.1 ปิดทั้งตอนกำไรและตอนขาดทุน — ไม่มีเงื่อนไข 'เฉพาะตอนกำไร'"
-      ],
-      "levels": {
-        "entry": 62819.1,
-        "exit": 64360.5752,
-        "stop": 64360.5752,
-        "close": 64471.7,
-        "pnl_pct_gross": -2.45,
-        "pnl_pct_net": -2.59,
-        "reason": "stop"
-      },
-      "evidence": {
-        "close": 64471.7,
-        "open": 62819.1,
-        "high": 64562.3,
-        "low": 62683.4,
-        "ema20": 63804.5546,
-        "ema50": 64303.1581,
-        "ema200": 71587.1187,
-        "rsi14": 54.2646,
-        "atr14": 1254.4314,
-        "atr_pct": 1.9457,
-        "swing_low10": 62490.0,
-        "swing_high10": 65425.5,
-        "ret_5d": 1.6711,
-        "ret_20d": 0.9585,
-        "regime": "bear",
-        "candle": "bullish engulfing",
-        "spec": "cngoal-5.1"
-      },
-      "checklist": [],
-      "bar_date": "2026-08-17",
-      "asset_class": "crypto"
-    }
-  ],
+  "signals": [],
   "open_positions": [],
   "portfolio": {
     "equity": 98.943,
@@ -65,11 +29,9 @@
     "paused_until": null
   },
   "halts": [],
-  "events": [
-    "BTC: ปิดไม้ที่ 6.436e+04 → -2.59% สุทธิ (-1.06 USDT)"
-  ],
+  "events": [],
   "data_health": {
-    "oldest_bar_age_days": 2,
+    "oldest_bar_age_days": 1,
     "stale_symbols": [],
     "per_symbol": [
       {
@@ -99,8 +61,8 @@
       {
         "symbol": "BNB",
         "source": "yahoo",
-        "bar_date": "2026-08-16",
-        "bar_age_days": 2,
+        "bar_date": "2026-08-17",
+        "bar_age_days": 1,
         "max_age_days": 3,
         "stale": false
       }
@@ -118,7 +80,7 @@
       "regime": "bear",
       "above_ema20": true,
       "candle": "bullish engulfing",
-      "in_position": true,
+      "in_position": false,
       "bar_date": "2026-08-17",
       "bar_age_days": 1,
       "source": "kraken",
@@ -162,16 +124,16 @@
       "symbol": "BNB",
       "name": "BNB",
       "class": "crypto",
-      "close": 602.4794,
-      "chg_5d_pct": -2.27,
-      "chg_20d_pct": 6.5,
-      "rsi14": 57.13,
+      "close": 605.1724,
+      "chg_5d_pct": -0.74,
+      "chg_20d_pct": 6.08,
+      "rsi14": 58.83,
       "regime": "bear",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-16",
-      "bar_age_days": 2,
+      "bar_date": "2026-08-17",
+      "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
     }
