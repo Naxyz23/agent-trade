@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-17T15:06:50+00:00",
-  "run_date": "2026-08-17",
+  "generated_at": "2026-08-18T07:00:49+00:00",
+  "run_date": "2026-08-18",
   "spec_version": "cngoal-5.1",
   "engine_version": "0.7",
   "group": "gold",
@@ -9,9 +9,9 @@
   "signals": [],
   "open_positions": [],
   "portfolio": {
-    "equity": 100.0,
+    "equity": 98.943,
     "peak": 100.0,
-    "drawdown_pct": 0.0,
+    "drawdown_pct": 1.06,
     "halted": false,
     "risk_pct_per_trade": 1.0
   },
@@ -22,14 +22,14 @@
   "halts": [],
   "events": [],
   "data_health": {
-    "oldest_bar_age_days": 3,
+    "oldest_bar_age_days": 1,
     "stale_symbols": [],
     "per_symbol": [
       {
         "symbol": "XAU",
         "source": "yahoo",
-        "bar_date": "2026-08-14",
-        "bar_age_days": 3,
+        "bar_date": "2026-08-17",
+        "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
       }
@@ -40,16 +40,16 @@
       "symbol": "XAU",
       "name": "Gold Futures",
       "class": "metal",
-      "close": 4380.3999,
-      "chg_5d_pct": 0.91,
-      "chg_20d_pct": 9.16,
-      "rsi14": 64.59,
+      "close": 4417.7998,
+      "chg_5d_pct": 1.28,
+      "chg_20d_pct": 10.16,
+      "rsi14": 66.72,
       "regime": "bear",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-14",
-      "bar_age_days": 3,
+      "bar_date": "2026-08-17",
+      "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
     }
