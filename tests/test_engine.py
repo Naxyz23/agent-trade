@@ -127,8 +127,11 @@ def test_ema200_slope_is_direction_not_position():
 
 # ------------------------------------------------------ cngoal v5.1 rules
 
-def test_entry_requires_all_four_conditions():
-    """ทุกสัญญาณ entry ต้องผ่านครบ 4 ข้อ ไม่มีข้อยกเว้น"""
+def test_entry_requires_all_conditions():
+    """ทุกสัญญาณ entry ต้องผ่านครบทุกข้อ ไม่มีข้อยกเว้น
+
+    v0.9: 5 ข้อเมื่อไม่ใช้ ADX · 6 ข้อเมื่อส่ง adx_min เข้ามา
+    """
     n = 0
     for seed in range(25):
         for trend in (0.0018, 0.0, -0.0018):
@@ -138,7 +141,7 @@ def test_entry_requires_all_four_conditions():
                     if s.kind != "entry":
                         continue
                     n += 1
-                    assert len(s.checklist) == 4
+                    assert len(s.checklist) == 5
                     assert all(c["pass"] for c in s.checklist), s.checklist
                     assert s.levels["sl_distance_pct"] >= rules.SL_MIN_DIST_PCT
                     if s.direction == "long":
@@ -838,6 +841,256 @@ def test_workflows_serialise_pushes_and_retry():
             f"{f.name} ต้องลบไฟล์ค้างจาก v0.4"
         assert "brief_" in t and "git add -A data/" in t, \
             f"{f.name} ต้อง commit brief html ให้ Cowork เปิดดูได้"
+
+
+# --------------------------------------------- v0.9 / cngoal v6.0 (19 ส.ค. 2026)
+
+def test_adx_basic_properties():
+    """ADX ต้องอยู่ในช่วง 0-100 และแรงกว่าในตลาดที่มีเทรนด์จริง"""
+    trend = ind.enrich(_synth(600, seed=3, trend=0.004, vol=0.008))
+    chop = ind.enrich(_synth(600, seed=3, trend=0.0, vol=0.008))
+    for d in (trend, chop):
+        v = d["adx14"].dropna()
+        assert len(v) > 400
+        assert (v >= 0).all() and (v <= 100).all()
+    # ค่ากลางของตลาดมีเทรนด์ต้องสูงกว่าตลาดออกข้างอย่างชัดเจน
+    assert trend["adx14"].median() > chop["adx14"].median() + 5, (
+        trend["adx14"].median(), chop["adx14"].median())
+    # warm-up ต้องเป็น NaN ไม่ใช่ 0 (0 จะผ่านการเทียบ >= ไม่ได้ แต่ก็ไม่ควรมีค่ามั่ว)
+    assert trend["adx14"].iloc[:20].isna().any()
+
+
+def test_ema_stack_actually_blocks_entries():
+    """เงื่อนไข EMA20>EMA50 ต้อง "ทำงานจริง" ไม่ใช่ผ่านฟรีทุกครั้ง
+
+    บทเรียนจาก v0.8: เทสต์ที่ครอบด้วย if แล้วไม่เคยเข้าเงื่อนไข = PASS โดยไม่ตรวจอะไร
+    ที่นี่จึงนับเคสที่ "ต่างกันจริง" แล้ว assert ว่าต้อง > 0
+    """
+    blocked = 0
+    with_stack = without = 0
+    for seed in range(30):
+        for trend in (0.0018, 0.0, -0.0018):
+            full = ind.enrich(_synth(500, seed=seed, trend=trend))
+            for end in range(240, len(full), 3):
+                d = full.iloc[:end]
+                a = rules.cngoal_entry("T", d, require_ema_stack=True)
+                b = rules.cngoal_entry("T", d, require_ema_stack=False)
+                with_stack += int(bool(a and a.kind == "entry"))
+                without += int(bool(b and b.kind == "entry"))
+                if (b and b.kind == "entry") and not (a and a.kind == "entry"):
+                    blocked += 1
+    assert without > 0 and with_stack > 0
+    assert blocked > 0, "ตัวกรอง EMA20/EMA50 ไม่ได้กรองอะไรเลย = เทสต์นี้ไม่ได้ตรวจอะไร"
+    assert with_stack < without, (with_stack, without)
+
+
+def test_adx_gate_actually_blocks_entries():
+    """ADX gate ต้องกรองจริง และยิ่งเกณฑ์สูงยิ่งเหลือน้อยลง (เป็นลำดับ)"""
+    counts = {}
+    for thr in (None, 15, 25, 40):
+        n = 0
+        for seed in range(30):
+            for trend in (0.0018, -0.0018):
+                full = ind.enrich(_synth(500, seed=seed, trend=trend))
+                for end in range(240, len(full), 3):
+                    s = rules.cngoal_entry("T", full.iloc[:end], adx_min=thr)
+                    if s and s.kind == "entry":
+                        n += 1
+                        if thr is not None:
+                            adx_check = [c for c in s.checklist if c["n"] == 6]
+                            assert len(adx_check) == 1 and adx_check[0]["pass"]
+                            assert s.evidence["adx14"] >= thr
+        counts[thr] = n
+    assert counts[None] > 0
+    assert counts[None] >= counts[15] >= counts[25] >= counts[40], counts
+    assert counts[25] < counts[None], "ADX 25 ไม่ได้กรองอะไรเลย"
+
+
+def test_adx_nan_is_not_a_free_pass():
+    """ADX ยังคำนวณไม่ได้ = ไม่ผ่าน (ไม่ใช่ผ่านฟรี) — ต่างจาก stop ที่ถอยไปใช้ chart ได้"""
+    full = ind.enrich(_synth(500, seed=7, trend=0.0018))
+    d = full.copy()
+    d["adx14"] = np.nan
+    checked = 0
+    for end in range(240, len(d), 3):
+        s = rules.cngoal_entry("T", d.iloc[:end], adx_min=25)
+        assert s is None or s.kind != "entry"
+        checked += 1
+    assert checked > 20
+
+
+def test_portfolio_wide_cap_blocks_across_agents():
+    """เพดานรวมทั้งพอร์ตต้องนับไม้ของ agent อื่นด้วย"""
+    from datetime import date
+    from engine import portfolio as P
+    pf = P.default_portfolio(100.0)
+    st = P.default_state()
+    st["positions"] = {"NVDA": {}, "MSFT": {}}
+    P.sync_group_positions(pf, "crypto", 3)
+    P.sync_group_positions(pf, "gold", 1)
+    today = date(2026, 8, 19)
+    # ต่อสายยังไม่เต็ม (2 < 5) และรวมทั้งพอร์ต 2+4 = 6 < 8 -> เปิดได้
+    assert P.entry_blockers(st, pf, today, 5, portfolio_max=8, group="stock") == []
+    # เพดานรวม 6 -> ตัน แม้ต่อสายจะยังว่าง
+    b = P.entry_blockers(st, pf, today, 5, portfolio_max=6, group="stock")
+    assert len(b) == 1 and "เพดานรวม" in b[0], b
+    # ไม่ส่ง portfolio_max = พฤติกรรมเดิมทุกประการ
+    assert P.entry_blockers(st, pf, today, 5) == []
+    # นับเฉพาะสายอื่น ไม่นับซ้ำสายตัวเอง
+    P.sync_group_positions(pf, "stock", 2)
+    assert P.portfolio_open_count(pf, exclude_group="stock") == 4
+    assert P.portfolio_open_count(pf) == 6
+
+
+def test_correlated_group_keeps_only_strongest():
+    """สัญญาณหลายตัวในกลุ่มเดียวกันวันเดียวกัน -> เปิดแค่ตัวที่ ADX สูงสุด"""
+    cands = [
+        {"symbol": "AMD", "score": 85, "reasons": [], "_corr_group": "us_semi", "_adx": 27.0},
+        {"symbol": "NVDA", "score": 85, "reasons": [], "_corr_group": "us_semi", "_adx": 41.0},
+        {"symbol": "TSM", "score": 85, "reasons": [], "_corr_group": "us_semi", "_adx": 33.0},
+        {"symbol": "JPM", "score": 85, "reasons": [], "_corr_group": "us_fin", "_adx": 26.0},
+    ]
+    ranked = sorted(cands, key=lambda d: (-(d.get("_adx") or 0), -d["score"], d["symbol"]))
+    assert [d["symbol"] for d in ranked] == ["NVDA", "TSM", "AMD", "JPM"]
+    seen, opened = set(), []
+    for d in ranked:
+        if d["_corr_group"] in seen:
+            continue
+        seen.add(d["_corr_group"])
+        opened.append(d["symbol"])
+    assert opened == ["NVDA", "JPM"], opened
+
+
+def test_spec_version_and_defaults_are_current():
+    assert rules.SPEC_VERSION == "cngoal-6.0"
+    assert rules.DEFAULT_REQUIRE_EMA_STACK is True
+    assert rules.DEFAULT_ADX_MIN is None, "ค่าเริ่มต้นต้องไม่ใช้ ADX — เปิดผ่าน watchlist เท่านั้น"
+
+
+def test_no_stale_spec_version_strings_in_code():
+    """กันเลขเวอร์ชันค้าง — ของเดิม render.py/notify.py/watchlist ค้างที่ v5.1 ข้ามไป 3 เวอร์ชัน
+
+    ตรวจเฉพาะข้อความที่ "อ้างว่าเป็นสเปกปัจจุบัน" ส่วนที่เล่าประวัติ (เช่น "กฎ v5.1 เดิม")
+    ปล่อยไว้ได้ เพราะมันถูกต้องในฐานะบันทึกว่าอะไรเปลี่ยนตอนไหน
+    """
+    import pathlib as _pl
+    root = _pl.Path(__file__).resolve().parent.parent
+    cur = rules.SPEC_VERSION.replace("cngoal-", "v")     # "v6.0"
+    bad = []
+    patterns = ["Machine Spec เป็นระบบหลัก", "รัน CNgoal v", "คำนวณตาม CNgoal v"]
+    for f in (root / "engine").glob("*.py"):
+        for i, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            for pat in patterns:
+                if pat in line and "v5." in line:
+                    bad.append(f"{f.name}:{i}: {line.strip()[:80]}")
+    assert not bad, "มีเลขเวอร์ชันค้าง:\n" + "\n".join(bad)
+    assert cur == "v6.0"
+
+
+def test_watchlist_adx_only_for_stocks():
+    """กันคนเผลอใส่ ADX ให้ทอง/crypto ซึ่งทดสอบแล้วว่าแย่ลง"""
+    import yaml, pathlib
+    cfg = yaml.safe_load(
+        (pathlib.Path(__file__).resolve().parent.parent / "watchlist.yml")
+        .read_text(encoding="utf-8"))
+    adx = cfg["rules"].get("adx_min_by_class", {}) or {}
+    assert adx.get("stock") == 25
+    assert "metal" not in adx and "crypto" not in adx, adx
+    for a in cfg["assets"]:
+        if a.get("class") in ("metal", "crypto"):
+            assert not a.get("adx_min"), a["symbol"]
+    # ทุกหุ้นต้องมี corr_group ไม่งั้นกฎกลุ่มสัมพันธ์จะไม่ทำงานกับตัวนั้น
+    for a in cfg["assets"]:
+        if a.get("class") == "stock":
+            assert a.get("corr_group"), a["symbol"]
+    assert cfg["risk"]["max_concurrent_portfolio"] == 8
+    # เลขเวอร์ชันใน watchlist ต้องตรงกับโค้ด — ของเดิมค้างที่ cngoal-5.1 ข้าม 3 เวอร์ชัน
+    assert cfg["risk"]["spec_version"] == rules.SPEC_VERSION, (
+        cfg["risk"]["spec_version"], rules.SPEC_VERSION)
+
+
+def test_main_runner_collects_every_test():
+    """กัน bug ที่เคยเกิด: ถ้า block __main__ ไม่ได้อยู่ท้ายไฟล์
+
+    เทสต์ที่นิยามหลังจากนั้นจะไม่ถูก globals() เก็บ = ถูกข้ามเงียบ ๆ ตอนรัน
+    `python tests/test_engine.py` ทั้งที่ pytest ยังเห็นครบ (บทเรียนจาก v0.8)
+    """
+    import pathlib, re
+    src = pathlib.Path(__file__).read_text(encoding="utf-8")
+    # ต้อง anchor ที่ต้นบรรทัด ไม่งั้นจะไปเจอ string literal ในเทสต์นี้เอง
+    hits = list(re.finditer(r"^if __name__", src, re.M))
+    assert len(hits) == 1, f"เจอ guard {len(hits)} จุด"
+    after = src[hits[0].start():]
+    assert not re.search(r"^def test_", after, re.M), \
+        "มี test ถูกนิยามหลัง block __main__ -> จะถูกข้ามตอนรันตรง ๆ"
+    n_file = len(re.findall(r"^def test_", src, re.M))
+    n_globals = len([k for k in globals() if k.startswith("test_")])
+    assert n_file == n_globals, (n_file, n_globals)
+
+
+def test_run_loop_opens_one_per_correlated_group():
+    """เทสต์เส้นทางจริงใน run.py ไม่ใช่แค่ logic การเรียง
+
+    บทเรียน v0.7: smoke test ที่ไม่เดินตาม code path จริงหลอกเราได้
+    ที่นี่จึงเรียก run.main() ตรง ๆ โดยปลอมแค่ชั้นดึงข้อมูลกับชั้นออกสัญญาณ
+    """
+    import json, tempfile, pathlib as _pl
+    from datetime import datetime, timezone
+    from engine import fetch as _fetch, portfolio as _P
+
+    df = ind.enrich(_synth(400, seed=11, trend=0.002))
+    df.index = pd.date_range("2025-01-01", periods=len(df), freq="D")
+
+    def fake_load_best(item, max_age_days, now=None, retries=2):
+        return df.copy(), {"source": "fake", "bar_age_days": 0, "stale": False, "tried": []}
+
+    fires = {"NVDA": 30.0, "AMD": 45.0, "TSM": 38.0, "JPM": 33.0}
+
+    def fake_evaluate(sym, d, **kw):
+        if sym not in fires:
+            return []
+        px = float(d.iloc[-1]["close"])
+        return [rules.Signal(
+            sym, "cngoal_entry", "entry", "long", 85, px,
+            reasons=["ทดสอบ"],
+            levels={"entry": px, "stop": px * 0.95, "sl_distance_pct": 5.0,
+                    "position_size": 20.0, "risk_amount": 1.0, "units": 0.2,
+                    "stop_source": "atr2"},
+            evidence={"adx14": fires[sym]}, checklist=[])]
+
+    old_lb, old_ev = _fetch.load_best, rules.evaluate
+    old_age = _fetch.bar_age_days
+    old_data, old_pf, old_man = engine_run.DATA, engine_run.PORTFOLIO_FILE, engine_run.MANUAL_FILE
+    tmp = _pl.Path(tempfile.mkdtemp())
+    try:
+        _fetch.load_best = fake_load_best
+        _fetch.bar_age_days = lambda d, now=None: 0
+        rules.evaluate = fake_evaluate
+        engine_run.DATA = tmp
+        engine_run.PORTFOLIO_FILE = tmp / "portfolio.json"
+        engine_run.MANUAL_FILE = tmp / "manual.json"
+        (tmp / "portfolio.json").write_text(
+            json.dumps(_P.default_portfolio(100.0)), encoding="utf-8")
+        engine_run.main("stock", now=datetime(2026, 8, 19, 23, tzinfo=timezone.utc))
+        out = json.loads((tmp / "signals_stock.json").read_text(encoding="utf-8"))
+        st = json.loads((tmp / "state_stock.json").read_text(encoding="utf-8"))
+    finally:
+        _fetch.load_best, rules.evaluate = old_lb, old_ev
+        _fetch.bar_age_days = old_age
+        engine_run.DATA, engine_run.PORTFOLIO_FILE, engine_run.MANUAL_FILE = (
+            old_data, old_pf, old_man)
+
+    opened = set(st["positions"])
+    # us_semi มี 3 ตัว (NVDA/AMD/TSM) ต้องเปิดแค่ AMD ซึ่ง ADX สูงสุด · JPM คนละกลุ่มจึงเปิดได้
+    assert opened == {"AMD", "JPM"}, opened
+    blocked = [s for s in out["signals"] if s["kind"] == "blocked"]
+    corr = [s for s in blocked if any("กลุ่ม `us_semi`" in r for r in s["reasons"])]
+    assert {s["symbol"] for s in corr} == {"NVDA", "TSM"}, [s["symbol"] for s in corr]
+    assert out["engine_version"] == "0.9"
+    assert out["rules_config"]["max_concurrent_portfolio"] == 8
+    # จำนวนไม้ของสายนี้ต้องถูกเขียนลง portfolio.json ให้สายอื่นเห็น
+    pf = json.loads((tmp / "portfolio.json").read_text(encoding="utf-8"))
+    assert pf["open_by_group"]["stock"] == 2, pf.get("open_by_group")
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ STATE_VERSION = 3
 
 def default_portfolio(equity: float) -> dict:
     return {"version": STATE_VERSION, "equity": float(equity), "peak": float(equity),
-            "halted": False, "halt_reason": None, "history": []}
+            "halted": False, "halt_reason": None, "open_by_group": {}, "history": []}
 
 
 def load_json(path: pathlib.Path, fallback: dict) -> dict:
@@ -160,11 +160,40 @@ def is_paused(state: dict, today: date) -> bool:
         return False
 
 
-def entry_blockers(state: dict, pf: dict, today: date, max_positions: int) -> list[str]:
+def sync_group_positions(pf: dict, group: str, n_open: int) -> None:
+    """บันทึกจำนวนไม้เปิดของสายนี้ลง portfolio.json ที่ใช้ร่วมกันทั้ง 3 agent
+
+    ทำไมต้องมี (v0.9)
+    -----------------
+    `max_concurrent_positions` เดิมนับ "ต่อ agent" เท่านั้น ทำให้เพดานจริงคือ
+    3 ไม้ (3 agent x 1) โดยไม่มีใครตั้งใจให้เป็นแบบนั้น และไม่มีทางตั้งเป็นค่าอื่น
+    ที่สมเหตุสมผลได้เลย เพราะ agent แต่ละตัวมองไม่เห็นไม้ของ agent อื่น
+    ทั้งที่ equity เป็นก้อนเดียวกัน — ความเสี่ยงจึงบวกกันจริงแต่ไม่มีใครนับ
+
+    ตัวเลขของสายอื่นอาจเก่าได้ถึง 1 วัน (แต่ละ workflow รันคนละเวลา) ซึ่งยอมรับได้
+    เพราะทิศทางของความคลาดเคลื่อนปลอดภัย: ไม้ที่ปิดไปแล้วแต่ยังไม่ถูกล้างจะทำให้
+    ระบบ "ระมัดระวังเกินจริง" ไม่ใช่ "เสี่ยงเกินจริง"
+    """
+    pf.setdefault("open_by_group", {})[group] = int(n_open)
+
+
+def portfolio_open_count(pf: dict, exclude_group: str | None = None) -> int:
+    """รวมไม้เปิดทุกสาย — ข้ามสายที่กำลังรันอยู่ (นับจาก state ของตัวเองแทน เพราะสดกว่า)"""
+    by = pf.get("open_by_group", {}) or {}
+    return sum(int(v) for k, v in by.items() if k != exclude_group)
+
+
+def entry_blockers(state: dict, pf: dict, today: date, max_positions: int,
+                   portfolio_max: int | None = None,
+                   group: str | None = None) -> list[str]:
     """เหตุผลทั้งหมดที่ "ห้ามเปิดไม้ใหม่" ตอนนี้ — ว่างเปล่า = เปิดได้
 
     run.py ต้องเรียกอันนี้ก่อนจะบันทึกอะไรลง state เสมอ
     ของเดิม (v0.5) halt เป็นแค่ข้อความใน JSON แต่โค้ดยังเขียน position ต่อ
+
+    v0.9 เพิ่มเพดานระดับพอร์ต (`portfolio_max`) ทับเพดานต่อ agent อีกชั้น
+    จากการจำลอง equity 54 ปี: เพดาน 8 ให้ CAGR 10.7% ขณะที่เพดาน 4 ให้ 8.7%
+    โดย maxDD เท่ากันที่ 28.8% — เพดานที่แคบเกินไปตัดกำไรทิ้งโดยไม่ได้ลดความเสี่ยง
     """
     out = []
     if pf.get("halted"):
@@ -173,7 +202,11 @@ def entry_blockers(state: dict, pf: dict, today: date, max_positions: int) -> li
         out.append(f"อยู่ในช่วงพักหลังแพ้ติดกัน — กลับมาเทรดได้ {state['paused_until']}")
     open_n = len(state.get("positions", {}))
     if open_n >= max_positions:
-        out.append(f"มีไม้เปิดอยู่ {open_n} ไม้ (เพดาน {max_positions})")
+        out.append(f"มีไม้เปิดอยู่ {open_n} ไม้ในสายนี้ (เพดานต่อสาย {max_positions})")
+    if portfolio_max is not None:
+        total = open_n + portfolio_open_count(pf, exclude_group=group)
+        if total >= portfolio_max:
+            out.append(f"ทั้งพอร์ตมีไม้เปิดอยู่ {total} ไม้ (เพดานรวม {portfolio_max})")
     return out
 
 

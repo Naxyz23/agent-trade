@@ -1,0 +1,109 @@
+(stock us + xau )
+LONG SETUP 
+Step 1 — Trend
+ราคา > EMA 200
+✅ ผ่าน
+
+Step 2 — Structure
+EMA 20 > EMA 50
+✅ ผ่าน
+
+Step 3 — Pullback
+ราคาย่อลงมาใกล้ EMA 20/50
+✅ ผ่าน
+
+Step 4 — RSI
+RSI ลงมา 40–50 แล้วเด้งกลับเหนือ 50
+✅ ผ่าน
+
+Step 5 — MACD
+MACD bullish crossover
+✅ ผ่าน
+
+Step 6 — Volume
+แท่งยืนยันมี Volume > ค่าเฉลี่ย
+✅ ผ่าน
+
+Step 7 — Entry
+เข้า Long
+
+Step 8 — Stop
+SL = 1.5–2 × ATR
+
+Step 9 — Take Profit
+ใช้ Risk : Reward อย่างน้อย
+1 : 2
+
+---------------------------------------------------
+แล้วถ้าเป็นตลาด Sideway?
+
+ตรงนี้สำคัญมาก
+ระบบ EMA + MACD จะเริ่มโดน Whipsaw เพราะตลาดไม่มี Trend ชัดเจน
+ให้เปลี่ยนชุด:
+Bollinger Bands + RSI + Volume
+ตัวอย่าง:
+ราคาแตะ Lower Band
+↓
+RSI < 30
+↓
+เกิด bullish reversal
+↓
+Volume เพิ่ม
+↓
+Long
+แต่ต้องระวังว่า Bollinger Band strategy ไม่ได้ชนะ Buy & Hold อย่างสม่ำเสมอ
+-----------------------------------------------------------------
+
+ถ้าเป็น Crypto Futures + Leverage ผมจะคิดต่างจากการซื้อหุ้น Spot พอสมควร เพราะสิ่งที่ต้องเอาชนะไม่ใช่แค่ “ทายถูกว่าราคาจะขึ้นหรือลง” แต่ต้องควบคุม Liquidation + Volatility + Position Size + Funding + Slippage ด้วย
+
+1 EMA 200 = Trend
+2 EMA 20/50 = Entry zone
+3 RSI 14 = Momentum
+4 Volume = Confirmation
+5 ATR 14 = Stop + Position sizing
+
+Setup A — Pullback Entry
+นี่เป็นตัวที่ผมชอบที่สุดสำหรับ Trend สมมติ BTC ขาขึ้น:
+เงื่อนไข:
+1. ราคา > EMA200
+2. EMA20 > EMA50
+3. ราคาย่อลง EMA20/50
+4. RSI อยู่ประมาณ 40–50
+5. เกิด Bullish candle
+6. Volume เพิ่ม → เข้า Long
+Stop ใต้ Swing Low + ATR buffer
+TP อย่างน้อย 1:2 R:R
+
+Setup B — Breakout Entry
+สมมติ BTC ติดอยู่ในกรอบ:อย่าเพิ่งซื้อเพราะราคาแตะ Resistance
+รอ: Breakout
+Volume สูง
+แล้วมีสองวิธี
+Aggressive
+ซื้อทันทีเมื่อแท่ง Breakout ปิด
+Conservative รอราคา: Breakout → Pullback → Retest Resistance
+แล้วเปลี่ยนเป็น Support วิธีนี้ช่วยลดการโดน Fake Breakout
+
+------------------------------------------------------------------------
+
+ถ้าจะทำให้เป็น Algorithm ผมจะให้คะแนนแบบนี้:
+| เงื่อนไข                         |   คะแนน |
+| ---------------------  | ------: |
+| ราคา > EMA200           |     +20 |
+| EMA20 > EMA50          |     +15 |
+| Pullback EMA20/50      |     +15 |
+| RSI กลับเหนือ 50         |     +15 |
+| Volume ยืนยัน                |    +15 |
+| MACD bullish           |      +5 |
+| OI/Funding ไม่ผิดปกติ     |     +10 |
+| **รวม**                | **100** |
+
+กฎ
+≥80 คะแนน → Strong Entry
+70–79 → Entry ได้ แต่ลด Position
+60–69 → รอ
+<60 → ไม่เข้า
+แบบนี้จะดีกว่าการใช้:
+RSI = Buy
+RSI = Sell
+เพราะตลาดจริงไม่ได้ง่ายขนาดนั้น

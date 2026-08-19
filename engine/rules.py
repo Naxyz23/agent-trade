@@ -1,4 +1,4 @@
-"""Rule engine v2 — ยึด CNgoal v5.1 Machine Spec เป็นระบบหลัก
+"""Rule engine — ยึด CNgoal Machine Spec เป็นระบบหลัก (ปัจจุบัน v6.0)
 
 ทำไมเปลี่ยนจาก v1
 -----------------
@@ -21,7 +21,19 @@ from typing import Any
 
 import pandas as pd
 
-SPEC_VERSION = "cngoal-5.1"
+SPEC_VERSION = "cngoal-6.0"
+#
+# 🔖 เกณฑ์การตั้งเลขเวอร์ชันของ spec (ตกลงกัน 19 ส.ค. 2026 — Nana ท้วงว่าของเดิมตั้งมั่ว)
+#   เลขหลัก (6.0 -> 7.0) = **ชุดไม้ที่ระบบจะเข้าเปลี่ยนไป**
+#       เงื่อนไขเข้า/ออก · วิธีวาง SL · timeframe · นิยาม bias
+#       = สัญญาณที่ออกด้วยเวอร์ชันก่อนหน้า ไม่ผ่านเกณฑ์ของเวอร์ชันใหม่ทั้งหมด
+#   เลขรอง (6.0 -> 6.1) = ไม้ชุดเดิม แต่ปรับตัวเลขรอบข้าง
+#       โมเดลต้นทุน · เพดานความเสี่ยง · เอกสาร · การรายงาน
+#
+#   ย้อนดูของเดิมด้วยเกณฑ์นี้ ทุกครั้งควรเป็นเลขหลักทั้งนั้น (ตั้งผิดมาตลอด):
+#     5.1  4H -> Daily, risk 2-5% -> 1%, นิยาม bias ใหม่
+#     5.2  exit EMA20 -> EMA50, stop ATR x2
+#     6.0  เพิ่มเงื่อนไขเข้า 2 ข้อ (เดิมตั้งเป็น 5.3 ซึ่งผิด — แก้แล้ว)
 
 # ค่าจาก Machine Spec — เปลี่ยนที่นี่ที่เดียวถ้า cngoal ออกเวอร์ชันใหม่
 SWING_LOOKBACK = 10
@@ -36,6 +48,22 @@ ATR_STOP_MULT = 2.0          # ตัวคูณ ATR14 เมื่อ stop_mod
 DEFAULT_STOP_MODE = "chart"  # "chart" = กฎ v5.1 เดิม | "atr2" = ATR14 x 2
 DEFAULT_TRAIL_EMA = 50       # เส้นที่ใช้ trail ออก (20 = กฎเดิม | 50 = v0.8)
 VALID_TRAIL_EMA = (20, 50)
+
+# --- v0.9 (cngoal v6.0): เงื่อนไขเข้าเพิ่ม 2 ข้อ ---
+DEFAULT_REQUIRE_EMA_STACK = True   # EMA20 > EMA50 (long) / EMA20 < EMA50 (short)
+DEFAULT_ADX_MIN = None             # None = ไม่ใช้ · ตั้งค่าได้ต่อ class ผ่าน watchlist.yml
+#
+# ที่มาของสองข้อนี้ — backtest 19 ส.ค. 2026 (16 สินทรัพย์ 54 ปี · รายงาน backtest-report-v3.html)
+#
+# EMA20 > EMA50  : ข้อเสนอของ Nana ที่ผ่านการทดสอบ +0.182R -> +0.207R ดีขึ้น 12/15 สินทรัพย์
+#                  โดยกำไรรวมไม่ลดเลย (ไม้ลด 12% แต่กำไรต่อไม้เพิ่มพอชดเชย) ใช้ได้ทุก class
+#
+# ADX(14) >= 25  : ประตูกันตลาดออกข้าง ⛔ **เฉพาะ class stock**
+#                  หุ้น 13 ตัว +0.227R -> +0.409R · พลิก 2000s จาก -0.029R เป็น +0.111R
+#                  ทดสอบทั้งเส้น 15/20/22/25/28/30/35 เป็นเนินเรียบ ไม่ใช่จุดแหลม = ผลจริง
+#                  XAU  : +0.115R -> +0.049R (ที่ 30 ติดลบ)  แย่ลง ห้ามใช้
+#                  BTC  : กำไรรวม 326R -> 180R โดยกำไรต่อไม้ไม่เพิ่ม  ห้ามใช้
+#                  โครงสร้างเดียวกับ stop_mode ที่แยกตาม class ตั้งแต่ v0.8
 
 
 @dataclass
@@ -150,7 +178,8 @@ def _place_stop(side: str, r: pd.Series, stop_mode: str = DEFAULT_STOP_MODE):
 
 def _evidence(r: pd.Series) -> dict:
     keys = ["close", "open", "high", "low", "ema20", "ema50", "ema200", "rsi14",
-            "atr14", "atr_pct", "swing_low10", "swing_high10", "ret_5d", "ret_20d"]
+            "atr14", "atr_pct", "adx14", "swing_low10", "swing_high10",
+            "ret_5d", "ret_20d"]
     out = {}
     for k in keys:
         v = r.get(k)
@@ -162,21 +191,35 @@ def _evidence(r: pd.Series) -> dict:
     return out
 
 
-# --------------------------------------------------- CNgoal v5.1 entry rules
+# --------------------------------------------------- CNgoal entry rules
 
 def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
                  equity: float | None = None, long_only: bool = False,
                  risk_pct: float = RISK_PCT,
-                 stop_mode: str = DEFAULT_STOP_MODE) -> Signal | None:
-    """4 เงื่อนไข ทุกข้อต้องผ่าน — ข้อใดไม่ผ่านคือไม่เข้า ไม่มีข้อยกเว้น
+                 stop_mode: str = DEFAULT_STOP_MODE,
+                 require_ema_stack: bool = DEFAULT_REQUIRE_EMA_STACK,
+                 adx_min: float | None = DEFAULT_ADX_MIN) -> Signal | None:
+    """ทุกเงื่อนไขต้องผ่าน — ข้อใดไม่ผ่านคือไม่เข้า ไม่มีข้อยกเว้น
+
+    v5.1/v5.2 มี 4 ข้อ · v6.0 เพิ่มอีก 2:
+      #2 EMA20 > EMA50 (ทุก class)   #6 ADX >= เกณฑ์ (เฉพาะหุ้น — ส่ง adx_min เข้ามา)
+
+    ⛔ ห้ามแปลงเป็นระบบให้คะแนนแล้วเข้าที่ 70/100 — ทดสอบเต็มรูปแบบแล้ว
+       กำไรรวมสูงกว่าจริงแต่พังทันทีที่ slippage 0.40% และดีขึ้นแค่ 9/15 สินทรัพย์
+       (รายละเอียดใน cngoal skill: references/rejected.md)
 
     ตัดสินที่แท่ง Daily ที่ปิดแล้วเท่านั้น (run.py ตัดแท่งที่ยังไม่ปิดออกก่อนเรียก)
     """
     r = df.iloc[-1]
-    for side, (bias, ema20_ok, rsi_ok, candle) in {
-        "long":  (bool(r["ema200_up"]),   r["close"] > r["ema20"], r["rsi14"] > 50,
+    adx_val = r.get("adx14")
+    adx_ok_val = (adx_val is not None
+                  and not (isinstance(adx_val, float) and math.isnan(adx_val)))
+    for side, (bias, stack_ok, ema20_ok, rsi_ok, candle) in {
+        "long":  (bool(r["ema200_up"]),   r["ema20"] > r["ema50"],
+                  r["close"] > r["ema20"], r["rsi14"] > 50,
                   bool(r["candle_bullish"])),
-        "short": (bool(r["ema200_down"]), r["close"] < r["ema20"], r["rsi14"] < 50,
+        "short": (bool(r["ema200_down"]), r["ema20"] < r["ema50"],
+                  r["close"] < r["ema20"], r["rsi14"] < 50,
                   bool(r["candle_bearish"])),
     }.items():
         if long_only and side == "short":
@@ -185,13 +228,26 @@ def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
             {"n": 1, "name": "EMA200 หันขึ้น" if side == "long" else "EMA200 หันลง",
              "pass": bias,
              "detail": f"EMA200 = {r['ema200']:.4g} vs 20 แท่งก่อน {df['ema200'].iloc[-21]:.4g}"},
-            {"n": 2, "name": f"ปิด {'>' if side == 'long' else '<'} EMA20", "pass": bool(ema20_ok),
+            {"n": 2, "name": f"EMA20 {'>' if side == 'long' else '<'} EMA50",
+             "pass": bool(stack_ok) if require_ema_stack else True,
+             "detail": f"EMA20 {r['ema20']:.4g} vs EMA50 {r['ema50']:.4g}"
+                       + ("" if require_ema_stack else "  (ปิดการตรวจข้อนี้ไว้)")},
+            {"n": 3, "name": f"ปิด {'>' if side == 'long' else '<'} EMA20", "pass": bool(ema20_ok),
              "detail": f"close {r['close']:.4g} vs EMA20 {r['ema20']:.4g}"},
-            {"n": 3, "name": f"RSI14 {'>' if side == 'long' else '<'} 50", "pass": bool(rsi_ok),
+            {"n": 4, "name": f"RSI14 {'>' if side == 'long' else '<'} 50", "pass": bool(rsi_ok),
              "detail": f"RSI14 = {r['rsi14']:.1f}"},
-            {"n": 4, "name": "candle ยืนยัน", "pass": candle,
+            {"n": 5, "name": "candle ยืนยัน", "pass": candle,
              "detail": _candle_name(r)},
         ]
+        if adx_min is not None:
+            # ADX ยังไม่พร้อม (ช่วง warm-up) = ไม่ผ่าน ไม่ใช่ผ่านฟรี
+            # ต่างจาก _place_stop ที่ถอยไปใช้กฎ chart ได้ เพราะอันนั้นยังมีทางเลือกที่ถูกต้อง
+            # ส่วนอันนี้ถ้าไม่รู้ค่า ADX ก็ไม่มีทางรู้ว่าตลาดมีเทรนด์จริงไหม -> ไม่เข้าดีกว่า
+            checks.append({
+                "n": 6, "name": f"ADX14 >= {adx_min:g}",
+                "pass": bool(adx_ok_val and float(adx_val) >= float(adx_min)),
+                "detail": (f"ADX14 = {float(adx_val):.1f}" if adx_ok_val
+                           else "ADX14 ยังคำนวณไม่ได้ (ข้อมูลสั้นเกินไป)")})
         if not all(c["pass"] for c in checks):
             continue
 
@@ -214,12 +270,16 @@ def cngoal_entry(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
         lv = _sizing(px, stop, leverage_cap, equity, risk_pct)
         lv["stop_source"] = src
         reasons = [
-            f"ครบทั้ง 4 เงื่อนไข CNgoal v5.1 ฝั่ง {side.upper()}",
+            f"ครบทั้ง {len(checks)} เงื่อนไข CNgoal v6.0 ฝั่ง {side.upper()}",
             f"EMA200 {'หันขึ้น' if side == 'long' else 'หันลง'} "
-            f"({r['ema200']:.4g} เทียบ {df['ema200'].iloc[-21]:.4g} เมื่อ 20 แท่งก่อน)",
+            f"({r['ema200']:.4g} เทียบ {df['ema200'].iloc[-21]:.4g} เมื่อ 20 แท่งก่อน)"
+            + (f" · EMA20 {r['ema20']:.4g} {'>' if side == 'long' else '<'} "
+               f"EMA50 {r['ema50']:.4g}" if require_ema_stack else ""),
             f"ปิด {r['close']:.4g} {'เหนือ' if side == 'long' else 'ใต้'} EMA20 {r['ema20']:.4g}"
             f" · RSI14 {r['rsi14']:.1f}",
-            f"candle ยืนยัน: {_candle_name(r)}",
+            f"candle ยืนยัน: {_candle_name(r)}"
+            + (f" · ADX14 {float(adx_val):.1f} (เกณฑ์ {adx_min:g})"
+               if adx_min is not None and adx_ok_val else ""),
             f"SL อิง {'ATR14 x 2' if src == 'atr2' else src} → {stop:.4g} "
             f"(ห่าง {sl_pct:.2f}%)"
             + ("  ⚠ position ชนเพดาน leverage" if lv["capped_by_leverage"] else ""),
@@ -367,11 +427,14 @@ def evaluate(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
              include_watch: bool = True, long_only: bool = False,
              min_bars: int = 221, risk_pct: float = RISK_PCT,
              stop_mode: str = DEFAULT_STOP_MODE,
-             trail_ema: int = DEFAULT_TRAIL_EMA) -> list[Signal]:
+             trail_ema: int = DEFAULT_TRAIL_EMA,
+             require_ema_stack: bool = DEFAULT_REQUIRE_EMA_STACK,
+             adx_min: float | None = DEFAULT_ADX_MIN) -> list[Signal]:
     """min_bars 221 = EMA200 (200) + slope lookback (20) + 1
 
     v0.8: `stop_mode` และ `trail_ema` ตั้งได้ต่อสินทรัพย์จาก watchlist.yml
     ค่าเริ่มต้นคือ chart + EMA50 · หุ้น US และ XAU ตั้งเป็น atr2 ใน watchlist
+    v0.9: `require_ema_stack` (ทุก class) และ `adx_min` (เฉพาะหุ้น) ตั้งจาก watchlist.yml เช่นกัน
     """
     if len(df) < min_bars:
         return []
@@ -385,7 +448,9 @@ def evaluate(sym: str, df: pd.DataFrame, leverage_cap: float = 5.0,
 
     try:
         s = cngoal_entry(sym, df, leverage_cap, equity, long_only, risk_pct,
-                         stop_mode=stop_mode)
+                         stop_mode=stop_mode,
+                         require_ema_stack=require_ema_stack,
+                         adx_min=adx_min)
         if s:
             out.append(s)
     except Exception as e:

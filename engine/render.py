@@ -144,7 +144,10 @@ def render(p: dict) -> str:
         out.append("<div class=foot>⚠ ดึงข้อมูลไม่สำเร็จ: "
                    + ", ".join(f"{e['symbol']}" for e in p["errors"]) + "</div>")
 
-    out.append("<div class=foot>คำนวณตาม CNgoal v5.1 Machine Spec · risk 1%/ไม้ · "
+    # อ่านเวอร์ชันจากไฟล์สัญญาณ ไม่ hardcode — ของเดิมค้างที่ v5.1 อยู่ 3 เวอร์ชัน
+    # ใช้ค่าจาก p ไม่ใช่ import rules เพราะ render.py ต้องรันเดี่ยว ๆ ได้โดยไม่ต้องมี pandas
+    _spec = str(p.get("spec_version", "")).replace("cngoal-", "v") or "?"
+    out.append(f"<div class=foot>คำนวณตาม CNgoal {_spec} Machine Spec · risk 1%/ไม้ · "
                "ตัดสินที่แท่ง Daily ที่ปิดแล้วเท่านั้น<br>"
                "เอกสารนี้ประกอบการตัดสินใจ ไม่ใช่คำแนะนำทางการเงิน</div>")
     return "\n".join(out)

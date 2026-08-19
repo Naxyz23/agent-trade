@@ -29,19 +29,19 @@ assets:
       sources: [yahoo], fetch_symbol: "GC=F" }
 
   # ---------------- หุ้น US (margin/CFD — ชอร์ตได้ leverage x5) ----------------
-  - { symbol: NVDA, fetch_symbol: "NVDA", class: stock, name: "NVIDIA",           leverage_cap: 5 }
-  - { symbol: MSFT, fetch_symbol: "MSFT", class: stock, name: "Microsoft",        leverage_cap: 5 }
-  - { symbol: AAPL, fetch_symbol: "AAPL", class: stock, name: "Apple",            leverage_cap: 5 }
-  - { symbol: GOOG, fetch_symbol: "GOOG", class: stock, name: "Alphabet C",       leverage_cap: 5 }
-  - { symbol: META, fetch_symbol: "META", class: stock, name: "Meta Platforms",   leverage_cap: 5 }
-  - { symbol: AMD,  fetch_symbol: "AMD",  class: stock, name: "AMD",              leverage_cap: 5 }
-  - { symbol: TSM,  fetch_symbol: "TSM",  class: stock, name: "TSMC ADR",         leverage_cap: 5 }
-  - { symbol: TSLA, fetch_symbol: "TSLA", class: stock, name: "Tesla",            leverage_cap: 5 }
-  - { symbol: ORCL, fetch_symbol: "ORCL", class: stock, name: "Oracle",           leverage_cap: 5 }
-  - { symbol: NFLX, fetch_symbol: "NFLX", class: stock, name: "Netflix",          leverage_cap: 5 }
-  - { symbol: JPM,  fetch_symbol: "JPM",  class: stock, name: "JPMorgan Chase",   leverage_cap: 5 }
-  - { symbol: LLY,  fetch_symbol: "LLY",  class: stock, name: "Eli Lilly",        leverage_cap: 5 }
-  - { symbol: WMT,  fetch_symbol: "WMT",  class: stock, name: "Walmart",          leverage_cap: 5 }
+  - { symbol: NVDA, fetch_symbol: "NVDA", class: stock, name: "NVIDIA",           leverage_cap: 5, corr_group: us_semi }
+  - { symbol: MSFT, fetch_symbol: "MSFT", class: stock, name: "Microsoft",        leverage_cap: 5, corr_group: us_bigtech }
+  - { symbol: AAPL, fetch_symbol: "AAPL", class: stock, name: "Apple",            leverage_cap: 5, corr_group: us_bigtech }
+  - { symbol: GOOG, fetch_symbol: "GOOG", class: stock, name: "Alphabet C",       leverage_cap: 5, corr_group: us_bigtech }
+  - { symbol: META, fetch_symbol: "META", class: stock, name: "Meta Platforms",   leverage_cap: 5, corr_group: us_bigtech }
+  - { symbol: AMD,  fetch_symbol: "AMD",  class: stock, name: "AMD",              leverage_cap: 5, corr_group: us_semi }
+  - { symbol: TSM,  fetch_symbol: "TSM",  class: stock, name: "TSMC ADR",         leverage_cap: 5, corr_group: us_semi }
+  - { symbol: TSLA, fetch_symbol: "TSLA", class: stock, name: "Tesla",            leverage_cap: 5, corr_group: us_growth }
+  - { symbol: ORCL, fetch_symbol: "ORCL", class: stock, name: "Oracle",           leverage_cap: 5, corr_group: us_bigtech }
+  - { symbol: NFLX, fetch_symbol: "NFLX", class: stock, name: "Netflix",          leverage_cap: 5, corr_group: us_bigtech }
+  - { symbol: JPM,  fetch_symbol: "JPM",  class: stock, name: "JPMorgan Chase",   leverage_cap: 5, corr_group: us_fin }
+  - { symbol: LLY,  fetch_symbol: "LLY",  class: stock, name: "Eli Lilly",        leverage_cap: 5, corr_group: us_health }
+  - { symbol: WMT,  fetch_symbol: "WMT",  class: stock, name: "Walmart",          leverage_cap: 5, corr_group: us_staples }
 
   # SPCX (SpaceX) — IPO 12 มิ.ย. 2026 มีข้อมูลแค่ ~46 แท่ง
   # ต้องมี 221 แท่งถึงคำนวณ EMA200 + slope ได้ → เปิดใช้ได้ราวเดือน เม.ย. 2027
@@ -67,6 +67,19 @@ assets:
 #            ตรงกับผลทดสอบ SL เมื่อ 17 ส.ค. ที่สรุปว่า SL ตามชาร์ตทนทานสุด
 rules:
   trail_ema: 50               # 20 หรือ 50 เท่านั้น
+
+  # ---- v0.9 (cngoal v6.0) — เพิ่มเงื่อนไขเข้า 2 ข้อ ----
+  # รายงาน: backtest-report-v3.html (16 สินทรัพย์ 54 ปี · 19 ส.ค. 2026)
+  require_ema_stack: true     # EMA20 > EMA50 (long) — ใช้ทุก class
+                              # +0.182R -> +0.207R · ดีขึ้น 12/15 สินทรัพย์ · กำไรรวมไม่ลด
+  adx_min_by_class:           # ประตูกันตลาดออกข้าง — ไม่ใส่ = ไม่ใช้
+    stock: 25                 # หุ้น +0.227R -> +0.409R · พลิก 2000s จาก -0.029R เป็น +0.111R
+    # metal: ห้ามใส่ — XAU +0.115R -> +0.049R (ที่ ADX 30 ติดลบ -0.228R)
+    # crypto: ห้ามใส่ — BTC กำไรรวม 326R -> 180R โดยกำไรต่อไม้ไม่เพิ่ม
+  # ตั้งรายตัวได้ด้วย field `adx_min:` ในรายการสินทรัพย์ (ใส่ 0 = ปิดการตรวจตัวนั้น)
+  # corr_group ในรายการสินทรัพย์ = กลุ่มที่ราคาวิ่งไปทางเดียวกัน (us_semi / us_bigtech / ...)
+  #   รอบไหนมีสัญญาณหลายตัวในกลุ่มเดียวกัน จะเปิดแค่ตัวที่ ADX สูงสุด
+  #   เพราะ risk 1% x 3 ตัวที่วิ่งเหมือนกัน = ความเสี่ยง 3% ก้อนเดียว ไม่ใช่ 3 ก้อนที่กระจาย
   stop_mode_default: chart    # chart = swing10/EMA50 (v5.1 เดิม) | atr2 = ATR14 x 2
   stop_mode_by_class:
     stock: atr2
@@ -74,20 +87,33 @@ rules:
     crypto: chart             # ห้ามเปลี่ยน — BTC ทดสอบแล้วแย่ลง
   # ตั้งรายตัวได้ด้วย field `stop_mode:` ในรายการสินทรัพย์ (ชนะค่าตาม class)
 
-# ---------------- Risk (ตรงกับ CNgoal v5.1 Machine Spec) ----------------
+# ---------------- Risk (ตรงกับ CNgoal v6.0 Machine Spec) ----------------
 # ยอดพอร์ตอยู่ใน data/portfolio.json ก้อนเดียว ใช้ร่วมกันทั้ง 3 agent
 # เพราะกฎ drawdown 15% ของ v5.1 พูดถึงพอร์ตทั้งก้อน ถ้าแยกตาม agent ตัวเลขจะไร้ความหมาย
 # ส่วนไม้ที่เปิดอยู่ + consecutive_losses ยังแยกตาม agent เหมือนเดิม
 # (ผลเทรด crypto ไม่ควรทำให้ agent หุ้นพักตาม — คนละพฤติกรรมตลาด)
 risk:
-  spec_version: "cngoal-5.1"
+  spec_version: "cngoal-6.0"   # ต้องตรงกับ rules.SPEC_VERSION (มีเทสต์ตรวจ)
   pct_per_trade: 1.0          # v0.6 อ่านค่านี้จริงแล้ว (ก่อนหน้านี้ rules.py hardcode ทิ้งไว้)
   default_leverage_cap: 5
   equity_usdt: 100            # ใช้เป็นยอดตั้งต้นครั้งแรกเท่านั้น หลังจากนั้นดู portfolio.json
   pause_after_losses: 3       # แพ้ติด 3 ไม้ (เฉพาะสายนั้น) → พัก
   pause_days: 3               # พักกี่วัน — ครบแล้วกลับมาเทรดเองอัตโนมัติ
   halt_drawdown_pct: 15       # พอร์ตลดจาก peak 15% → หยุด ปลดล็อกด้วยมือใน manual.json
-  max_concurrent_positions: 1 # ต่อ agent — 3 agent x 1 = risk รวมไม่เกิน 3% พร้อมกัน
+  max_concurrent_positions: 5 # ต่อ agent (สายนั้น ๆ)
+  max_concurrent_portfolio: 8 # ★ v0.9 — เพดานรวมทั้งพอร์ตทุกสาย (นับข้าม agent ผ่าน portfolio.json)
+                              #
+                              # ของเดิมตั้ง 1 ต่อ agent = เพดานจริง 3 ไม้ โดยไม่ได้ตั้งใจ
+                              # และ agent มองไม่เห็นไม้ของกันและกัน ทั้งที่ equity เป็นก้อนเดียว
+                              #
+                              # จำลอง equity 54 ปี (risk 1% ทบต้น) ด้วยกฎ v6.0:
+                              #   เพดาน 4 -> CAGR 8.7%   maxDD 28.0%
+                              #   เพดาน 6 -> CAGR 10.2%  maxDD 28.8%
+                              #   เพดาน 8 -> CAGR 10.7%  maxDD 28.8%   <- เลือกอันนี้
+                              #   ไม่จำกัด -> CAGR 11.2% maxDD 28.8%
+                              # maxDD ไม่ขยับเลยตั้งแต่ 5 ขึ้นไป เพราะพอมี ADX filter แล้ว
+                              # ไม้พร้อมกันแทบไม่เคยเกิน 8 — เพดานนี้เป็นราวกันตกกันเหตุการณ์หาง
+                              # ที่ยังไม่เคยเกิดในข้อมูล ไม่ใช่ตัวคุมผลตอบแทน
   max_gap_loss_r: 5           # ขาดทุนเกินกี่เท่าของ SL ที่วางไว้ ถึงจะถือว่า "ข้อมูลเพี้ยน"
                               # ไม่ใช่ตลาดพังจริง (split / สลับแหล่งข้อมูล / feed เสีย)
                               # แล้วบันทึกผลที่ราคา stop ตามแผนแทน พร้อมเตือนให้ไปเช็ค

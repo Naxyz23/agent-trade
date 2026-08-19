@@ -73,6 +73,29 @@ def atr(df: pd.DataFrame, n: int = 14) -> pd.Series:
     return wilder_smooth(true_range(df), n)
 
 
+
+def adx(df: pd.DataFrame, n: int = 14) -> pd.Series:
+    """ADX (Wilder) — วัด "ความแรงของเทรนด์" ไม่บอกทิศทาง
+
+    ใช้เป็นประตูกันตลาดออกข้างใน cngoal v6.0 — เฉพาะหุ้น US เท่านั้น
+    backtest 19 ส.ค. 2026: หุ้น 13 ตัว +0.227R -> +0.409R เมื่อบังคับ ADX >= 25
+    และพลิกทศวรรษ 2000s จาก -0.029R เป็น +0.111R
+    ⛔ ห้ามเอาไปใช้กับ XAU (แย่ลง) หรือ crypto (กำไรรวมหายครึ่ง) — ทดสอบแล้ว
+
+    เขียนเองแทนการพึ่ง TA-lib เพราะ requirements ของ repo นี้มีแค่ pandas/numpy
+    และสูตร Wilder ตรงไปตรงมาพอที่จะเทียบตัวเลขกับ TradingView ได้
+    """
+    up = df["high"].diff()
+    dn = -df["low"].diff()
+    plus_dm = np.where((up > dn) & (up > 0), up, 0.0)
+    minus_dm = np.where((dn > up) & (dn > 0), dn, 0.0)
+    atr_ = wilder_smooth(true_range(df), n)
+    pdi = 100 * wilder_smooth(pd.Series(plus_dm, index=df.index), n) / atr_
+    mdi = 100 * wilder_smooth(pd.Series(minus_dm, index=df.index), n) / atr_
+    dx = 100 * (pdi - mdi).abs() / (pdi + mdi).replace(0.0, np.nan)
+    return wilder_smooth(dx, n)
+
+
 def bollinger(close: pd.Series, n: int = 20, k: float = 2.0):
     mid = sma(close, n)
     sd = close.rolling(n, min_periods=n).std(ddof=0)
@@ -145,6 +168,7 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
     out["macd"], out["macd_signal"], out["macd_hist"] = macd(c)
     out["atr14"] = atr(out, 14)
     out["atr_pct"] = out["atr14"] / c * 100
+    out["adx14"] = adx(out, 14)
     out["bb_lo"], out["bb_mid"], out["bb_hi"] = bollinger(c, 20, 2.0)
     out["bb_width"] = (out["bb_hi"] - out["bb_lo"]) / out["bb_mid"]
     out["bb_width_pctile"] = out["bb_width"].rolling(120, min_periods=60).rank(pct=True)

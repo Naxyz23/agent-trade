@@ -1,4 +1,4 @@
-"""Orchestrator — ดึงข้อมูล → คำนวณ → รัน CNgoal v5.1 → ติดตามไม้ → signals_<group>.json
+"""Orchestrator — ดึงข้อมูล → คำนวณ → รัน CNgoal v6.0 → ติดตามไม้ → signals_<group>.json
 
 ทำไมแยกเป็น group (crypto / gold / stock)
 ------------------------------------------
@@ -93,7 +93,13 @@ def main(group: str, now: datetime | None = None) -> int:
     trail_ema = int(rules_cfg.get("trail_ema", rules.DEFAULT_TRAIL_EMA))
     stop_default = str(rules_cfg.get("stop_mode_default", rules.DEFAULT_STOP_MODE))
     stop_by_class = rules_cfg.get("stop_mode_by_class", {}) or {}
+    # v0.9 (cngoal v6.0)
+    require_stack = bool(rules_cfg.get("require_ema_stack",
+                                       rules.DEFAULT_REQUIRE_EMA_STACK))
+    adx_by_class = rules_cfg.get("adx_min_by_class", {}) or {}
     max_positions = int(risk_cfg.get("max_concurrent_positions", 1))
+    portfolio_max = risk_cfg.get("max_concurrent_portfolio")
+    portfolio_max = int(portfolio_max) if portfolio_max is not None else None
     pause_after = int(risk_cfg.get("pause_after_losses", 3))
     pause_days = int(risk_cfg.get("pause_days", 3))
     dd_limit = float(risk_cfg.get("halt_drawdown_pct", 15))
@@ -114,6 +120,7 @@ def main(group: str, now: datetime | None = None) -> int:
     events += notes
 
     entries, exits, watches, snapshot, errors, data_health = [], [], [], [], [], []
+    candidates: list[dict] = []       # v0.9 — สัญญาณเข้าที่รอคัดหลังจบลูป
 
     for item in assets:
         sym = item["symbol"]
@@ -164,6 +171,13 @@ def main(group: str, now: datetime | None = None) -> int:
         # ตั้งรายตัว > ตั้งตาม class > ค่าเริ่มต้น
         stop_mode = item.get("stop_mode") or stop_by_class.get(
             item.get("class", "other"), stop_default)
+        # ADX: ตั้งรายตัว > ตั้งตาม class > ไม่ใช้
+        #   `adx_min: 0` รายตัว = ปิดการตรวจ (ต่างจากไม่ใส่ ซึ่งจะไปใช้ค่าตาม class)
+        if "adx_min" in item:
+            adx_min = item["adx_min"] or None
+        else:
+            adx_min = adx_by_class.get(item.get("class", "other"))
+        adx_min = float(adx_min) if adx_min is not None else None
         sigs = rules.evaluate(
             sym, df,
             leverage_cap=item.get("leverage_cap", risk_cfg.get("default_leverage_cap", 5)),
@@ -173,6 +187,8 @@ def main(group: str, now: datetime | None = None) -> int:
             risk_pct=risk_pct,
             stop_mode=stop_mode,
             trail_ema=trail_ema,
+            require_ema_stack=require_stack,
+            adx_min=adx_min,
         )
 
         for sig in sigs:
@@ -191,21 +207,55 @@ def main(group: str, now: datetime | None = None) -> int:
                 exits.append(d)
 
             elif sig.kind == "entry":
-                blockers = portfolio.entry_blockers(state, pf, today, max_positions)
-                if blockers:
-                    d["kind"] = "blocked"
-                    d["reasons"] += [f"⛔ ไม่เปิดไม้: {b}" for b in blockers]
-                    watches.append(d)
-                    continue
-                portfolio.open_position(state, sym, d, bar_date)
-                d["reasons"].append(
-                    f"📌 ระบบบันทึกเป็นไม้เปิดแล้ว (size {d['levels'].get('position_size')} · "
-                    f"เสี่ยง {d['levels'].get('risk_amount')} USDT) — "
-                    f"จะติดตาม SL/EMA{trail_ema} ให้อัตโนมัติ "
-                    f"ราคานี้อิงราคาปิดของแท่งที่ให้สัญญาณ ของจริงอาจต่างเล็กน้อย")
-                entries.append(d)
+                # v0.9: ยังไม่เปิดตรงนี้ — เก็บไว้ก่อน แล้วค่อยคัดทีเดียวหลังจบลูป
+                # เหตุผล: ถ้าเปิดในลูปเลย ใครอยู่ต้นไฟล์ watchlist จะได้ slot ก่อนเสมอ
+                # ซึ่งไม่มีเหตุผลรองรับ และตัวที่สัมพันธ์กัน (NVDA/AMD/TSM) จะเข้าพร้อมกันหมด
+                d["_corr_group"] = item.get("corr_group") or item.get("class", "other")
+                d["_adx"] = d.get("evidence", {}).get("adx14")
+                d["_bar_date"] = bar_date
+                candidates.append(d)
             else:
                 watches.append(d)
+
+    # ---- v0.9: คัดสัญญาณเข้าทั้งหมดพร้อมกัน ----
+    # 1) กลุ่มที่สัมพันธ์กันเอาแค่ตัวเดียว (ADX สูงสุด = เทรนด์แรงสุด)
+    # 2) เรียงตาม ADX แล้วค่อยไล่เปิดจนกว่าจะชนเพดาน
+    def _rank(d):
+        return (-(d.get("_adx") or 0), -d["score"], d["symbol"])
+
+    candidates.sort(key=_rank)
+    seen_groups: set[str] = set()
+    for d in candidates:
+        sym = d["symbol"]
+        g = d.pop("_corr_group")
+        adx_v = d.pop("_adx")
+        bar_date = d.pop("_bar_date")
+        if g in seen_groups:
+            d["kind"] = "blocked"
+            d["reasons"].append(
+                f"⛔ ไม่เปิดไม้: มีสัญญาณในกลุ่ม `{g}` ที่แรงกว่าเข้าไปแล้วในรอบนี้ "
+                f"— นับเป็นความเสี่ยงก้อนเดียวกัน (กฎ correlated group v6.0)")
+            watches.append(d)
+            continue
+        blockers = portfolio.entry_blockers(state, pf, today, max_positions,
+                                            portfolio_max=portfolio_max, group=group)
+        if blockers:
+            d["kind"] = "blocked"
+            d["reasons"] += [f"⛔ ไม่เปิดไม้: {b}" for b in blockers]
+            watches.append(d)
+            continue
+        portfolio.open_position(state, sym, d, bar_date)
+        seen_groups.add(g)
+        d["reasons"].append(
+            f"📌 ระบบบันทึกเป็นไม้เปิดแล้ว (size {d['levels'].get('position_size')} · "
+            f"เสี่ยง {d['levels'].get('risk_amount')} USDT) — "
+            f"จะติดตาม SL/EMA{trail_ema} ให้อัตโนมัติ "
+            f"ราคานี้อิงราคาปิดของแท่งที่ให้สัญญาณ ของจริงอาจต่างเล็กน้อย"
+            + (f" · ADX14 {adx_v:.1f}" if adx_v is not None else ""))
+        entries.append(d)
+
+    # จำนวนไม้เปิดของสายนี้ต้องเขียนลง portfolio.json ให้สายอื่นเห็น (เพดานรวมทั้งพอร์ต)
+    portfolio.sync_group_positions(pf, group, len(state.get("positions", {})))
 
     watches.sort(key=lambda d: -d["score"])
     watches = watches[: filt.get("max_watch_per_run", 6)]
@@ -224,10 +274,14 @@ def main(group: str, now: datetime | None = None) -> int:
         "generated_at": now.isoformat(timespec="seconds"),
         "run_date": now.strftime("%Y-%m-%d"),
         "spec_version": rules.SPEC_VERSION,
-        "engine_version": "0.8",
+        "engine_version": "0.9",
         "rules_config": {"trail_ema": trail_ema,
                          "stop_mode_default": stop_default,
-                         "stop_mode_by_class": stop_by_class},
+                         "stop_mode_by_class": stop_by_class,
+                         "require_ema_stack": require_stack,
+                         "adx_min_by_class": adx_by_class,
+                         "max_concurrent_positions": max_positions,
+                         "max_concurrent_portfolio": portfolio_max},
         "group": group,
         "universe_size": len([a for a in assets if a.get("signals") is not False]),
         "context_size": len([a for a in assets if a.get("signals") is False]),

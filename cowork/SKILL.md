@@ -1,9 +1,9 @@
 ---
 name: signal-brief
-description: อ่านผลสแกน CNgoal v5.1 จาก signals_<group>.json บน GitHub (public repo) แล้วสรุปเป็นภาษาคนพร้อมบริบทที่ระบบไม่รู้ (earnings, ข่าว) ใช้ทุกครั้งที่ scheduled task รอบเช้า/บ่ายทำงาน หรือ Nana ถามถึงสัญญาณของวันนี้
+description: อ่านผลสแกน CNgoal v6.0 จาก signals_<group>.json บน GitHub (public repo) แล้วสรุปเป็นภาษาคนพร้อมบริบทที่ระบบไม่รู้ (earnings, ข่าว) ใช้ทุกครั้งที่ scheduled task รอบเช้า/บ่ายทำงาน หรือ Nana ถามถึงสัญญาณของวันนี้
 ---
 
-# Signal Brief (engine v0.7)
+# Signal Brief (engine v0.9 · กฎ CNgoal v6.0)
 
 แปลงผลสแกนที่คำนวณมาแล้ว → สรุปที่ Nana อ่านแล้วตัดสินใจได้ทันที
 **ห้ามคำนวณ indicator เอง** ตัวเลขทุกตัวมาจากไฟล์ JSON เท่านั้น
@@ -55,6 +55,9 @@ https://raw.githubusercontent.com/Naxyz23/agent-trade/refs/heads/main/data/signa
 
 6. `entry` → ระบบเปิดไม้ให้แล้วอัตโนมัติ (v0.7) ไม่ต้องยืนยันอะไร
    - `levels.stop_source` บอกที่มาของ SL: `atr2` = ATR14 x 2 (หุ้น US + XAU ตั้งแต่ v0.8)
+   - `checklist` มี 5 ข้อ (6 ข้อสำหรับหุ้น US ที่บวกเงื่อนไข ADX14 ≥ 25 ตั้งแต่ v0.9)
+     ข้อ 2 `EMA20 > EMA50` และข้อ 6 `ADX14 ≥ 25` เป็นของใหม่ใน CNgoal v6.0
+   - `evidence.adx14` = ความแรงของเทรนด์ตอนเข้าไม้ · `rules_config` บอกกฎที่ใช้จริงในรอบนั้น
      · `swing_low10` / `swing_high10` / `ema50` = SL ตามชาร์ต (crypto ยังใช้แบบนี้)
    - checklist 4 ข้อ ผ่านเพราะอะไร (จาก `checklist[].detail`)
    - Entry / Stop / ระยะ SL% / Position size / Risk เป็นจำนวนเงิน
@@ -64,11 +67,14 @@ https://raw.githubusercontent.com/Naxyz23/agent-trade/refs/heads/main/data/signa
    - **สิ่งที่ระบบไม่รู้ — คุณค่าหลักของ skill นี้:**
      หุ้น US → ค้นเว็บว่ามี earnings ใน 7 วันข้างหน้าไหม
      XAU/crypto → มีเหตุการณ์ใหญ่ค้างอยู่หรือเปล่า
-   - ถ้าไม่ใช่ BTC → เตือนว่า v5.1 ยังไม่มีหลักฐานฝั่งบวกสำหรับตัวนั้น
+   - ถ้าไม่ใช่ BTC → เตือนว่ายังไม่มีหลักฐานฝั่งบวกที่แข็งพอสำหรับตัวนั้น
+     (หุ้น US ทดสอบบนกลุ่มที่ลำเอียง · XAU CI ยังคร่อมศูนย์ · SPY edge ≈ ศูนย์)
      (หุ้น US ทั้ง 13 ตัวยังไม่เคยผ่าน backtest เลย ยกเว้น NVDA)
 
 7. `blocked` → เข้าเงื่อนไขครบ 4 ข้อแล้ว แต่กฎ risk ห้ามเปิด
-   ต้องบอกว่าถูกบล็อกเพราะอะไร (halt / ช่วงพัก / เต็มเพดานไม้) ห้ามเงียบ
+   ต้องบอกว่าถูกบล็อกเพราะอะไร ห้ามเงียบ — เหตุผลที่เป็นไปได้:
+   halt · ช่วงพัก · เต็มเพดานต่อสาย (5) · เต็มเพดานรวมทั้งพอร์ต (8) ·
+   **มีสัญญาณในกลุ่มที่สัมพันธ์กันแรงกว่าเข้าไปแล้ว** (`corr_group` — ใหม่ v0.9)
 
 8. `portfolio` → รายงานยอดพอร์ต, drawdown%, และสถานะ halted ทุกครั้งที่ drawdown > 5%
 
@@ -96,4 +102,5 @@ https://raw.githubusercontent.com/Naxyz23/agent-trade/refs/heads/main/data/signa
 
 เมื่อ Nana มั่นใจว่าระบบทำงานถูกต้อง (เทียบตัวเลขกับ TradingView ตรงกัน, เห็น brief สม่ำเสมอ)
 ให้ปรับข้อ 2 กลับเป็น **ส่งเฉพาะวันที่มี entry/exit/blocked/halt/error จริง**
-เพื่อกัน alert fatigue — v5.1 คาด ~0.7-1 เทรด/เดือน วันส่วนใหญ่ควรเงียบ
+เพื่อกัน alert fatigue — v6.0 คาด ~3.5 สัญญาณ/เดือน ทั้งพอร์ต (16 สินทรัพย์)
+วันส่วนใหญ่ควรเงียบ · ⛔ ห้ามรายงานความถี่เป็น "ไม้/ปี/สินทรัพย์" มันทำให้เข้าใจผิด
