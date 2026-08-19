@@ -1,5 +1,16 @@
 {
-  "positions": {},
+  "positions": {
+    "ORCL": {
+      "side": "short",
+      "entry": 142.79,
+      "stop": 157.1399,
+      "size": 9.85,
+      "risk_amount": 0.99,
+      "sl_distance_pct": 10.05,
+      "opened": "2026-08-18",
+      "price_basis": "close_of_signal_bar"
+    }
+  },
   "closed": [],
   "consecutive_losses": 0,
   "paused_until": null,
