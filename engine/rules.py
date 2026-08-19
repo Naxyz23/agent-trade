@@ -21,7 +21,7 @@ from typing import Any
 
 import pandas as pd
 
-SPEC_VERSION = "cngoal-6.0"
+SPEC_VERSION = "cngoal-6.1"
 #
 # 🔖 เกณฑ์การตั้งเลขเวอร์ชันของ spec (ตกลงกัน 19 ส.ค. 2026 — Nana ท้วงว่าของเดิมตั้งมั่ว)
 #   เลขหลัก (6.0 -> 7.0) = **ชุดไม้ที่ระบบจะเข้าเปลี่ยนไป**
@@ -34,6 +34,8 @@ SPEC_VERSION = "cngoal-6.0"
 #     5.1  4H -> Daily, risk 2-5% -> 1%, นิยาม bias ใหม่
 #     5.2  exit EMA20 -> EMA50, stop ATR x2
 #     6.0  เพิ่มเงื่อนไขเข้า 2 ข้อ (เดิมตั้งเป็น 5.3 ซึ่งผิด — แก้แล้ว)
+#     6.1  เพิ่มสินทรัพย์ (SLV/USOIL) + ขยาย ADX ไป class commodity
+#          = เลขรอง เพราะไม้ของสินทรัพย์เดิมไม่เปลี่ยนเลยสักไม้
 
 # ค่าจาก Machine Spec — เปลี่ยนที่นี่ที่เดียวถ้า cngoal ออกเวอร์ชันใหม่
 SWING_LOOKBACK = 10

@@ -28,6 +28,16 @@ assets:
   - { symbol: XAU, class: metal, name: "Gold Futures", leverage_cap: 5,
       sources: [yahoo], fetch_symbol: "GC=F" }
 
+  # ---------------- สินค้าโภคภัณฑ์อื่น (เพิ่ม 19 ส.ค. 2026 — สาย gold ดูแล) ----------------
+  # ผ่านการคัดจากผู้สมัคร 14 ตัว เกณฑ์: corr กับ SPY ต่ำ + exp ไม่ติดลบ + **ทนต้นทุนได้**
+  #   SLV   corr +0.23 · exp +1.887R · ที่ slippage 0.40% ยังได้ +1.444R  (ทนสุดในกลุ่ม)
+  #   USOIL corr +0.19 · exp +0.249R · ที่ slippage 0.40% ยังได้ +0.110R
+  # ที่ตกไป: N225/HG/TLT (ตกด่านต้นทุน) · GDX/FXI/XLU/XLE (exp ติดลบ) ·
+  #          EEM +0.82 / IWM +0.89 (corr สูงเกิน = มันคือ SPY อีกตัว ไม่ได้กระจายอะไร)
+  # ⚠️ ต้องเช็คก่อนว่ากระดานที่ใช้เทรดมีสองตัวนี้จริง — ออกสัญญาณที่ทำตามไม่ได้ = แย่กว่าไม่ออก
+  - { symbol: SLV,   fetch_symbol: "SLV",  class: commodity, name: "Silver ETF",  leverage_cap: 5 }
+  - { symbol: USOIL, fetch_symbol: "CL=F", class: commodity, name: "WTI Crude",   leverage_cap: 5 }
+
   # ---------------- หุ้น US (margin/CFD — ชอร์ตได้ leverage x5) ----------------
   - { symbol: NVDA, fetch_symbol: "NVDA", class: stock, name: "NVIDIA",           leverage_cap: 5, corr_group: us_semi }
   - { symbol: MSFT, fetch_symbol: "MSFT", class: stock, name: "Microsoft",        leverage_cap: 5, corr_group: us_bigtech }
@@ -74,7 +84,12 @@ rules:
                               # +0.182R -> +0.207R · ดีขึ้น 12/15 สินทรัพย์ · กำไรรวมไม่ลด
   adx_min_by_class:           # ประตูกันตลาดออกข้าง — ไม่ใส่ = ไม่ใช้
     stock: 25                 # หุ้น +0.227R -> +0.409R · พลิก 2000s จาก -0.029R เป็น +0.111R
-    # metal: ห้ามใส่ — XAU +0.115R -> +0.049R (ที่ ADX 30 ติดลบ -0.228R)
+    commodity: 25             # ยืนยันซ้ำ 19 ส.ค. 2026 บนกลุ่มที่ไม่เกี่ยวกับหุ้นเลย:
+                              #   SLV+HG+USOIL+GDX (ไม่รวม XAU กันการอ้างตัวเอง)
+                              #   ไม่มี ADX +0.057R -> ADX20 +0.249R -> ADX25 +0.476R
+                              #   กำไรรวมก็เพิ่มด้วย (+25R -> +90R) ไม่ใช่แค่กำไรต่อไม้
+    # metal: ห้ามใส่ — XAU เป็นข้อยกเว้นที่ทดสอบแล้ว: +0.115R -> ADX25 +0.049R
+    #        (ADX30 ติดลบ -0.228R) ไม่เรียงลำดับและ n น้อย จึงไม่เปลี่ยนของที่ใช้อยู่
     # crypto: ห้ามใส่ — BTC กำไรรวม 326R -> 180R โดยกำไรต่อไม้ไม่เพิ่ม
   # ตั้งรายตัวได้ด้วย field `adx_min:` ในรายการสินทรัพย์ (ใส่ 0 = ปิดการตรวจตัวนั้น)
   # corr_group ในรายการสินทรัพย์ = กลุ่มที่ราคาวิ่งไปทางเดียวกัน (us_semi / us_bigtech / ...)
@@ -84,6 +99,7 @@ rules:
   stop_mode_by_class:
     stock: atr2
     metal: atr2               # XAU
+    commodity: atr2           # SLV, USOIL
     crypto: chart             # ห้ามเปลี่ยน — BTC ทดสอบแล้วแย่ลง
   # ตั้งรายตัวได้ด้วย field `stop_mode:` ในรายการสินทรัพย์ (ชนะค่าตาม class)
 
@@ -93,7 +109,7 @@ rules:
 # ส่วนไม้ที่เปิดอยู่ + consecutive_losses ยังแยกตาม agent เหมือนเดิม
 # (ผลเทรด crypto ไม่ควรทำให้ agent หุ้นพักตาม — คนละพฤติกรรมตลาด)
 risk:
-  spec_version: "cngoal-6.0"   # ต้องตรงกับ rules.SPEC_VERSION (มีเทสต์ตรวจ)
+  spec_version: "cngoal-6.1"   # ต้องตรงกับ rules.SPEC_VERSION (มีเทสต์ตรวจ)
   pct_per_trade: 1.0          # v0.6 อ่านค่านี้จริงแล้ว (ก่อนหน้านี้ rules.py hardcode ทิ้งไว้)
   default_leverage_cap: 5
   equity_usdt: 100            # ใช้เป็นยอดตั้งต้นครั้งแรกเท่านั้น หลังจากนั้นดู portfolio.json

@@ -413,12 +413,29 @@ def test_crypto_group_is_only_crypto_class():
     assert got and all(a["class"] == "crypto" for a in got)
 
 
-def test_gold_group_is_only_metal_class():
+def test_gold_group_is_commodities_only():
+    """v0.9.1 ขยายจาก metal อย่างเดียวเป็น metal + commodity
+
+    เดิมเทสต์นี้บังคับว่าสาย gold ต้องมีแต่ class metal — เปลี่ยนเพราะ 19 ส.ค. 2026
+    รับ SLV (เงิน) กับ USOIL (น้ำมัน) เข้ามา ทั้งคู่เป็นสินค้าโภคภัณฑ์ เวลาตลาดใกล้กัน
+    และใช้กฎชุดเดียวกัน (atr2 + ADX 25) จึงให้ agent เดียวกันดูแล
+    แต่ยังต้องกันไม่ให้หุ้น/crypto หลุดเข้ามาปนเหมือนเดิม
+    """
     import yaml as _yaml
     cfg = _yaml.safe_load((pathlib.Path(__file__).resolve().parent.parent
                            / "watchlist.yml").read_text())
     got = engine_run.assets_for_group(cfg, "gold")
-    assert got and all(a["class"] == "metal" for a in got)
+    assert got and all(a["class"] in ("metal", "commodity") for a in got)
+    syms = {a["symbol"] for a in got}
+    assert {"XAU", "SLV", "USOIL"} <= syms, syms
+    # SLV/USOIL ต้องได้ ADX ส่วน XAU ต้องไม่ได้ (เป็นข้อยกเว้นที่ทดสอบแล้ว)
+    adx = cfg["rules"]["adx_min_by_class"]
+    for a in got:
+        want = adx.get(a["class"])
+        if a["symbol"] == "XAU":
+            assert want is None, "XAU ต้องไม่ใช้ ADX — ทดสอบแล้วแย่ลง"
+        else:
+            assert want == 25, a["symbol"]
 
 
 def test_stock_group_includes_context_symbols():
@@ -962,7 +979,7 @@ def test_correlated_group_keeps_only_strongest():
 
 
 def test_spec_version_and_defaults_are_current():
-    assert rules.SPEC_VERSION == "cngoal-6.0"
+    assert rules.SPEC_VERSION == "cngoal-6.1"
     assert rules.DEFAULT_REQUIRE_EMA_STACK is True
     assert rules.DEFAULT_ADX_MIN is None, "ค่าเริ่มต้นต้องไม่ใช้ ADX — เปิดผ่าน watchlist เท่านั้น"
 
@@ -984,7 +1001,7 @@ def test_no_stale_spec_version_strings_in_code():
                 if pat in line and "v5." in line:
                     bad.append(f"{f.name}:{i}: {line.strip()[:80]}")
     assert not bad, "มีเลขเวอร์ชันค้าง:\n" + "\n".join(bad)
-    assert cur == "v6.0"
+    assert cur == "v6.1"
 
 
 def test_watchlist_adx_only_for_stocks():
@@ -995,6 +1012,7 @@ def test_watchlist_adx_only_for_stocks():
         .read_text(encoding="utf-8"))
     adx = cfg["rules"].get("adx_min_by_class", {}) or {}
     assert adx.get("stock") == 25
+    assert adx.get("commodity") == 25          # ยืนยันซ้ำบน SLV/HG/USOIL/GDX (ไม่รวม XAU)
     assert "metal" not in adx and "crypto" not in adx, adx
     for a in cfg["assets"]:
         if a.get("class") in ("metal", "crypto"):
@@ -1004,6 +1022,14 @@ def test_watchlist_adx_only_for_stocks():
         if a.get("class") == "stock":
             assert a.get("corr_group"), a["symbol"]
     assert cfg["risk"]["max_concurrent_portfolio"] == 8
+    # ทุก class ที่ใช้ต้องมีที่อยู่ในสักสาย ไม่งั้นสินทรัพย์จะเงียบหายไปเฉย ๆ
+    covered = set().union(*engine_run.GROUP_CLASSES.values())
+    used = {a.get("class") for a in cfg["assets"]}
+    assert used <= covered, f"class ที่ไม่มี agent ไหนดูแล: {used - covered}"
+    # ทุก class ที่ไม่ใช่ context ต้องมี stop_mode กำหนดไว้
+    sm = cfg["rules"]["stop_mode_by_class"]
+    for cl in used - {"context"}:
+        assert cl in sm, f"{cl} ไม่มี stop_mode"
     # เลขเวอร์ชันใน watchlist ต้องตรงกับโค้ด — ของเดิมค้างที่ cngoal-5.1 ข้าม 3 เวอร์ชัน
     assert cfg["risk"]["spec_version"] == rules.SPEC_VERSION, (
         cfg["risk"]["spec_version"], rules.SPEC_VERSION)
@@ -1086,7 +1112,7 @@ def test_run_loop_opens_one_per_correlated_group():
     blocked = [s for s in out["signals"] if s["kind"] == "blocked"]
     corr = [s for s in blocked if any("กลุ่ม `us_semi`" in r for r in s["reasons"])]
     assert {s["symbol"] for s in corr} == {"NVDA", "TSM"}, [s["symbol"] for s in corr]
-    assert out["engine_version"] == "0.9"
+    assert out["engine_version"] == "0.9.1"
     assert out["rules_config"]["max_concurrent_portfolio"] == 8
     # จำนวนไม้ของสายนี้ต้องถูกเขียนลง portfolio.json ให้สายอื่นเห็น
     pf = json.loads((tmp / "portfolio.json").read_text(encoding="utf-8"))

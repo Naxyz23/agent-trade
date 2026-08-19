@@ -3,7 +3,7 @@ name: signal-brief
 description: อ่านผลสแกน CNgoal v6.0 จาก signals_<group>.json บน GitHub (public repo) แล้วสรุปเป็นภาษาคนพร้อมบริบทที่ระบบไม่รู้ (earnings, ข่าว) ใช้ทุกครั้งที่ scheduled task รอบเช้า/บ่ายทำงาน หรือ Nana ถามถึงสัญญาณของวันนี้
 ---
 
-# Signal Brief (engine v0.9 · กฎ CNgoal v6.0)
+# Signal Brief (engine v0.9.1 · กฎ CNgoal v6.1)
 
 แปลงผลสแกนที่คำนวณมาแล้ว → สรุปที่ Nana อ่านแล้วตัดสินใจได้ทันที
 **ห้ามคำนวณ indicator เอง** ตัวเลขทุกตัวมาจากไฟล์ JSON เท่านั้น
@@ -57,6 +57,7 @@ https://raw.githubusercontent.com/Naxyz23/agent-trade/refs/heads/main/data/signa
    - `levels.stop_source` บอกที่มาของ SL: `atr2` = ATR14 x 2 (หุ้น US + XAU ตั้งแต่ v0.8)
    - `checklist` มี 5 ข้อ (6 ข้อสำหรับหุ้น US ที่บวกเงื่อนไข ADX14 ≥ 25 ตั้งแต่ v0.9)
      ข้อ 2 `EMA20 > EMA50` และข้อ 6 `ADX14 ≥ 25` เป็นของใหม่ใน CNgoal v6.0
+     ADX ใช้กับ **หุ้น US + SLV + USOIL** เท่านั้น ⛔ ไม่ใช้กับ XAU และ crypto
    - `evidence.adx14` = ความแรงของเทรนด์ตอนเข้าไม้ · `rules_config` บอกกฎที่ใช้จริงในรอบนั้น
      · `swing_low10` / `swing_high10` / `ema50` = SL ตามชาร์ต (crypto ยังใช้แบบนี้)
    - checklist 4 ข้อ ผ่านเพราะอะไร (จาก `checklist[].detail`)
@@ -68,6 +69,8 @@ https://raw.githubusercontent.com/Naxyz23/agent-trade/refs/heads/main/data/signa
      หุ้น US → ค้นเว็บว่ามี earnings ใน 7 วันข้างหน้าไหม
      XAU/crypto → มีเหตุการณ์ใหญ่ค้างอยู่หรือเปล่า
    - ถ้าไม่ใช่ BTC → เตือนว่ายังไม่มีหลักฐานฝั่งบวกที่แข็งพอสำหรับตัวนั้น
+   - **ถ้าเป็นสัญญาณ short → ห้ามเคลมว่าเป็นแหล่งกำไร** ทดสอบบนกลุ่มที่ไม่ลำเอียงแล้ว
+     ยังได้ −0.141R CI [−0.263,−0.010] · Nana เลือกเก็บชอร์ตไว้เอง แต่คาดหวังผลไม่ได้
      (หุ้น US ทดสอบบนกลุ่มที่ลำเอียง · XAU CI ยังคร่อมศูนย์ · SPY edge ≈ ศูนย์)
      (หุ้น US ทั้ง 13 ตัวยังไม่เคยผ่าน backtest เลย ยกเว้น NVDA)
 
@@ -102,5 +105,5 @@ https://raw.githubusercontent.com/Naxyz23/agent-trade/refs/heads/main/data/signa
 
 เมื่อ Nana มั่นใจว่าระบบทำงานถูกต้อง (เทียบตัวเลขกับ TradingView ตรงกัน, เห็น brief สม่ำเสมอ)
 ให้ปรับข้อ 2 กลับเป็น **ส่งเฉพาะวันที่มี entry/exit/blocked/halt/error จริง**
-เพื่อกัน alert fatigue — v6.0 คาด ~3.5 สัญญาณ/เดือน ทั้งพอร์ต (16 สินทรัพย์)
+เพื่อกัน alert fatigue — v6.1 คาด ~4-5 สัญญาณ/เดือน ทั้งพอร์ต (20 ตัวที่ส่งสัญญาณ)
 วันส่วนใหญ่ควรเงียบ · ⛔ ห้ามรายงานความถี่เป็น "ไม้/ปี/สินทรัพย์" มันทำให้เข้าใจผิด

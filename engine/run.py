@@ -41,13 +41,15 @@ PORTFOLIO_FILE = DATA / "portfolio.json"
 # class ใน watchlist.yml -> group ที่ agent นี้รับผิดชอบ
 GROUP_CLASSES = {
     "crypto": {"crypto"},
-    "gold": {"metal"},
+    # v0.9.1: สาย gold รับสินค้าโภคภัณฑ์ตัวอื่นด้วย (SLV เงิน · USOIL น้ำมัน)
+    # เวลาตลาดใกล้กัน และ ADX ใช้ได้เหมือนกัน — ดู adx_min_by_class ใน watchlist.yml
+    "gold": {"metal", "commodity"},
     "stock": {"stock", "context"},   # SPY/QQQ/DXY เป็นบริบทของหุ้น US เอาไว้ด้วยกัน
 }
 
 # กราฟเก่าได้กี่วันถึงยังเชื่อถือได้ — crypto เทรด 7 วัน/สัปดาห์ จึงเข้มกว่า
 # หุ้น/ทองมีเสาร์อาทิตย์ + วันหยุดตลาด ต้องเผื่อ (จันทร์เช้าจะเห็นแท่งวันศุกร์ = 3 วัน)
-DEFAULT_MAX_AGE = {"crypto": 2, "metal": 5, "stock": 5, "context": 5}
+DEFAULT_MAX_AGE = {"crypto": 2, "metal": 5, "commodity": 5, "stock": 5, "context": 5}
 
 
 def assets_for_group(cfg: dict, group: str) -> list[dict]:
@@ -274,7 +276,7 @@ def main(group: str, now: datetime | None = None) -> int:
         "generated_at": now.isoformat(timespec="seconds"),
         "run_date": now.strftime("%Y-%m-%d"),
         "spec_version": rules.SPEC_VERSION,
-        "engine_version": "0.9",
+        "engine_version": "0.9.1",
         "rules_config": {"trail_ema": trail_ema,
                          "stop_mode_default": stop_default,
                          "stop_mode_by_class": stop_by_class,
