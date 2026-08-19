@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-18T14:55:42+00:00",
-  "run_date": "2026-08-18",
+  "generated_at": "2026-08-19T07:02:26+00:00",
+  "run_date": "2026-08-19",
   "spec_version": "cngoal-5.1",
   "engine_version": "0.8",
   "rules_config": {
@@ -37,7 +37,7 @@
       {
         "symbol": "XAU",
         "source": "yahoo",
-        "bar_date": "2026-08-17",
+        "bar_date": "2026-08-18",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -49,15 +49,15 @@
       "symbol": "XAU",
       "name": "Gold Futures",
       "class": "metal",
-      "close": 4417.7998,
-      "chg_5d_pct": 1.28,
-      "chg_20d_pct": 10.16,
-      "rsi14": 66.72,
+      "close": 4366.0,
+      "chg_5d_pct": -0.39,
+      "chg_20d_pct": 7.24,
+      "rsi14": 61.22,
       "regime": "bear",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-17",
+      "bar_date": "2026-08-18",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
