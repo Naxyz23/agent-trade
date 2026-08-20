@@ -12,5 +12,8 @@
       "equity": 98.943,
       "note": "BTC stop"
     }
-  ]
+  ],
+  "open_by_group": {
+    "crypto": 0
+  }
 }
