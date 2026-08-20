@@ -1,21 +1,87 @@
 {
-  "generated_at": "2026-08-19T07:02:26+00:00",
-  "run_date": "2026-08-19",
-  "spec_version": "cngoal-5.1",
-  "engine_version": "0.8",
+  "generated_at": "2026-08-20T01:23:58+00:00",
+  "run_date": "2026-08-20",
+  "spec_version": "cngoal-6.1",
+  "engine_version": "0.9.1",
   "rules_config": {
     "trail_ema": 50,
     "stop_mode_default": "chart",
     "stop_mode_by_class": {
       "stock": "atr2",
       "metal": "atr2",
+      "commodity": "atr2",
       "crypto": "chart"
-    }
+    },
+    "require_ema_stack": true,
+    "adx_min_by_class": {
+      "stock": 25,
+      "commodity": 25
+    },
+    "max_concurrent_positions": 5,
+    "max_concurrent_portfolio": 8
   },
   "group": "gold",
-  "universe_size": 1,
+  "universe_size": 3,
   "context_size": 0,
-  "signals": [],
+  "signals": [
+    {
+      "symbol": "USOIL",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 84.87000274658203,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 84.87,
+        "open": 84.4,
+        "high": 84.9,
+        "low": 84.23,
+        "ema20": 81.99,
+        "ema50": 82.27,
+        "ema200": 79.379,
+        "rsi14": 56.2676,
+        "atr14": 3.5954,
+        "atr_pct": 4.2363,
+        "adx14": 15.7756,
+        "swing_low10": 74.57,
+        "swing_high10": 85.94,
+        "ret_5d": 1.9215,
+        "ret_20d": -2.2573,
+        "regime": "bull",
+        "candle": "-",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-08-19",
+      "asset_class": "commodity"
+    }
+  ],
   "open_positions": [],
   "portfolio": {
     "equity": 98.943,
@@ -37,7 +103,23 @@
       {
         "symbol": "XAU",
         "source": "yahoo",
-        "bar_date": "2026-08-18",
+        "bar_date": "2026-08-19",
+        "bar_age_days": 1,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "SLV",
+        "source": "yahoo",
+        "bar_date": "2026-08-19",
+        "bar_age_days": 1,
+        "max_age_days": 5,
+        "stale": false
+      },
+      {
+        "symbol": "USOIL",
+        "source": "yahoo",
+        "bar_date": "2026-08-19",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -49,15 +131,49 @@
       "symbol": "XAU",
       "name": "Gold Futures",
       "class": "metal",
-      "close": 4366.0,
-      "chg_5d_pct": -0.39,
-      "chg_20d_pct": 7.24,
-      "rsi14": 61.22,
+      "close": 4550.2002,
+      "chg_5d_pct": 3.2,
+      "chg_20d_pct": 9.73,
+      "rsi14": 70.52,
       "regime": "bear",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-18",
+      "bar_date": "2026-08-19",
+      "bar_age_days": 1,
+      "source": "yahoo",
+      "stale": false
+    },
+    {
+      "symbol": "SLV",
+      "name": "Silver ETF",
+      "class": "commodity",
+      "close": 60.01,
+      "chg_5d_pct": 1.61,
+      "chg_20d_pct": 11.29,
+      "rsi14": 61.05,
+      "regime": "bear",
+      "above_ema20": true,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-19",
+      "bar_age_days": 1,
+      "source": "yahoo",
+      "stale": false
+    },
+    {
+      "symbol": "USOIL",
+      "name": "WTI Crude",
+      "class": "commodity",
+      "close": 84.87,
+      "chg_5d_pct": 1.92,
+      "chg_20d_pct": -2.26,
+      "rsi14": 56.27,
+      "regime": "bull",
+      "above_ema20": true,
+      "candle": "-",
+      "in_position": false,
+      "bar_date": "2026-08-19",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
