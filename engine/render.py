@@ -119,7 +119,7 @@ def render(p: dict) -> str:
                    f"<td>{'🛑 halted' if pfo.get('halted') else 'ปกติ'}</td></tr></table>")
 
     if not sigs:
-        out.append("<div class=card>ไม่มีอะไรต้องทำวันนี้ — ไม่มีสินทรัพย์ตัวไหนเข้าเงื่อนไขครบ 4 ข้อ</div>")
+        out.append("<div class=card>ไม่มีอะไรต้องทำวันนี้ — ไม่มีสินทรัพย์ตัวไหนเข้าเงื่อนไขครบทุกข้อ</div>")
 
     if p.get("open_positions"):
         rows = "".join(f"<tr><td>{x['symbol']}</td><td>{x['side']}</td>"

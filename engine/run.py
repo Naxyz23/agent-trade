@@ -276,7 +276,7 @@ def main(group: str, now: datetime | None = None) -> int:
         "generated_at": now.isoformat(timespec="seconds"),
         "run_date": now.strftime("%Y-%m-%d"),
         "spec_version": rules.SPEC_VERSION,
-        "engine_version": "0.9.1",
+        "engine_version": "0.9.2",
         "rules_config": {"trail_ema": trail_ema,
                          "stop_mode_default": stop_default,
                          "stop_mode_by_class": stop_by_class,

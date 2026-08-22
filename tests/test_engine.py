@@ -484,11 +484,13 @@ def test_notify_sends_on_entry_exit_halt_and_errors():
              "checklist": [{"n": i, "name": "c", "pass": True} for i in range(1, 5)]}
     pl = notify.build_payload({**base, "signals": [entry]})
     assert pl and len(pl["embeds"]) == 1
-    assert "NVDA" in pl["embeds"][0]["title"] and "SHORT" in pl["embeds"][0]["title"]
+    desc = pl["embeds"][0]["description"]
+    assert "NVDA" in desc and "SHORT" in desc
     _payload_ok(pl)
     # halt ต้องมาก่อนทุกอย่าง
     pl2 = notify.build_payload({**base, "signals": [entry], "halts": ["พัก 3 วัน"]})
-    assert pl2["embeds"][0]["title"] == "หยุดเทรด" and pl2["content"].startswith("🛑")
+    assert pl2["embeds"][0]["description"].splitlines()[0].startswith("🛑")
+    assert pl2["content"].startswith("🛑")
     # errors อย่างเดียวก็ต้องส่ง ห้ามเงียบ
     assert notify.build_payload({**base, "errors": [{"symbol": "XAU", "error": "e"}]})
 
@@ -500,7 +502,8 @@ def test_notify_exit_sorted_before_entry():
                     "levels": {"entry": 1.0, "exit": 2.0, "pnl_pct_net": 1.0,
                                "stop": 0.5, "sl_distance_pct": 5.0}}
     pl = notify.build_payload({**base, "signals": [mk("entry"), mk("exit")]})
-    assert "EXIT" in pl["embeds"][0]["title"], "ปิดไม้ต้องขึ้นก่อนเปิดไม้เสมอ"
+    first = pl["embeds"][0]["description"].splitlines()[0]
+    assert first.startswith(notify.EMO["exit"]), "ปิดไม้ต้องขึ้นก่อนเปิดไม้เสมอ"
 
 
 def test_notify_respects_discord_limits_under_load():
@@ -535,6 +538,48 @@ def test_notify_handles_current_live_signals_shape():
             _payload_ok(pl)
         checked += 1
     print(f"    ตรวจ live signals_<group>.json ที่มีอยู่จริง {checked} ไฟล์")
+
+
+def test_notify_message_is_compact():
+    """Nana 22 ส.ค. 2026: ข้อความยาวเกิน -> 1 สัญญาณต้องได้ 1 บรรทัด ไม่มี fields
+
+    กันการถอยกลับไปเป็น embed ต่อสัญญาณ ซึ่งทำให้ต้องเลื่อนอ่านบนมือถือ
+    """
+    mk = lambda i, kind="entry": {
+        "symbol": f"SYM{i}", "kind": kind, "direction": "long", "rule": "cngoal_entry",
+        "bar_date": "2026-08-20", "reasons": ["เหตุผลยาวมาก " * 40] * 6,
+        "levels": {"entry": 100.0, "stop": 95.0, "sl_distance_pct": 5.0,
+                   "position_size": 10.0, "risk_amount": 1.0, "leverage_cap": 5},
+        "checklist": [{"n": j, "name": "c", "pass": j < 6} for j in range(1, 7)]}
+    sigs = [mk(i) for i in range(6)] + [mk(i, "watch") for i in range(6, 20)]
+    pl = notify.build_payload({"run_date": "2026-08-20", "spec_version": rules.SPEC_VERSION,
+                               "signals": sigs, "halts": [], "errors": []})
+    _payload_ok(pl)
+    assert len(pl["embeds"]) == 1, "ต้องรวมเป็น embed เดียว"
+    assert not pl["embeds"][0].get("fields"), "ห้ามมี fields — บรรทัดเดียวพอ"
+    lines = pl["embeds"][0]["description"].splitlines()
+    # 6 entry + 1 บรรทัดรวม watch
+    assert len(lines) == 7, lines
+    assert all(len(x) < 160 for x in lines), "แต่ละบรรทัดต้องสั้นพอสำหรับจอมือถือ"
+    assert lines[0].startswith(notify.EMO["entry"]) and "5/6" in lines[0]
+    assert lines[-1].startswith(notify.EMO["watch"]) and "+6" in lines[-1], lines[-1]
+    assert len(pl["embeds"][0]["description"]) < 1200, "ข้อความรวมต้องสั้น"
+
+
+def test_notify_passed_counts_are_not_hardcoded():
+    """checklist 5 ข้อ (crypto) กับ 6 ข้อ (stock/commodity) ต้องแสดงตัวหารตามจริง"""
+    mk5 = {"checklist": [{"n": i, "name": "c", "pass": i <= 4} for i in range(1, 6)]}
+    mk6 = {"checklist": [{"n": i, "name": "c", "pass": True} for i in range(1, 7)]}
+    assert notify.passed(mk5) == "4/5"
+    assert notify.passed(mk6) == "6/6"
+    assert notify.passed({}) == ""
+
+
+def test_notify_price_precision_is_order_ready():
+    """142.79 ห้ามกลายเป็น 142.8 — ราคาต้องเอาไปตั้งออเดอร์ได้ตรง"""
+    assert notify._fmt(142.7899932861328) == "142.79"
+    assert notify._fmt(3421.5) == "3,421.50"
+    assert notify._fmt(0.00012345678) == "0.000123457"
 
 
 # ==================================================================== v0.6
@@ -1112,7 +1157,7 @@ def test_run_loop_opens_one_per_correlated_group():
     blocked = [s for s in out["signals"] if s["kind"] == "blocked"]
     corr = [s for s in blocked if any("กลุ่ม `us_semi`" in r for r in s["reasons"])]
     assert {s["symbol"] for s in corr} == {"NVDA", "TSM"}, [s["symbol"] for s in corr]
-    assert out["engine_version"] == "0.9.1"
+    assert out["engine_version"] == "0.9.2"
     assert out["rules_config"]["max_concurrent_portfolio"] == 8
     # จำนวนไม้ของสายนี้ต้องถูกเขียนลง portfolio.json ให้สายอื่นเห็น
     pf = json.loads((tmp / "portfolio.json").read_text(encoding="utf-8"))

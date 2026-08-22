@@ -1,4 +1,4 @@
-"""ส่งสัญญาณเข้า Discord ผ่าน webhook
+"""ส่งสัญญาณเข้า Discord ผ่าน webhook — โหมด "สั้น" (v0.9.2)
 
 ทำไมให้ GitHub Actions ส่งเอง ไม่ใช่ให้ Cowork ส่ง
 ------------------------------------------------
@@ -6,9 +6,16 @@
 แต่ GitHub Actions รันของมันเองอยู่แล้ว ส่งตรงจากตรงนั้นเลยจึงเชื่อถือได้กว่า
 Cowork ค่อยตามมาเสริมบริบท (earnings, ข่าว) ทีหลังในรอบของมัน
 
-กันสแปม: v6.0 คาดว่า ~3.5 สัญญาณ/เดือน ทั้งพอร์ต ถ้าส่ง "วันนี้ไม่มีอะไร" วันละ 2 ครั้ง
-จะได้ข้อความไร้สาระ 60 ข้อความ/เดือน แล้วจะเลิกอ่าน -> ค่าเริ่มต้นจึงส่งเฉพาะ
-วันที่มี entry/exit/halt จริง (ตั้ง notify.on_empty: true ถ้าอยากได้ทุกวัน)
+กันสแปม: ค่าเริ่มต้นส่งเฉพาะวันที่มี entry/exit/halt/error จริง
+(ตั้ง notify.on_empty: true ถ้าอยากได้ทุกวัน)
+
+ทำไมข้อความสั้นลง (Nana ขอ 22 ส.ค. 2026)
+----------------------------------------
+ของเดิมส่ง 1 embed ต่อ 1 สัญญาณ พร้อม reasons 6 บรรทัด + 6 fields
+= ข้อความยาวจนต้องเลื่อนอ่าน ทั้งที่ 90% ของเนื้อหาซ้ำกับ brief.html อยู่แล้ว
+ตอนนี้เหลือ **1 บรรทัดต่อ 1 สินทรัพย์**: ผ่านกี่ข้อ + ตัวเลขที่ต้องใช้เทรดจริง
+(entry / stop / size) ส่วน watch รวบเป็นบรรทัดเดียวท้ายสุด
+รายละเอียดเต็ม (reasons, evidence, checklist รายข้อ) อยู่ใน brief.html เหมือนเดิม
 """
 from __future__ import annotations
 
@@ -34,69 +41,88 @@ COLOR = {
     "halt":  0xDC2626,
 }
 SIDE = {"long": "LONG", "short": "SHORT", "neutral": ""}
+EMO = {"exit": "🔴", "entry": "🟢", "blocked": "🟠", "watch": "👀"}
+MAX_WATCH_ITEMS = 8      # เกินนี้รวบเป็น "+N" — บรรทัดเดียวต้องไม่ยาวเกินจอมือถือ
 
 
 def _clip(s: str, n: int) -> str:
     return s if len(s) <= n else s[: n - 1] + "…"
 
 
-def _fmt(v, nd=4) -> str:
-    """เลขคริปโตกับเลขหุ้นต่างกันหลายหลัก ใช้ significant digits แทนทศนิยมตายตัว"""
+def _fmt(v, nd=6) -> str:
+    """ราคาต้องพอเอาไปตั้งออเดอร์ได้จริง
+
+    ของเดิมใช้ 4 significant digits -> 142.79 กลายเป็น 142.8 (คลาดจากราคาจริง)
+    เลข >= 1 ใช้ทศนิยม 2 ตำแหน่ง · เลขเล็ก (เหรียญราคาต่ำ) ค่อยใช้ significant digits
+    """
     try:
         v = float(v)
     except (TypeError, ValueError):
         return str(v)
-    if abs(v) >= 1000:
+    if abs(v) >= 1:
         return f"{v:,.2f}"
     return f"{v:,.{nd}g}"
 
 
-def signal_embed(s: dict) -> dict:
+def passed(s: dict) -> str:
+    """'4/6' — ไม่ hardcode จำนวนข้อ เพราะ stock/commodity มี 6 ข้อ ที่เหลือ 5"""
+    ck = s.get("checklist") or []
+    if not ck:
+        return ""
+    return f"{sum(1 for c in ck if c.get('pass'))}/{len(ck)}"
+
+
+def _blocked_why(s: dict) -> str:
+    for r in reversed(s.get("reasons") or []):
+        if r.startswith("⛔"):
+            r = r.lstrip("⛔ ")
+            return r.split(":", 1)[1].strip() if ":" in r else r
+    return "กฎ risk บล็อกไว้"
+
+
+def signal_line(s: dict) -> str:
+    """1 สัญญาณ = 1 บรรทัด"""
     side = SIDE.get(s.get("direction", ""), "")
-    title = f"{s['symbol']} · {s['kind'].upper()}" + (f" {side}" if side else "")
-    desc = "\n".join(f"• {r}" for r in s.get("reasons", []))
     lv = s.get("levels") or {}
-    fields = []
+    parts = [f"{EMO.get(s['kind'], '•')} **{s['symbol']}**" + (f" {side}" if side else "")]
 
     if s["kind"] == "exit":
-        fields = [
-            {"name": "เข้าที่", "value": _fmt(lv.get("entry")), "inline": True},
-            {"name": "ออกที่", "value": _fmt(lv.get("exit")), "inline": True},
-            {"name": "สุทธิ", "value": f"{lv.get('pnl_pct_net', 0):+.2f}%", "inline": True},
-        ]
-    elif lv.get("entry"):
-        fields = [
-            {"name": "Entry", "value": _fmt(lv["entry"]), "inline": True},
-            {"name": "Stop", "value": _fmt(lv["stop"]), "inline": True},
-            {"name": "ระยะ SL", "value": f"{lv['sl_distance_pct']:.2f}%", "inline": True},
-        ]
+        parts.append(f"{_fmt(lv.get('entry'))} → {_fmt(lv.get('exit'))}")
+        parts.append(f"**{lv.get('pnl_pct_net', 0):+.2f}%**")
+        why = lv.get("why") or (s.get("reasons") or [""])[0]
+        if why:
+            parts.append(_clip(str(why), 48))
+        return " · ".join(parts)
+
+    if n := passed(s):
+        parts.append(n)
+
+    if s["kind"] == "blocked":
+        parts.append("บล็อก: " + _clip(_blocked_why(s), 70))
+        return " · ".join(parts)
+
+    if lv.get("entry") is not None:
+        parts.append(f"E {_fmt(lv['entry'])}")
+        if lv.get("stop") is not None:
+            parts.append(f"SL {_fmt(lv['stop'])} ({lv.get('sl_distance_pct', 0):.1f}%)")
         if "position_size" in lv:
-            cap = " ⚠ ชนเพดาน" if lv.get("capped_by_leverage") else ""
-            fields += [
-                {"name": "Position", "value": f"{lv['position_size']:,.2f}{cap}", "inline": True},
-                {"name": "เสี่ยง", "value": f"{lv.get('risk_amount', 0):,.2f}", "inline": True},
-                {"name": "Leverage", "value": f"x{lv.get('leverage_cap', 5):g}", "inline": True},
-            ]
+            cap = " ⚠เพดาน" if lv.get("capped_by_leverage") else ""
+            parts.append(f"size {lv['position_size']:,.2f}{cap}")
+        elif lv.get("position_pct_of_equity"):
+            parts.append(f"{lv['position_pct_of_equity']:.1f}% ของพอร์ต")
+    return " · ".join(parts)
 
-    if s.get("checklist"):
-        ck = "  ".join(("✅" if c["pass"] else "❌") + f"{c['n']}" for c in s["checklist"])
-        fields.append({"name": "เงื่อนไข 4 ข้อ", "value": _clip(ck, MAX_FIELD_VALUE),
-                       "inline": False})
 
-    for f in fields:
-        f["value"] = _clip(str(f["value"]) or "—", MAX_FIELD_VALUE)
-
-    return {
-        "title": _clip(title, 256),
-        "description": _clip(desc, MAX_DESC),
-        "color": COLOR.get(s["kind"], 0x6B7280),
-        "fields": fields[:MAX_FIELDS],
-        "footer": {"text": f"{s.get('rule', '')} · แท่งวันที่ {s.get('bar_date', '')}"},
-    }
+def watch_line(watch: list[dict]) -> str:
+    """ตัวที่ยังไม่ครบ รวบเป็นบรรทัดเดียว เรียงตัวที่ใกล้ครบที่สุดขึ้นก่อน"""
+    ranked = sorted(watch, key=lambda s: -sum(1 for c in s["checklist"] if c.get("pass")))
+    items = [f"{s['symbol']} {passed(s)}" for s in ranked[:MAX_WATCH_ITEMS]]
+    more = f" +{len(ranked) - MAX_WATCH_ITEMS}" if len(ranked) > MAX_WATCH_ITEMS else ""
+    return f"{EMO['watch']} ใกล้ครบ: " + " · ".join(items) + more
 
 
 def build_payload(p: dict) -> dict | None:
-    """คืน None ถ้าไม่มีอะไรควรส่ง"""
+    """คืน None ถ้าไม่มีอะไรควรส่ง — 1 ข้อความ 1 embed เท่านั้น"""
     sigs = p.get("signals", [])
     # v0.6: "blocked" = เข้าเงื่อนไขครบแต่กฎ risk ห้ามเปิด — ต้องบอก ไม่ใช่เงียบ
     actionable = [s for s in sigs if s["kind"] in ("entry", "exit", "blocked")]
@@ -110,31 +136,49 @@ def build_payload(p: dict) -> dict | None:
     n_x = sum(1 for s in actionable if s["kind"] == "exit")
     n_b = sum(1 for s in actionable if s["kind"] == "blocked")
     head = (f"**Signal Brief {p.get('run_date','')}** — เข้า {n_e} · ออก {n_x}"
-            + (f" · ถูกบล็อก {n_b}" if n_b else ""))
+            + (f" · บล็อก {n_b}" if n_b else ""))
     if halts:
         head = "🛑 " + head
 
-    embeds = []
-    for h in halts:
-        embeds.append({"title": "หยุดเทรด", "description": _clip(h, MAX_DESC),
-                       "color": COLOR["halt"]})
+    lines = [f"🛑 **หยุดเทรด** · {_clip(str(h), 200)}" for h in halts]
     # ออกก่อนเข้า — รักษาเงินต้นสำคัญกว่าหาไม้ใหม่
     order = {"exit": 0, "entry": 1, "blocked": 2}
-    for s in sorted(actionable, key=lambda x: order.get(x["kind"], 3)):
-        embeds.append(signal_embed(s))
+    lines += [signal_line(s) for s in sorted(actionable, key=lambda x: order.get(x["kind"], 3))]
+
+    watch = [s for s in sigs if s["kind"] == "watch" and s.get("checklist")]
+    if watch:
+        lines.append(watch_line(watch))
     if errors:
-        embeds.append({
-            "title": f"ดึงข้อมูลไม่สำเร็จ {len(errors)} ตัว",
-            "description": _clip(", ".join(e["symbol"] for e in errors), MAX_DESC),
-            "color": 0xB45309,
-        })
+        lines.append("⚠ ดึงข้อมูลไม่ได้: "
+                     + _clip(", ".join(str(e.get("symbol", "?")) for e in errors), 180))
 
-    embeds = embeds[:MAX_EMBEDS]
-    # Discord นับตัวอักษรรวมทุก embed ต้องไม่เกิน 6000 — ตัดจากท้ายถ้าเกิน
-    while len(json.dumps(embeds, ensure_ascii=False)) > MAX_TOTAL and len(embeds) > 1:
-        embeds.pop()
+    if halts or n_x:
+        color = COLOR["exit"]
+    elif n_e:
+        color = COLOR["entry"]
+    elif n_b:
+        color = COLOR["blocked"]
+    else:
+        color = COLOR["watch"]
 
-    return {"content": head, "embeds": embeds,
+    spec = str(p.get("spec_version", "")).replace("cngoal-", "v")
+    bar = next((s.get("bar_date") for s in actionable if s.get("bar_date")), "")
+    foot = " · ".join(x for x in (f"CNgoal {spec}" if spec else "",
+                                  f"แท่ง {bar}" if bar else "",
+                                  "รายละเอียดเต็มใน brief.html") if x)
+
+    desc = "\n".join(lines)
+    while len(desc) > MAX_DESC and len(lines) > 1:
+        lines.pop()
+        desc = "\n".join(lines) + "\n…"
+    embed = {"description": _clip(desc, MAX_DESC), "color": color,
+             "footer": {"text": _clip(foot, 2048)}}
+    # Discord นับตัวอักษรรวมทุก embed ต้องไม่เกิน 6000 — ตัดบรรทัดท้ายถ้าเกิน
+    while len(json.dumps([embed], ensure_ascii=False)) > MAX_TOTAL and len(lines) > 1:
+        lines.pop()
+        embed["description"] = "\n".join(lines) + "\n…"
+
+    return {"content": _clip(head, 2000), "embeds": [embed],
             "allowed_mentions": {"parse": []},
             "username": "CNgoal Signals"}
 
@@ -143,7 +187,7 @@ def send(webhook: str, payload: dict, timeout: int = 20) -> int:
     req = urllib.request.Request(
         webhook, method="POST",
         data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-        headers={"Content-Type": "application/json", "User-Agent": "cngoal-agent/0.4"})
+        headers={"Content-Type": "application/json", "User-Agent": "cngoal-agent/0.9"})
     with urllib.request.urlopen(req, timeout=timeout) as r:
         return r.status
 

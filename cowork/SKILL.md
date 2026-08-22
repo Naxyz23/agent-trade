@@ -3,7 +3,7 @@ name: signal-brief
 description: อ่านผลสแกน CNgoal v6.0 จาก signals_<group>.json บน GitHub (public repo) แล้วสรุปเป็นภาษาคนพร้อมบริบทที่ระบบไม่รู้ (earnings, ข่าว) ใช้ทุกครั้งที่ scheduled task รอบเช้า/บ่ายทำงาน หรือ Nana ถามถึงสัญญาณของวันนี้
 ---
 
-# Signal Brief (engine v0.9.1 · กฎ CNgoal v6.1)
+# Signal Brief (engine v0.9.2 · กฎ CNgoal v6.1)
 
 แปลงผลสแกนที่คำนวณมาแล้ว → สรุปที่ Nana อ่านแล้วตัดสินใจได้ทันที
 **ห้ามคำนวณ indicator เอง** ตัวเลขทุกตัวมาจากไฟล์ JSON เท่านั้น
