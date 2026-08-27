@@ -1,18 +1,20 @@
 {
-  "positions": {
-    "ORCL": {
+  "positions": {},
+  "closed": [
+    {
+      "symbol": "ORCL",
       "side": "short",
       "entry": 142.79,
-      "stop": 157.1399,
-      "size": 9.85,
-      "risk_amount": 0.99,
-      "sl_distance_pct": 10.05,
+      "exit": 148.87,
       "opened": "2026-08-18",
-      "price_basis": "close_of_signal_bar"
+      "closed": "2026-08-26",
+      "size": 9.85,
+      "pnl_pct_net": -4.398,
+      "pnl_amount": -0.4332,
+      "why": "ema50_cross"
     }
-  },
-  "closed": [],
-  "consecutive_losses": 0,
+  ],
+  "consecutive_losses": 1,
   "paused_until": null,
   "version": 3
 }
