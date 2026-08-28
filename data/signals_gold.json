@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-08-27T17:36:30+00:00",
-  "run_date": "2026-08-27",
+  "generated_at": "2026-08-28T18:37:13+00:00",
+  "run_date": "2026-08-28",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -30,28 +30,28 @@
       "kind": "watch",
       "direction": "long",
       "score": 40,
-      "price": 4598.2001953125,
+      "price": 4609.7001953125,
       "reasons": [
         "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
         "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
       ],
       "levels": {},
       "evidence": {
-        "close": 4598.2002,
-        "open": 4615.2998,
-        "high": 4615.2998,
-        "low": 4598.2002,
-        "ema20": 4408.2919,
-        "ema50": 4319.1668,
-        "ema200": 4302.3744,
-        "rsi14": 69.4946,
-        "atr14": 73.2624,
-        "atr_pct": 1.5933,
-        "adx14": 30.2204,
+        "close": 4609.7002,
+        "open": 4609.7002,
+        "high": 4609.7002,
+        "low": 4609.7002,
+        "ema20": 4427.4736,
+        "ema50": 4330.5602,
+        "ema200": 4305.4324,
+        "rsi14": 70.0639,
+        "atr14": 68.8508,
+        "atr_pct": 1.4936,
+        "adx14": 30.512,
         "swing_low10": 4315.0,
         "swing_high10": 4670.8999,
-        "ret_5d": 2.4235,
-        "ret_20d": 13.9663,
+        "ret_5d": 2.0681,
+        "ret_20d": 12.429,
         "regime": "bull",
         "candle": "-",
         "spec": "cngoal-6.1"
@@ -78,15 +78,72 @@
           "pass": false
         }
       ],
-      "bar_date": "2026-08-26",
+      "bar_date": "2026-08-27",
       "asset_class": "metal"
+    },
+    {
+      "symbol": "USOIL",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 83.52999877929688,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 83.53,
+        "open": 82.0,
+        "high": 84.27,
+        "low": 80.65,
+        "ema20": 83.1101,
+        "ema50": 82.7847,
+        "ema200": 79.694,
+        "rsi14": 51.6762,
+        "atr14": 3.6824,
+        "atr_pct": 4.4085,
+        "adx14": 14.4056,
+        "swing_low10": 79.62,
+        "swing_high10": 89.0,
+        "ret_5d": -4.8958,
+        "ret_20d": -0.0718,
+        "regime": "bull",
+        "candle": "-",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-08-27",
+      "asset_class": "commodity"
     }
   ],
   "open_positions": [],
   "portfolio": {
-    "equity": 98.943,
+    "equity": 98.5098,
     "peak": 100.0,
-    "drawdown_pct": 1.06,
+    "drawdown_pct": 1.49,
     "halted": false,
     "risk_pct_per_trade": 1.0
   },
@@ -103,7 +160,7 @@
       {
         "symbol": "XAU",
         "source": "yahoo",
-        "bar_date": "2026-08-26",
+        "bar_date": "2026-08-27",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -111,7 +168,7 @@
       {
         "symbol": "SLV",
         "source": "yahoo",
-        "bar_date": "2026-08-26",
+        "bar_date": "2026-08-27",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -119,7 +176,7 @@
       {
         "symbol": "USOIL",
         "source": "yahoo",
-        "bar_date": "2026-08-26",
+        "bar_date": "2026-08-27",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -131,15 +188,15 @@
       "symbol": "XAU",
       "name": "Gold Futures",
       "class": "metal",
-      "close": 4598.2002,
-      "chg_5d_pct": 2.42,
-      "chg_20d_pct": 13.97,
-      "rsi14": 69.49,
+      "close": 4609.7002,
+      "chg_5d_pct": 2.07,
+      "chg_20d_pct": 12.43,
+      "rsi14": 70.06,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-26",
+      "bar_date": "2026-08-27",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -148,15 +205,15 @@
       "symbol": "SLV",
       "name": "Silver ETF",
       "class": "commodity",
-      "close": 61.59,
-      "chg_5d_pct": 2.63,
-      "chg_20d_pct": 18.97,
-      "rsi14": 61.92,
+      "close": 62.77,
+      "chg_5d_pct": 1.8,
+      "chg_20d_pct": 17.33,
+      "rsi14": 64.83,
       "regime": "bear",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-26",
+      "bar_date": "2026-08-27",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -165,15 +222,15 @@
       "symbol": "USOIL",
       "name": "WTI Crude",
       "class": "commodity",
-      "close": 82.23,
-      "chg_5d_pct": -4.19,
-      "chg_20d_pct": -2.64,
-      "rsi14": 49.04,
+      "close": 83.53,
+      "chg_5d_pct": -4.9,
+      "chg_20d_pct": -0.07,
+      "rsi14": 51.68,
       "regime": "bull",
-      "above_ema20": false,
+      "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-08-26",
+      "bar_date": "2026-08-27",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
