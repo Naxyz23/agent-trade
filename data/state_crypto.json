@@ -1,5 +1,16 @@
 {
-  "positions": {},
+  "positions": {
+    "ETH": {
+      "side": "long",
+      "entry": 2467.12,
+      "stop": 2353.1145,
+      "size": 21.32,
+      "risk_amount": 0.99,
+      "sl_distance_pct": 4.621,
+      "opened": "2026-08-31",
+      "price_basis": "close_of_signal_bar"
+    }
+  },
   "closed": [
     {
       "symbol": "BTC",
