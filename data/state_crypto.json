@@ -9,6 +9,16 @@
       "sl_distance_pct": 4.621,
       "opened": "2026-08-31",
       "price_basis": "close_of_signal_bar"
+    },
+    "SOL": {
+      "side": "long",
+      "entry": 100.4,
+      "stop": 93.1767,
+      "size": 13.69,
+      "risk_amount": 0.99,
+      "sl_distance_pct": 7.194,
+      "opened": "2026-09-02",
+      "price_basis": "close_of_signal_bar"
     }
   },
   "closed": [
