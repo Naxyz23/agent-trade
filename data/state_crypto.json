@@ -19,6 +19,16 @@
       "sl_distance_pct": 7.194,
       "opened": "2026-09-02",
       "price_basis": "close_of_signal_bar"
+    },
+    "BTC": {
+      "side": "long",
+      "entry": 81276.1,
+      "stop": 76160.6631,
+      "size": 15.65,
+      "risk_amount": 0.99,
+      "sl_distance_pct": 6.294,
+      "opened": "2026-09-03",
+      "price_basis": "close_of_signal_bar"
     }
   },
   "closed": [
