@@ -29,6 +29,16 @@
       "sl_distance_pct": 6.294,
       "opened": "2026-09-03",
       "price_basis": "close_of_signal_bar"
+    },
+    "BNB": {
+      "side": "long",
+      "entry": 721.2604,
+      "stop": 674.499,
+      "size": 15.19,
+      "risk_amount": 0.99,
+      "sl_distance_pct": 6.483,
+      "opened": "2026-09-04",
+      "price_basis": "close_of_signal_bar"
     }
   },
   "closed": [
