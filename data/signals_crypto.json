@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-06T04:36:38+00:00",
-  "run_date": "2026-09-06",
+  "generated_at": "2026-09-07T04:37:48+00:00",
+  "run_date": "2026-09-07",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -23,92 +23,7 @@
   "group": "crypto",
   "universe_size": 4,
   "context_size": 0,
-  "signals": [
-    {
-      "symbol": "BNB",
-      "rule": "cngoal_entry",
-      "kind": "entry",
-      "direction": "long",
-      "score": 85,
-      "price": 721.2604370117188,
-      "reasons": [
-        "ครบทั้ง 5 เงื่อนไข CNgoal v6.0 ฝั่ง LONG",
-        "EMA200 หันขึ้น (650.6 เทียบ 644.1 เมื่อ 20 แท่งก่อน) · EMA20 679.1 > EMA50 642.2",
-        "ปิด 721.3 เหนือ EMA20 679.1 · RSI14 70.8",
-        "candle ยืนยัน: bullish pin bar",
-        "SL อิง swing_low10 → 674.5 (ห่าง 6.48%)",
-        "📌 ระบบบันทึกเป็นไม้เปิดแล้ว (size 15.19 · เสี่ยง 0.99 USDT) — จะติดตาม SL/EMA50 ให้อัตโนมัติ ราคานี้อิงราคาปิดของแท่งที่ให้สัญญาณ ของจริงอาจต่างเล็กน้อย · ADX14 46.7"
-      ],
-      "levels": {
-        "risk_pct": 1.0,
-        "entry": 721.2604,
-        "stop": 674.499,
-        "sl_distance_pct": 6.483,
-        "leverage_cap": 5,
-        "round_trip_cost_pct": 0.14,
-        "position_pct_of_equity": 15.4,
-        "capped_by_leverage": false,
-        "risk_amount": 0.99,
-        "position_size": 15.19,
-        "units": 0.021066,
-        "stop_source": "swing_low10"
-      },
-      "evidence": {
-        "close": 721.2604,
-        "open": 724.9983,
-        "high": 728.6565,
-        "low": 710.2684,
-        "ema20": 679.1369,
-        "ema50": 642.2213,
-        "ema200": 650.6373,
-        "rsi14": 70.8451,
-        "atr14": 19.1843,
-        "atr_pct": 2.6598,
-        "adx14": 46.7491,
-        "swing_low10": 675.1742,
-        "swing_high10": 728.6565,
-        "ret_5d": 5.3228,
-        "ret_20d": 18.8034,
-        "regime": "bull",
-        "candle": "bullish pin bar",
-        "spec": "cngoal-6.1"
-      },
-      "checklist": [
-        {
-          "n": 1,
-          "name": "EMA200 หันขึ้น",
-          "pass": true,
-          "detail": "EMA200 = 650.6 vs 20 แท่งก่อน 644.1"
-        },
-        {
-          "n": 2,
-          "name": "EMA20 > EMA50",
-          "pass": true,
-          "detail": "EMA20 679.1 vs EMA50 642.2"
-        },
-        {
-          "n": 3,
-          "name": "ปิด > EMA20",
-          "pass": true,
-          "detail": "close 721.3 vs EMA20 679.1"
-        },
-        {
-          "n": 4,
-          "name": "RSI14 > 50",
-          "pass": true,
-          "detail": "RSI14 = 70.8"
-        },
-        {
-          "n": 5,
-          "name": "candle ยืนยัน",
-          "pass": true,
-          "detail": "bullish pin bar"
-        }
-      ],
-      "bar_date": "2026-09-04",
-      "asset_class": "crypto"
-    }
-  ],
+  "signals": [],
   "open_positions": [
     {
       "symbol": "ETH",
@@ -175,7 +90,7 @@
       {
         "symbol": "BTC",
         "source": "kraken",
-        "bar_date": "2026-09-05",
+        "bar_date": "2026-09-06",
         "bar_age_days": 1,
         "max_age_days": 2,
         "stale": false
@@ -183,7 +98,7 @@
       {
         "symbol": "ETH",
         "source": "kraken",
-        "bar_date": "2026-09-05",
+        "bar_date": "2026-09-06",
         "bar_age_days": 1,
         "max_age_days": 2,
         "stale": false
@@ -191,7 +106,7 @@
       {
         "symbol": "SOL",
         "source": "kraken",
-        "bar_date": "2026-09-05",
+        "bar_date": "2026-09-06",
         "bar_age_days": 1,
         "max_age_days": 2,
         "stale": false
@@ -199,7 +114,7 @@
       {
         "symbol": "BNB",
         "source": "yahoo",
-        "bar_date": "2026-09-04",
+        "bar_date": "2026-09-05",
         "bar_age_days": 2,
         "max_age_days": 3,
         "stale": false
@@ -211,15 +126,15 @@
       "symbol": "BTC",
       "name": "Bitcoin",
       "class": "crypto",
-      "close": 79828.4,
-      "chg_5d_pct": 1.61,
-      "chg_20d_pct": 27.08,
-      "rsi14": 66.82,
+      "close": 80334.3,
+      "chg_5d_pct": 3.79,
+      "chg_20d_pct": 24.6,
+      "rsi14": 67.85,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": true,
-      "bar_date": "2026-09-05",
+      "bar_date": "2026-09-06",
       "bar_age_days": 1,
       "source": "kraken",
       "stale": false
@@ -228,15 +143,15 @@
       "symbol": "ETH",
       "name": "Ethereum",
       "class": "crypto",
-      "close": 2480.62,
-      "chg_5d_pct": 0.55,
-      "chg_20d_pct": 32.38,
-      "rsi14": 64.04,
+      "close": 2514.35,
+      "chg_5d_pct": 4.02,
+      "chg_20d_pct": 31.47,
+      "rsi14": 65.83,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": true,
-      "bar_date": "2026-09-05",
+      "bar_date": "2026-09-06",
       "bar_age_days": 1,
       "source": "kraken",
       "stale": false
@@ -245,15 +160,15 @@
       "symbol": "SOL",
       "name": "Solana",
       "class": "crypto",
-      "close": 103.17,
-      "chg_5d_pct": 0.13,
-      "chg_20d_pct": 38.39,
-      "rsi14": 64.67,
+      "close": 106.54,
+      "chg_5d_pct": 6.61,
+      "chg_20d_pct": 40.26,
+      "rsi14": 68.11,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": true,
-      "bar_date": "2026-09-05",
+      "bar_date": "2026-09-06",
       "bar_age_days": 1,
       "source": "kraken",
       "stale": false
@@ -262,15 +177,15 @@
       "symbol": "BNB",
       "name": "BNB",
       "class": "crypto",
-      "close": 721.2604,
-      "chg_5d_pct": 5.32,
-      "chg_20d_pct": 18.8,
-      "rsi14": 70.85,
+      "close": 766.9117,
+      "chg_5d_pct": 10.98,
+      "chg_20d_pct": 27.29,
+      "rsi14": 78.44,
       "regime": "bull",
       "above_ema20": true,
-      "candle": "bullish pin bar",
-      "in_position": false,
-      "bar_date": "2026-09-04",
+      "candle": "-",
+      "in_position": true,
+      "bar_date": "2026-09-05",
       "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
