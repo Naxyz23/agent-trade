@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-05T10:55:20+00:00",
-  "run_date": "2026-09-05",
+  "generated_at": "2026-09-08T11:44:55+00:00",
+  "run_date": "2026-09-08",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -382,14 +382,14 @@
   "halts": [],
   "events": [],
   "data_health": {
-    "oldest_bar_age_days": 1,
+    "oldest_bar_age_days": 4,
     "stale_symbols": [],
     "per_symbol": [
       {
         "symbol": "NVDA",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -397,7 +397,7 @@
         "symbol": "MSFT",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -405,7 +405,7 @@
         "symbol": "AAPL",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -413,7 +413,7 @@
         "symbol": "GOOG",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -421,7 +421,7 @@
         "symbol": "META",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -429,7 +429,7 @@
         "symbol": "AMD",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -437,7 +437,7 @@
         "symbol": "TSM",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -445,7 +445,7 @@
         "symbol": "TSLA",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -453,7 +453,7 @@
         "symbol": "ORCL",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -461,7 +461,7 @@
         "symbol": "NFLX",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -469,7 +469,7 @@
         "symbol": "JPM",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -477,7 +477,7 @@
         "symbol": "LLY",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -485,7 +485,7 @@
         "symbol": "WMT",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -493,7 +493,7 @@
         "symbol": "SPY",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -501,7 +501,7 @@
         "symbol": "QQQ",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -509,7 +509,7 @@
         "symbol": "DXY",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       }
@@ -529,7 +529,7 @@
       "candle": "bearish pin bar",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -546,7 +546,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -563,7 +563,7 @@
       "candle": "bearish engulfing",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -580,7 +580,7 @@
       "candle": "bearish engulfing",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -597,7 +597,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -614,7 +614,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -631,7 +631,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -648,7 +648,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -665,7 +665,7 @@
       "candle": "bullish pin bar",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -682,7 +682,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -699,7 +699,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -716,7 +716,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -733,7 +733,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -750,7 +750,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -767,7 +767,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -784,7 +784,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     }
