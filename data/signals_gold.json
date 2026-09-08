@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-05T10:31:16+00:00",
-  "run_date": "2026-09-05",
+  "generated_at": "2026-09-08T11:12:00+00:00",
+  "run_date": "2026-09-08",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -43,7 +43,7 @@
         "low": 4429.7998,
         "ema20": 4426.0091,
         "ema50": 4350.5204,
-        "ema200": 4312.3491,
+        "ema200": 4312.345,
         "rsi14": 52.3358,
         "atr14": 82.0925,
         "atr_pct": 1.8532,
@@ -157,7 +157,7 @@
         "low": 88.72,
         "ema20": 85.9162,
         "ema50": 84.1221,
-        "ema200": 80.234,
+        "ema200": 80.2345,
         "rsi14": 65.256,
         "atr14": 3.6017,
         "atr_pct": 3.9372,
@@ -211,14 +211,14 @@
   "halts": [],
   "events": [],
   "data_health": {
-    "oldest_bar_age_days": 1,
+    "oldest_bar_age_days": 4,
     "stale_symbols": [],
     "per_symbol": [
       {
         "symbol": "XAU",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -226,7 +226,7 @@
         "symbol": "SLV",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       },
@@ -234,7 +234,7 @@
         "symbol": "USOIL",
         "source": "yahoo",
         "bar_date": "2026-09-04",
-        "bar_age_days": 1,
+        "bar_age_days": 4,
         "max_age_days": 5,
         "stale": false
       }
@@ -254,7 +254,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -271,7 +271,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     },
@@ -288,7 +288,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-04",
-      "bar_age_days": 1,
+      "bar_age_days": 4,
       "source": "yahoo",
       "stale": false
     }
