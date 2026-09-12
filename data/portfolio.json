@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "equity": 98.5098,
+  "equity": 97.5029,
   "peak": 100.0,
   "halted": false,
   "halt_reason": null,
@@ -18,10 +18,17 @@
       "amount": -0.4332,
       "equity": 98.5098,
       "note": "ORCL ema50_cross"
+    },
+    {
+      "at": "2026-09-12T04:32:32+00:00",
+      "event": "pnl",
+      "amount": -1.0069,
+      "equity": 97.5029,
+      "note": "BTC stop"
     }
   ],
   "open_by_group": {
-    "crypto": 4,
+    "crypto": 3,
     "gold": 0,
     "stock": 0
   }

@@ -20,16 +20,6 @@
       "opened": "2026-09-02",
       "price_basis": "close_of_signal_bar"
     },
-    "BTC": {
-      "side": "long",
-      "entry": 81276.1,
-      "stop": 76160.6631,
-      "size": 15.65,
-      "risk_amount": 0.99,
-      "sl_distance_pct": 6.294,
-      "opened": "2026-09-03",
-      "price_basis": "close_of_signal_bar"
-    },
     "BNB": {
       "side": "long",
       "entry": 721.2604,
@@ -53,9 +43,21 @@
       "pnl_pct_net": -2.594,
       "pnl_amount": -1.057,
       "why": "stop"
+    },
+    {
+      "symbol": "BTC",
+      "side": "long",
+      "entry": 81276.1,
+      "exit": 76160.6631,
+      "opened": "2026-09-03",
+      "closed": "2026-09-11",
+      "size": 15.65,
+      "pnl_pct_net": -6.434,
+      "pnl_amount": -1.0069,
+      "why": "stop"
     }
   ],
-  "consecutive_losses": 1,
+  "consecutive_losses": 2,
   "paused_until": null,
   "version": 3
 }
