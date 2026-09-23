@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-22T12:02:53+00:00",
-  "run_date": "2026-09-22",
+  "generated_at": "2026-09-23T12:08:59+00:00",
+  "run_date": "2026-09-23",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -43,7 +43,7 @@
         "low": 221.56,
         "ema20": 219.3495,
         "ema50": 215.6108,
-        "ema200": 199.7529,
+        "ema200": 199.7532,
         "rsi14": 58.2361,
         "atr14": 6.4611,
         "atr_pct": 2.8416,
@@ -100,7 +100,7 @@
         "low": 491.33,
         "ema20": 494.0805,
         "ema50": 472.2989,
-        "ema200": 443.995,
+        "ema200": 443.9953,
         "rsi14": 57.1419,
         "atr14": 10.613,
         "atr_pct": 2.1158,
@@ -157,7 +157,7 @@
         "low": 344.8,
         "ema20": 340.9167,
         "ema50": 343.769,
-        "ema200": 326.2597,
+        "ema200": 326.2602,
         "rsi14": 58.5092,
         "atr14": 8.1044,
         "atr_pct": 2.3098,
@@ -214,7 +214,7 @@
         "low": 679.6,
         "ema20": 640.3642,
         "ema50": 615.8175,
-        "ema200": 622.8597,
+        "ema200": 622.8607,
         "rsi14": 77.8122,
         "atr14": 25.9513,
         "atr_pct": 3.501,
@@ -271,7 +271,7 @@
         "low": 582.27,
         "ema20": 513.3544,
         "ema50": 496.509,
-        "ema200": 388.6593,
+        "ema200": 388.66,
         "rsi14": 72.9629,
         "atr14": 26.3522,
         "atr_pct": 4.2813,
@@ -328,7 +328,7 @@
         "low": 437.06,
         "ema20": 425.6738,
         "ema50": 421.4804,
-        "ema200": 379.4864,
+        "ema200": 379.4868,
         "rsi14": 61.55,
         "atr14": 10.8324,
         "atr_pct": 2.4335,
@@ -382,14 +382,14 @@
   "halts": [],
   "events": [],
   "data_health": {
-    "oldest_bar_age_days": 1,
+    "oldest_bar_age_days": 2,
     "stale_symbols": [],
     "per_symbol": [
       {
         "symbol": "NVDA",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -397,7 +397,7 @@
         "symbol": "MSFT",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -405,7 +405,7 @@
         "symbol": "AAPL",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -413,7 +413,7 @@
         "symbol": "GOOG",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -421,7 +421,7 @@
         "symbol": "META",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -429,7 +429,7 @@
         "symbol": "AMD",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -437,7 +437,7 @@
         "symbol": "TSM",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -445,7 +445,7 @@
         "symbol": "TSLA",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -453,7 +453,7 @@
         "symbol": "ORCL",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -461,7 +461,7 @@
         "symbol": "NFLX",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -469,7 +469,7 @@
         "symbol": "JPM",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -477,7 +477,7 @@
         "symbol": "LLY",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -485,7 +485,7 @@
         "symbol": "WMT",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -493,7 +493,7 @@
         "symbol": "SPY",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -501,7 +501,7 @@
         "symbol": "QQQ",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -509,7 +509,7 @@
         "symbol": "DXY",
         "source": "yahoo",
         "bar_date": "2026-09-21",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       }
@@ -529,7 +529,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -546,7 +546,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -563,7 +563,7 @@
       "candle": "bullish engulfing",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -580,7 +580,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -597,7 +597,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -614,7 +614,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -631,7 +631,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -648,7 +648,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -665,7 +665,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -682,7 +682,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -699,7 +699,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -716,7 +716,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -733,7 +733,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -750,7 +750,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -767,7 +767,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -784,7 +784,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-09-21",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     }
