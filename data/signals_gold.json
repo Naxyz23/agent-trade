@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-02T12:25:51+00:00",
-  "run_date": "2026-10-02",
+  "generated_at": "2026-10-03T11:35:01+00:00",
+  "run_date": "2026-10-03",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -25,33 +25,117 @@
   "context_size": 0,
   "signals": [
     {
+      "symbol": "XAU",
+      "rule": "cngoal_entry",
+      "kind": "entry",
+      "direction": "short",
+      "score": 85,
+      "price": 4162.2998046875,
+      "reasons": [
+        "ครบทั้ง 5 เงื่อนไข CNgoal v6.0 ฝั่ง SHORT",
+        "EMA200 หันลง (4334 เทียบ 4336 เมื่อ 20 แท่งก่อน) · EMA20 4309 < EMA50 4346",
+        "ปิด 4162 ใต้ EMA20 4309 · RSI14 34.1",
+        "candle ยืนยัน: bearish engulfing",
+        "SL อิง ATR14 x 2 → 4356 (ห่าง 4.65%)",
+        "📌 ระบบบันทึกเป็นไม้เปิดแล้ว (size 20.77 · เสี่ยง 0.96 USDT) — จะติดตาม SL/EMA50 ให้อัตโนมัติ ราคานี้อิงราคาปิดของแท่งที่ให้สัญญาณ ของจริงอาจต่างเล็กน้อย · ADX14 19.4"
+      ],
+      "levels": {
+        "risk_pct": 1.0,
+        "entry": 4162.2998,
+        "stop": 4355.6595,
+        "sl_distance_pct": 4.646,
+        "leverage_cap": 5,
+        "round_trip_cost_pct": 0.14,
+        "position_pct_of_equity": 21.5,
+        "capped_by_leverage": false,
+        "risk_amount": 0.96,
+        "position_size": 20.77,
+        "units": 0.00499,
+        "stop_source": "atr2"
+      },
+      "evidence": {
+        "close": 4162.2998,
+        "open": 4204.6001,
+        "high": 4259.0,
+        "low": 4153.7998,
+        "ema20": 4308.8706,
+        "ema50": 4345.9676,
+        "ema200": 4334.4338,
+        "rsi14": 34.1352,
+        "atr14": 96.6799,
+        "atr_pct": 2.3228,
+        "adx14": 19.436,
+        "swing_low10": 4143.1001,
+        "swing_high10": 4422.1001,
+        "ret_5d": -3.6772,
+        "ret_20d": -8.3174,
+        "regime": "bear",
+        "candle": "bearish engulfing",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันลง",
+          "pass": true,
+          "detail": "EMA200 = 4334 vs 20 แท่งก่อน 4336"
+        },
+        {
+          "n": 2,
+          "name": "EMA20 < EMA50",
+          "pass": true,
+          "detail": "EMA20 4309 vs EMA50 4346"
+        },
+        {
+          "n": 3,
+          "name": "ปิด < EMA20",
+          "pass": true,
+          "detail": "close 4162 vs EMA20 4309"
+        },
+        {
+          "n": 4,
+          "name": "RSI14 < 50",
+          "pass": true,
+          "detail": "RSI14 = 34.1"
+        },
+        {
+          "n": 5,
+          "name": "candle ยืนยัน",
+          "pass": true,
+          "detail": "bearish engulfing"
+        }
+      ],
+      "bar_date": "2026-10-02",
+      "asset_class": "metal"
+    },
+    {
       "symbol": "SLV",
       "rule": "setup_forming",
       "kind": "watch",
       "direction": "short",
       "score": 40,
-      "price": 55.02000045776367,
+      "price": 54.7400016784668,
       "reasons": [
         "ผ่าน 3/4 ข้อฝั่ง SHORT — ยังขาด: candle bearish",
         "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
       ],
       "levels": {},
       "evidence": {
-        "close": 55.02,
-        "open": 55.11,
-        "high": 55.35,
-        "low": 54.49,
-        "ema20": 57.5296,
-        "ema50": 58.1062,
-        "ema200": 59.0101,
-        "rsi14": 40.9682,
-        "atr14": 1.6973,
-        "atr_pct": 3.0848,
-        "adx14": 12.7075,
-        "swing_low10": 54.23,
+        "close": 54.74,
+        "open": 55.46,
+        "high": 55.68,
+        "low": 53.9,
+        "ema20": 57.2639,
+        "ema50": 57.9742,
+        "ema200": 58.9676,
+        "rsi14": 40.2226,
+        "atr14": 1.7032,
+        "atr_pct": 3.1114,
+        "adx14": 13.2764,
+        "swing_low10": 53.9,
         "swing_high10": 61.0,
-        "ret_5d": -4.5123,
-        "ret_20d": -6.8563,
+        "ret_5d": -5.8479,
+        "ret_20d": -9.5954,
         "regime": "bear",
         "candle": "-",
         "spec": "cngoal-6.1"
@@ -78,11 +162,23 @@
           "pass": false
         }
       ],
-      "bar_date": "2026-10-01",
+      "bar_date": "2026-10-02",
       "asset_class": "commodity"
     }
   ],
-  "open_positions": [],
+  "open_positions": [
+    {
+      "symbol": "XAU",
+      "side": "short",
+      "entry": 4162.2998,
+      "stop": 4355.6595,
+      "size": 20.77,
+      "risk_amount": 0.96,
+      "sl_distance_pct": 4.646,
+      "opened": "2026-10-02",
+      "price_basis": "close_of_signal_bar"
+    }
+  ],
   "portfolio": {
     "equity": 96.4808,
     "peak": 100.0,
@@ -103,7 +199,7 @@
       {
         "symbol": "XAU",
         "source": "yahoo",
-        "bar_date": "2026-10-01",
+        "bar_date": "2026-10-02",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -111,7 +207,7 @@
       {
         "symbol": "SLV",
         "source": "yahoo",
-        "bar_date": "2026-10-01",
+        "bar_date": "2026-10-02",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -119,7 +215,7 @@
       {
         "symbol": "USOIL",
         "source": "yahoo",
-        "bar_date": "2026-10-01",
+        "bar_date": "2026-10-02",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -131,15 +227,15 @@
       "symbol": "XAU",
       "name": "Gold Futures",
       "class": "metal",
-      "close": 4202.2998,
-      "chg_5d_pct": -2.23,
-      "chg_20d_pct": -4.81,
-      "rsi14": 36.74,
-      "regime": "bull",
+      "close": 4162.2998,
+      "chg_5d_pct": -3.68,
+      "chg_20d_pct": -8.32,
+      "rsi14": 34.14,
+      "regime": "bear",
       "above_ema20": false,
-      "candle": "-",
+      "candle": "bearish engulfing",
       "in_position": false,
-      "bar_date": "2026-10-01",
+      "bar_date": "2026-10-02",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -148,15 +244,15 @@
       "symbol": "SLV",
       "name": "Silver ETF",
       "class": "commodity",
-      "close": 55.02,
-      "chg_5d_pct": -4.51,
-      "chg_20d_pct": -6.86,
-      "rsi14": 40.97,
+      "close": 54.74,
+      "chg_5d_pct": -5.85,
+      "chg_20d_pct": -9.6,
+      "rsi14": 40.22,
       "regime": "bear",
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-10-01",
+      "bar_date": "2026-10-02",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -165,15 +261,15 @@
       "symbol": "USOIL",
       "name": "WTI Crude",
       "class": "commodity",
-      "close": 92.87,
-      "chg_5d_pct": -1.84,
-      "chg_20d_pct": 2.04,
-      "rsi14": 50.47,
+      "close": 91.11,
+      "chg_5d_pct": -1.41,
+      "chg_20d_pct": -0.21,
+      "rsi14": 47.43,
       "regime": "bull",
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-10-01",
+      "bar_date": "2026-10-02",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
