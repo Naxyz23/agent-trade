@@ -1,5 +1,16 @@
 {
-  "positions": {},
+  "positions": {
+    "META": {
+      "side": "long",
+      "entry": 741.9,
+      "stop": 691.9042,
+      "size": 14.32,
+      "risk_amount": 0.96,
+      "sl_distance_pct": 6.739,
+      "opened": "2026-10-05",
+      "price_basis": "close_of_signal_bar"
+    }
+  },
   "closed": [
     {
       "symbol": "ORCL",
