@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "equity": 96.4808,
+  "equity": 96.5009,
   "peak": 100.0,
   "halted": false,
   "halt_reason": null,
@@ -32,10 +32,17 @@
       "amount": -1.0221,
       "equity": 96.4808,
       "note": "BTC stop"
+    },
+    {
+      "at": "2026-10-09T06:06:27+00:00",
+      "event": "pnl",
+      "amount": 0.0201,
+      "equity": 96.5009,
+      "note": "ETH ema50_cross"
     }
   ],
   "open_by_group": {
-    "crypto": 4,
+    "crypto": 3,
     "gold": 1,
     "stock": 1
   }

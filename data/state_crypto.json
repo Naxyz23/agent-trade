@@ -1,15 +1,5 @@
 {
   "positions": {
-    "ETH": {
-      "side": "long",
-      "entry": 2467.12,
-      "stop": 2353.1145,
-      "size": 21.32,
-      "risk_amount": 0.99,
-      "sl_distance_pct": 4.621,
-      "opened": "2026-08-31",
-      "price_basis": "close_of_signal_bar"
-    },
     "SOL": {
       "side": "long",
       "entry": 100.4,
@@ -77,6 +67,18 @@
       "pnl_pct_net": -3.042,
       "pnl_amount": -1.0221,
       "why": "stop"
+    },
+    {
+      "symbol": "ETH",
+      "side": "long",
+      "entry": 2467.12,
+      "exit": 2472.9,
+      "opened": "2026-08-31",
+      "closed": "2026-10-08",
+      "size": 21.32,
+      "pnl_pct_net": 0.094,
+      "pnl_amount": 0.0201,
+      "why": "ema50_cross"
     }
   ],
   "consecutive_losses": 0,
