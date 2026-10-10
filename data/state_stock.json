@@ -9,6 +9,16 @@
       "sl_distance_pct": 6.739,
       "opened": "2026-10-05",
       "price_basis": "close_of_signal_bar"
+    },
+    "NFLX": {
+      "side": "short",
+      "entry": 70.3,
+      "stop": 73.9998,
+      "size": 18.34,
+      "risk_amount": 0.97,
+      "sl_distance_pct": 5.263,
+      "opened": "2026-10-09",
+      "price_basis": "close_of_signal_bar"
     }
   },
   "closed": [
