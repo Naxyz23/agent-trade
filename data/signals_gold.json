@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-10T12:24:51+00:00",
-  "run_date": "2026-10-10",
+  "generated_at": "2026-10-13T14:05:31+00:00",
+  "run_date": "2026-10-13",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -25,35 +25,92 @@
   "context_size": 0,
   "signals": [
     {
+      "symbol": "SLV",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "short",
+      "score": 40,
+      "price": 54.349998474121094,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง SHORT — ยังขาด: candle bearish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 54.35,
+        "open": 54.72,
+        "high": 54.74,
+        "low": 54.3,
+        "ema20": 55.9931,
+        "ema50": 57.2278,
+        "ema200": 58.7076,
+        "rsi14": 41.7981,
+        "atr14": 1.5077,
+        "atr_pct": 2.774,
+        "adx14": 16.2187,
+        "swing_low10": 52.84,
+        "swing_high10": 55.86,
+        "ret_5d": -1.4148,
+        "ret_20d": -4.3807,
+        "regime": "bear",
+        "candle": "-",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันลง",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด < EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI < 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bearish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-10-12",
+      "asset_class": "commodity"
+    },
+    {
       "symbol": "USOIL",
       "rule": "setup_forming",
       "kind": "watch",
       "direction": "long",
       "score": 40,
-      "price": 91.8499984741211,
+      "price": 93.73999786376953,
       "reasons": [
-        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: ปิด > EMA20",
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
         "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
       ],
       "levels": {},
       "evidence": {
-        "close": 91.85,
-        "open": 91.29,
-        "high": 92.17,
-        "low": 90.01,
-        "ema20": 92.021,
-        "ema50": 90.1962,
-        "ema200": 83.3275,
-        "rsi14": 50.1187,
-        "atr14": 4.2535,
-        "atr_pct": 4.6309,
-        "adx14": 17.8934,
+        "close": 93.74,
+        "open": 91.83,
+        "high": 94.36,
+        "low": 89.61,
+        "ema20": 92.1847,
+        "ema50": 90.3352,
+        "ema200": 83.4321,
+        "rsi14": 53.7634,
+        "atr14": 4.289,
+        "atr_pct": 4.5754,
+        "adx14": 18.1808,
         "swing_low10": 86.86,
-        "swing_high10": 96.54,
-        "ret_5d": 0.8122,
-        "ret_20d": -8.1959,
+        "swing_high10": 94.74,
+        "ret_5d": 4.8194,
+        "ret_20d": -7.5451,
         "regime": "bull",
-        "candle": "bullish pin bar",
+        "candle": "-",
         "spec": "cngoal-6.1"
       },
       "checklist": [
@@ -65,7 +122,7 @@
         {
           "n": 2,
           "name": "ปิด > EMA20",
-          "pass": false
+          "pass": true
         },
         {
           "n": 3,
@@ -75,10 +132,10 @@
         {
           "n": 4,
           "name": "candle bullish",
-          "pass": true
+          "pass": false
         }
       ],
-      "bar_date": "2026-10-09",
+      "bar_date": "2026-10-12",
       "asset_class": "commodity"
     }
   ],
@@ -96,9 +153,9 @@
     }
   ],
   "portfolio": {
-    "equity": 96.5009,
+    "equity": 97.1935,
     "peak": 100.0,
-    "drawdown_pct": 3.5,
+    "drawdown_pct": 2.81,
     "halted": false,
     "risk_pct_per_trade": 1.0
   },
@@ -115,7 +172,7 @@
       {
         "symbol": "XAU",
         "source": "yahoo",
-        "bar_date": "2026-10-09",
+        "bar_date": "2026-10-12",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -123,7 +180,7 @@
       {
         "symbol": "SLV",
         "source": "yahoo",
-        "bar_date": "2026-10-09",
+        "bar_date": "2026-10-12",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -131,7 +188,7 @@
       {
         "symbol": "USOIL",
         "source": "yahoo",
-        "bar_date": "2026-10-09",
+        "bar_date": "2026-10-12",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -143,15 +200,15 @@
       "symbol": "XAU",
       "name": "Gold Futures",
       "class": "metal",
-      "close": 4216.2998,
-      "chg_5d_pct": 1.3,
-      "chg_20d_pct": -4.37,
-      "rsi14": 43.52,
+      "close": 4190.6001,
+      "chg_5d_pct": 0.81,
+      "chg_20d_pct": -3.71,
+      "rsi14": 41.37,
       "regime": "bear",
       "above_ema20": false,
       "candle": "-",
       "in_position": true,
-      "bar_date": "2026-10-09",
+      "bar_date": "2026-10-12",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -160,15 +217,15 @@
       "symbol": "SLV",
       "name": "Silver ETF",
       "class": "commodity",
-      "close": 54.78,
-      "chg_5d_pct": 0.07,
-      "chg_20d_pct": -5.75,
-      "rsi14": 43.16,
+      "close": 54.35,
+      "chg_5d_pct": -1.41,
+      "chg_20d_pct": -4.38,
+      "rsi14": 41.8,
       "regime": "bear",
       "above_ema20": false,
-      "candle": "bearish pin bar",
+      "candle": "-",
       "in_position": false,
-      "bar_date": "2026-10-09",
+      "bar_date": "2026-10-12",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -177,15 +234,15 @@
       "symbol": "USOIL",
       "name": "WTI Crude",
       "class": "commodity",
-      "close": 91.85,
-      "chg_5d_pct": 0.81,
-      "chg_20d_pct": -8.2,
-      "rsi14": 50.12,
+      "close": 93.74,
+      "chg_5d_pct": 4.82,
+      "chg_20d_pct": -7.55,
+      "rsi14": 53.76,
       "regime": "bull",
-      "above_ema20": false,
-      "candle": "bullish pin bar",
+      "above_ema20": true,
+      "candle": "-",
       "in_position": false,
-      "bar_date": "2026-10-09",
+      "bar_date": "2026-10-12",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
