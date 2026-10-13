@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "equity": 96.5009,
+  "equity": 97.1935,
   "peak": 100.0,
   "halted": false,
   "halt_reason": null,
@@ -39,10 +39,17 @@
       "amount": 0.0201,
       "equity": 96.5009,
       "note": "ETH ema50_cross"
+    },
+    {
+      "at": "2026-10-13T06:46:20+00:00",
+      "event": "pnl",
+      "amount": 0.6926,
+      "equity": 97.1935,
+      "note": "SOL ema50_cross"
     }
   ],
   "open_by_group": {
-    "crypto": 3,
+    "crypto": 2,
     "gold": 1,
     "stock": 2
   }
