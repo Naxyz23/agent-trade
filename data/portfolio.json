@@ -1,6 +1,6 @@
 {
   "version": 3,
-  "equity": 97.4011,
+  "equity": 96.416,
   "peak": 100.0,
   "halted": false,
   "halt_reason": null,
@@ -53,6 +53,13 @@
       "amount": 0.2076,
       "equity": 97.4011,
       "note": "BNB ema50_cross"
+    },
+    {
+      "at": "2026-10-21T12:25:06+00:00",
+      "event": "pnl",
+      "amount": -0.9851,
+      "equity": 96.416,
+      "note": "META stop"
     }
   ],
   "open_by_group": {

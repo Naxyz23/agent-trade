@@ -1,15 +1,5 @@
 {
   "positions": {
-    "META": {
-      "side": "long",
-      "entry": 741.9,
-      "stop": 691.9042,
-      "size": 14.32,
-      "risk_amount": 0.96,
-      "sl_distance_pct": 6.739,
-      "opened": "2026-10-05",
-      "price_basis": "close_of_signal_bar"
-    },
     "NFLX": {
       "side": "short",
       "entry": 70.3,
@@ -18,6 +8,16 @@
       "risk_amount": 0.97,
       "sl_distance_pct": 5.263,
       "opened": "2026-10-09",
+      "price_basis": "close_of_signal_bar"
+    },
+    "MSFT": {
+      "side": "long",
+      "entry": 531.87,
+      "stop": 508.9688,
+      "size": 22.62,
+      "risk_amount": 0.97,
+      "sl_distance_pct": 4.306,
+      "opened": "2026-10-20",
       "price_basis": "close_of_signal_bar"
     }
   },
@@ -33,9 +33,21 @@
       "pnl_pct_net": -4.398,
       "pnl_amount": -0.4332,
       "why": "ema50_cross"
+    },
+    {
+      "symbol": "META",
+      "side": "long",
+      "entry": 741.9,
+      "exit": 691.9042,
+      "opened": "2026-10-05",
+      "closed": "2026-10-20",
+      "size": 14.32,
+      "pnl_pct_net": -6.879,
+      "pnl_amount": -0.9851,
+      "why": "stop"
     }
   ],
-  "consecutive_losses": 1,
+  "consecutive_losses": 2,
   "paused_until": null,
   "version": 3
 }
