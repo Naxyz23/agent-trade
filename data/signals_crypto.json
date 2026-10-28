@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-27T05:00:31+00:00",
-  "run_date": "2026-10-27",
+  "generated_at": "2026-10-28T05:38:50+00:00",
+  "run_date": "2026-10-28",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -23,7 +23,65 @@
   "group": "crypto",
   "universe_size": 4,
   "context_size": 0,
-  "signals": [],
+  "signals": [
+    {
+      "symbol": "BNB",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 741.4193725585938,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: RSI > 50",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 741.4194,
+        "open": 737.7246,
+        "high": 745.2345,
+        "low": 732.4883,
+        "ema20": 740.6336,
+        "ema50": 733.795,
+        "ema200": 690.6892,
+        "rsi14": 49.8944,
+        "atr14": 18.1084,
+        "atr_pct": 2.4424,
+        "adx14": 22.1403,
+        "swing_low10": 705.7646,
+        "swing_high10": 750.823,
+        "ret_5d": -0.5965,
+        "ret_20d": -4.8994,
+        "regime": "bull",
+        "candle": "bullish engulfing",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": false
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": true
+        }
+      ],
+      "bar_date": "2026-10-26",
+      "asset_class": "crypto"
+    }
+  ],
   "open_positions": [],
   "portfolio": {
     "equity": 95.9253,
@@ -45,7 +103,7 @@
       {
         "symbol": "BTC",
         "source": "kraken",
-        "bar_date": "2026-10-26",
+        "bar_date": "2026-10-27",
         "bar_age_days": 1,
         "max_age_days": 2,
         "stale": false
@@ -53,7 +111,7 @@
       {
         "symbol": "ETH",
         "source": "kraken",
-        "bar_date": "2026-10-26",
+        "bar_date": "2026-10-27",
         "bar_age_days": 1,
         "max_age_days": 2,
         "stale": false
@@ -61,7 +119,7 @@
       {
         "symbol": "SOL",
         "source": "kraken",
-        "bar_date": "2026-10-26",
+        "bar_date": "2026-10-27",
         "bar_age_days": 1,
         "max_age_days": 2,
         "stale": false
@@ -69,7 +127,7 @@
       {
         "symbol": "BNB",
         "source": "yahoo",
-        "bar_date": "2026-10-25",
+        "bar_date": "2026-10-26",
         "bar_age_days": 2,
         "max_age_days": 3,
         "stale": false
@@ -81,15 +139,15 @@
       "symbol": "BTC",
       "name": "Bitcoin",
       "class": "crypto",
-      "close": 80001.9,
-      "chg_5d_pct": -4.79,
-      "chg_20d_pct": -6.48,
-      "rsi14": 41.48,
+      "close": 80800.9,
+      "chg_5d_pct": -0.63,
+      "chg_20d_pct": -2.97,
+      "rsi14": 45.44,
       "regime": "bull",
       "above_ema20": false,
-      "candle": "-",
+      "candle": "bullish engulfing",
       "in_position": false,
-      "bar_date": "2026-10-26",
+      "bar_date": "2026-10-27",
       "bar_age_days": 1,
       "source": "kraken",
       "stale": false
@@ -98,15 +156,15 @@
       "symbol": "ETH",
       "name": "Ethereum",
       "class": "crypto",
-      "close": 2320.45,
-      "chg_5d_pct": -6.12,
-      "chg_20d_pct": -13.97,
-      "rsi14": 33.62,
+      "close": 2347.34,
+      "chg_5d_pct": -1.62,
+      "chg_20d_pct": -8.76,
+      "rsi14": 37.58,
       "regime": "bull",
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-10-26",
+      "bar_date": "2026-10-27",
       "bar_age_days": 1,
       "source": "kraken",
       "stale": false
@@ -115,15 +173,15 @@
       "symbol": "SOL",
       "name": "Solana",
       "class": "crypto",
-      "close": 100.76,
-      "chg_5d_pct": -5.73,
-      "chg_20d_pct": -16.51,
-      "rsi14": 35.11,
+      "close": 101.22,
+      "chg_5d_pct": -2.24,
+      "chg_20d_pct": -12.93,
+      "rsi14": 36.55,
       "regime": "bull",
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-10-26",
+      "bar_date": "2026-10-27",
       "bar_age_days": 1,
       "source": "kraken",
       "stale": false
@@ -132,15 +190,15 @@
       "symbol": "BNB",
       "name": "BNB",
       "class": "crypto",
-      "close": 737.7246,
-      "chg_5d_pct": -0.42,
-      "chg_20d_pct": -6.24,
-      "rsi14": 48.18,
+      "close": 741.4194,
+      "chg_5d_pct": -0.6,
+      "chg_20d_pct": -4.9,
+      "rsi14": 49.89,
       "regime": "bull",
-      "above_ema20": false,
-      "candle": "-",
+      "above_ema20": true,
+      "candle": "bullish engulfing",
       "in_position": false,
-      "bar_date": "2026-10-25",
+      "bar_date": "2026-10-26",
       "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
