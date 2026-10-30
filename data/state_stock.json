@@ -19,6 +19,16 @@
       "sl_distance_pct": 4.306,
       "opened": "2026-10-20",
       "price_basis": "close_of_signal_bar"
+    },
+    "WMT": {
+      "side": "long",
+      "entry": 121.25,
+      "stop": 116.5328,
+      "size": 24.66,
+      "risk_amount": 0.96,
+      "sl_distance_pct": 3.89,
+      "opened": "2026-10-29",
+      "price_basis": "close_of_signal_bar"
     }
   },
   "closed": [
