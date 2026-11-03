@@ -10,16 +10,6 @@
       "opened": "2026-10-09",
       "price_basis": "close_of_signal_bar"
     },
-    "MSFT": {
-      "side": "long",
-      "entry": 531.87,
-      "stop": 508.9688,
-      "size": 22.62,
-      "risk_amount": 0.97,
-      "sl_distance_pct": 4.306,
-      "opened": "2026-10-20",
-      "price_basis": "close_of_signal_bar"
-    },
     "WMT": {
       "side": "long",
       "entry": 121.25,
@@ -55,9 +45,21 @@
       "pnl_pct_net": -6.879,
       "pnl_amount": -0.9851,
       "why": "stop"
+    },
+    {
+      "symbol": "MSFT",
+      "side": "long",
+      "entry": 531.87,
+      "exit": 508.9688,
+      "opened": "2026-10-20",
+      "closed": "2026-11-02",
+      "size": 22.62,
+      "pnl_pct_net": -4.446,
+      "pnl_amount": -1.0056,
+      "why": "stop"
     }
   ],
-  "consecutive_losses": 2,
-  "paused_until": null,
+  "consecutive_losses": 0,
+  "paused_until": "2026-11-06",
   "version": 3
 }
