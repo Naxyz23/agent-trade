@@ -19,6 +19,16 @@
       "sl_distance_pct": 3.89,
       "opened": "2026-10-29",
       "price_basis": "close_of_signal_bar"
+    },
+    "GOOG": {
+      "side": "short",
+      "entry": 283.93,
+      "stop": 305.1493,
+      "size": 12.7,
+      "risk_amount": 0.95,
+      "sl_distance_pct": 7.473,
+      "opened": "2026-11-06",
+      "price_basis": "close_of_signal_bar"
     }
   },
   "closed": [
