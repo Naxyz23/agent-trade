@@ -1,5 +1,16 @@
 {
-  "positions": {},
+  "positions": {
+    "SOL": {
+      "side": "short",
+      "entry": 83.24,
+      "stop": 98.108,
+      "size": 5.31,
+      "risk_amount": 0.95,
+      "sl_distance_pct": 17.862,
+      "opened": "2026-11-10",
+      "price_basis": "close_of_signal_bar"
+    }
+  },
   "closed": [
     {
       "symbol": "BTC",
