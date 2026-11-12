@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-11T14:43:06+00:00",
-  "run_date": "2026-11-11",
+  "generated_at": "2026-11-12T15:35:59+00:00",
+  "run_date": "2026-11-12",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -25,204 +25,33 @@
   "context_size": 3,
   "signals": [
     {
-      "symbol": "MSFT",
-      "rule": "setup_forming",
-      "kind": "watch",
-      "direction": "long",
-      "score": 40,
-      "price": 533.1599731445312,
-      "reasons": [
-        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
-        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
-      ],
-      "levels": {},
-      "evidence": {
-        "close": 533.16,
-        "open": 542.98,
-        "high": 544.19,
-        "low": 526.37,
-        "ema20": 530.2277,
-        "ema50": 515.2219,
-        "ema200": 468.9456,
-        "rsi14": 52.2966,
-        "atr14": 15.8275,
-        "atr_pct": 2.9686,
-        "adx14": 18.4515,
-        "swing_low10": 504.96,
-        "swing_high10": 559.15,
-        "ret_5d": 2.3359,
-        "ret_20d": -1.8935,
-        "regime": "bull",
-        "candle": "-",
-        "spec": "cngoal-6.1"
-      },
-      "checklist": [
-        {
-          "n": 1,
-          "name": "EMA200 หันขึ้น",
-          "pass": true
-        },
-        {
-          "n": 2,
-          "name": "ปิด > EMA20",
-          "pass": true
-        },
-        {
-          "n": 3,
-          "name": "RSI > 50",
-          "pass": true
-        },
-        {
-          "n": 4,
-          "name": "candle bullish",
-          "pass": false
-        }
-      ],
-      "bar_date": "2026-11-10",
-      "asset_class": "stock"
-    },
-    {
-      "symbol": "AAPL",
-      "rule": "setup_forming",
-      "kind": "watch",
-      "direction": "long",
-      "score": 40,
-      "price": 348.510009765625,
-      "reasons": [
-        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
-        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
-      ],
-      "levels": {},
-      "evidence": {
-        "close": 348.51,
-        "open": 351.35,
-        "high": 353.87,
-        "low": 346.46,
-        "ema20": 343.3759,
-        "ema50": 336.596,
-        "ema200": 305.9358,
-        "rsi14": 55.6199,
-        "atr14": 8.7525,
-        "atr_pct": 2.5114,
-        "adx14": 17.2272,
-        "swing_low10": 325.33,
-        "swing_high10": 355.38,
-        "ret_5d": 5.0045,
-        "ret_20d": 2.1215,
-        "regime": "bull",
-        "candle": "-",
-        "spec": "cngoal-6.1"
-      },
-      "checklist": [
-        {
-          "n": 1,
-          "name": "EMA200 หันขึ้น",
-          "pass": true
-        },
-        {
-          "n": 2,
-          "name": "ปิด > EMA20",
-          "pass": true
-        },
-        {
-          "n": 3,
-          "name": "RSI > 50",
-          "pass": true
-        },
-        {
-          "n": 4,
-          "name": "candle bullish",
-          "pass": false
-        }
-      ],
-      "bar_date": "2026-11-10",
-      "asset_class": "stock"
-    },
-    {
-      "symbol": "TSLA",
-      "rule": "setup_forming",
-      "kind": "watch",
-      "direction": "long",
-      "score": 40,
-      "price": 379.7799987792969,
-      "reasons": [
-        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
-        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
-      ],
-      "levels": {},
-      "evidence": {
-        "close": 379.78,
-        "open": 370.85,
-        "high": 380.0,
-        "low": 370.4,
-        "ema20": 379.6446,
-        "ema50": 374.3283,
-        "ema200": 378.3241,
-        "rsi14": 50.5436,
-        "atr14": 16.6818,
-        "atr_pct": 4.3925,
-        "adx14": 16.1132,
-        "swing_low10": 338.15,
-        "swing_high10": 414.23,
-        "ret_5d": -4.6976,
-        "ret_20d": 1.2126,
-        "regime": "bull",
-        "candle": "-",
-        "spec": "cngoal-6.1"
-      },
-      "checklist": [
-        {
-          "n": 1,
-          "name": "EMA200 หันขึ้น",
-          "pass": true
-        },
-        {
-          "n": 2,
-          "name": "ปิด > EMA20",
-          "pass": true
-        },
-        {
-          "n": 3,
-          "name": "RSI > 50",
-          "pass": true
-        },
-        {
-          "n": 4,
-          "name": "candle bullish",
-          "pass": false
-        }
-      ],
-      "bar_date": "2026-11-10",
-      "asset_class": "stock"
-    },
-    {
-      "symbol": "ORCL",
+      "symbol": "NVDA",
       "rule": "setup_forming",
       "kind": "watch",
       "direction": "short",
       "score": 40,
-      "price": 117.9800033569336,
+      "price": 173.72999572753906,
       "reasons": [
         "ผ่าน 3/4 ข้อฝั่ง SHORT — ยังขาด: candle bearish",
         "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
       ],
       "levels": {},
       "evidence": {
-        "close": 117.98,
-        "open": 117.91,
-        "high": 120.23,
-        "low": 115.5,
-        "ema20": 127.0024,
-        "ema50": 134.6677,
-        "ema200": 157.1966,
-        "rsi14": 40.7102,
-        "atr14": 8.032,
-        "atr_pct": 6.808,
-        "adx14": 15.2994,
-        "swing_low10": 109.21,
-        "swing_high10": 148.48,
-        "ret_5d": -6.5061,
-        "ret_20d": -17.6117,
+        "close": 173.73,
+        "open": 172.8,
+        "high": 177.54,
+        "low": 170.77,
+        "ema20": 199.655,
+        "ema50": 210.3899,
+        "ema200": 204.178,
+        "rsi14": 28.7369,
+        "atr14": 8.6963,
+        "atr_pct": 5.0057,
+        "adx14": 36.8299,
+        "swing_low10": 165.89,
+        "swing_high10": 215.33,
+        "ret_5d": -13.1914,
+        "ret_20d": -21.4957,
         "regime": "bear",
         "candle": "-",
         "spec": "cngoal-6.1"
@@ -249,7 +78,235 @@
           "pass": false
         }
       ],
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
+      "asset_class": "stock"
+    },
+    {
+      "symbol": "AAPL",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 355.6300048828125,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 355.63,
+        "open": 349.55,
+        "high": 355.91,
+        "low": 349.33,
+        "ema20": 344.5429,
+        "ema50": 337.3424,
+        "ema200": 306.4303,
+        "rsi14": 60.4211,
+        "atr14": 8.6559,
+        "atr_pct": 2.434,
+        "adx14": 17.4687,
+        "swing_low10": 325.33,
+        "swing_high10": 355.91,
+        "ret_5d": 1.751,
+        "ret_20d": 3.6943,
+        "regime": "bull",
+        "candle": "-",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-11-11",
+      "asset_class": "stock"
+    },
+    {
+      "symbol": "AMD",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 552.9000244140625,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 552.9,
+        "open": 543.08,
+        "high": 567.65,
+        "low": 522.65,
+        "ema20": 519.8659,
+        "ema50": 532.2971,
+        "ema200": 441.1186,
+        "rsi14": 53.6282,
+        "atr14": 40.0647,
+        "atr_pct": 7.2463,
+        "adx14": 21.9925,
+        "swing_low10": 402.1,
+        "swing_high10": 575.1,
+        "ret_5d": 13.1184,
+        "ret_20d": -3.1393,
+        "regime": "bull",
+        "candle": "-",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-11-11",
+      "asset_class": "stock"
+    },
+    {
+      "symbol": "TSM",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 413.3500061035156,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: RSI > 50",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 413.35,
+        "open": 415.25,
+        "high": 416.8,
+        "low": 407.03,
+        "ema20": 409.5957,
+        "ema50": 421.5514,
+        "ema200": 394.8787,
+        "rsi14": 49.6175,
+        "atr14": 16.9658,
+        "atr_pct": 4.1045,
+        "adx14": 29.411,
+        "swing_low10": 351.19,
+        "swing_high10": 436.24,
+        "ret_5d": 4.4473,
+        "ret_20d": -3.8721,
+        "regime": "bull",
+        "candle": "bullish pin bar",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": false
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": true
+        }
+      ],
+      "bar_date": "2026-11-11",
+      "asset_class": "stock"
+    },
+    {
+      "symbol": "TSLA",
+      "rule": "setup_forming",
+      "kind": "watch",
+      "direction": "long",
+      "score": 40,
+      "price": 390.8399963378906,
+      "reasons": [
+        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
+        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
+      ],
+      "levels": {},
+      "evidence": {
+        "close": 390.84,
+        "open": 386.58,
+        "high": 395.43,
+        "low": 386.35,
+        "ema20": 380.7108,
+        "ema50": 374.9758,
+        "ema200": 378.4487,
+        "rsi14": 54.3626,
+        "atr14": 16.6081,
+        "atr_pct": 4.2493,
+        "adx14": 15.0283,
+        "swing_low10": 338.15,
+        "swing_high10": 414.23,
+        "ret_5d": 1.4668,
+        "ret_20d": 6.4495,
+        "regime": "bull",
+        "candle": "-",
+        "spec": "cngoal-6.1"
+      },
+      "checklist": [
+        {
+          "n": 1,
+          "name": "EMA200 หันขึ้น",
+          "pass": true
+        },
+        {
+          "n": 2,
+          "name": "ปิด > EMA20",
+          "pass": true
+        },
+        {
+          "n": 3,
+          "name": "RSI > 50",
+          "pass": true
+        },
+        {
+          "n": 4,
+          "name": "candle bullish",
+          "pass": false
+        }
+      ],
+      "bar_date": "2026-11-11",
       "asset_class": "stock"
     },
     {
@@ -258,28 +315,28 @@
       "kind": "watch",
       "direction": "long",
       "score": 40,
-      "price": 342.07000732421875,
+      "price": 343.3900146484375,
       "reasons": [
         "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
         "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
       ],
       "levels": {},
       "evidence": {
-        "close": 342.07,
-        "open": 343.96,
-        "high": 344.85,
-        "low": 341.26,
-        "ema20": 338.9312,
-        "ema50": 340.1231,
-        "ema200": 327.8731,
-        "rsi14": 52.6713,
-        "atr14": 7.7987,
-        "atr_pct": 2.2799,
-        "adx14": 15.9633,
+        "close": 343.39,
+        "open": 342.89,
+        "high": 345.0,
+        "low": 340.82,
+        "ema20": 339.3559,
+        "ema50": 340.2512,
+        "ema200": 328.0275,
+        "rsi14": 53.7495,
+        "atr14": 7.5402,
+        "atr_pct": 2.1958,
+        "adx14": 16.5114,
         "swing_low10": 333.0,
         "swing_high10": 359.8,
-        "ret_5d": 1.2101,
-        "ret_20d": 3.2103,
+        "ret_5d": -2.4765,
+        "ret_20d": 2.4189,
         "regime": "bull",
         "candle": "-",
         "spec": "cngoal-6.1"
@@ -306,64 +363,7 @@
           "pass": false
         }
       ],
-      "bar_date": "2026-11-10",
-      "asset_class": "stock"
-    },
-    {
-      "symbol": "LLY",
-      "rule": "setup_forming",
-      "kind": "watch",
-      "direction": "long",
-      "score": 40,
-      "price": 1432.2900390625,
-      "reasons": [
-        "ผ่าน 3/4 ข้อฝั่ง LONG — ยังขาด: candle bullish",
-        "ยังไม่ใช่สัญญาณเข้า แค่บอกให้รู้ว่าใกล้ครบ"
-      ],
-      "levels": {},
-      "evidence": {
-        "close": 1432.29,
-        "open": 1408.49,
-        "high": 1438.88,
-        "low": 1400.0,
-        "ema20": 1334.0265,
-        "ema50": 1261.7286,
-        "ema200": 1126.5254,
-        "rsi14": 69.8221,
-        "atr14": 47.9625,
-        "atr_pct": 3.3487,
-        "adx14": 38.1424,
-        "swing_low10": 1260.34,
-        "swing_high10": 1453.0,
-        "ret_5d": 1.6255,
-        "ret_20d": 22.7842,
-        "regime": "bull",
-        "candle": "-",
-        "spec": "cngoal-6.1"
-      },
-      "checklist": [
-        {
-          "n": 1,
-          "name": "EMA200 หันขึ้น",
-          "pass": true
-        },
-        {
-          "n": 2,
-          "name": "ปิด > EMA20",
-          "pass": true
-        },
-        {
-          "n": 3,
-          "name": "RSI > 50",
-          "pass": true
-        },
-        {
-          "n": 4,
-          "name": "candle bullish",
-          "pass": false
-        }
-      ],
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "asset_class": "stock"
     }
   ],
@@ -422,7 +422,7 @@
       {
         "symbol": "NVDA",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -430,7 +430,7 @@
       {
         "symbol": "MSFT",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -438,7 +438,7 @@
       {
         "symbol": "AAPL",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -446,7 +446,7 @@
       {
         "symbol": "GOOG",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -454,7 +454,7 @@
       {
         "symbol": "META",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -462,7 +462,7 @@
       {
         "symbol": "AMD",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -470,7 +470,7 @@
       {
         "symbol": "TSM",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -478,7 +478,7 @@
       {
         "symbol": "TSLA",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -486,7 +486,7 @@
       {
         "symbol": "ORCL",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -494,7 +494,7 @@
       {
         "symbol": "NFLX",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -502,7 +502,7 @@
       {
         "symbol": "JPM",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -510,7 +510,7 @@
       {
         "symbol": "LLY",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -518,7 +518,7 @@
       {
         "symbol": "WMT",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -526,7 +526,7 @@
       {
         "symbol": "SPY",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -534,7 +534,7 @@
       {
         "symbol": "QQQ",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -542,7 +542,7 @@
       {
         "symbol": "DXY",
         "source": "yahoo",
-        "bar_date": "2026-11-10",
+        "bar_date": "2026-11-11",
         "bar_age_days": 1,
         "max_age_days": 5,
         "stale": false
@@ -554,15 +554,15 @@
       "symbol": "NVDA",
       "name": "NVIDIA",
       "class": "stock",
-      "close": 168.89,
-      "chg_5d_pct": -18.29,
-      "chg_20d_pct": -26.09,
-      "rsi14": 23.95,
-      "regime": "bull",
+      "close": 173.73,
+      "chg_5d_pct": -13.19,
+      "chg_20d_pct": -21.5,
+      "rsi14": 28.74,
+      "regime": "bear",
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -571,15 +571,15 @@
       "symbol": "MSFT",
       "name": "Microsoft",
       "class": "stock",
-      "close": 533.16,
-      "chg_5d_pct": 2.34,
-      "chg_20d_pct": -1.89,
-      "rsi14": 52.3,
+      "close": 521.13,
+      "chg_5d_pct": -6.24,
+      "chg_20d_pct": -2.35,
+      "rsi14": 47.68,
       "regime": "bull",
-      "above_ema20": true,
+      "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -588,15 +588,15 @@
       "symbol": "AAPL",
       "name": "Apple",
       "class": "stock",
-      "close": 348.51,
-      "chg_5d_pct": 5.0,
-      "chg_20d_pct": 2.12,
-      "rsi14": 55.62,
+      "close": 355.63,
+      "chg_5d_pct": 1.75,
+      "chg_20d_pct": 3.69,
+      "rsi14": 60.42,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -605,15 +605,15 @@
       "symbol": "GOOG",
       "name": "Alphabet C",
       "class": "stock",
-      "close": 284.92,
-      "chg_5d_pct": 2.39,
-      "chg_20d_pct": -18.48,
-      "rsi14": 31.41,
+      "close": 290.63,
+      "chg_5d_pct": 1.16,
+      "chg_20d_pct": -15.43,
+      "rsi14": 36.94,
       "regime": "bear",
       "above_ema20": false,
       "candle": "-",
       "in_position": true,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -622,15 +622,15 @@
       "symbol": "META",
       "name": "Meta Platforms",
       "class": "stock",
-      "close": 641.39,
-      "chg_5d_pct": 3.28,
-      "chg_20d_pct": -15.88,
-      "rsi14": 46.5,
+      "close": 628.77,
+      "chg_5d_pct": -0.2,
+      "chg_20d_pct": -14.75,
+      "rsi14": 43.36,
       "regime": "bull",
       "above_ema20": false,
-      "candle": "-",
+      "candle": "bearish engulfing",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -639,15 +639,15 @@
       "symbol": "AMD",
       "name": "AMD",
       "class": "stock",
-      "close": 515.21,
-      "chg_5d_pct": 6.47,
-      "chg_20d_pct": -14.92,
-      "rsi14": 48.6,
+      "close": 552.9,
+      "chg_5d_pct": 13.12,
+      "chg_20d_pct": -3.14,
+      "rsi14": 53.63,
       "regime": "bull",
-      "above_ema20": false,
+      "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -656,15 +656,15 @@
       "symbol": "TSM",
       "name": "TSMC ADR",
       "class": "stock",
-      "close": 396.48,
-      "chg_5d_pct": -2.06,
-      "chg_20d_pct": -10.93,
-      "rsi14": 44.05,
+      "close": 413.35,
+      "chg_5d_pct": 4.45,
+      "chg_20d_pct": -3.87,
+      "rsi14": 49.62,
       "regime": "bull",
-      "above_ema20": false,
-      "candle": "-",
+      "above_ema20": true,
+      "candle": "bullish pin bar",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -673,15 +673,15 @@
       "symbol": "TSLA",
       "name": "Tesla",
       "class": "stock",
-      "close": 379.78,
-      "chg_5d_pct": -4.7,
-      "chg_20d_pct": 1.21,
-      "rsi14": 50.54,
+      "close": 390.84,
+      "chg_5d_pct": 1.47,
+      "chg_20d_pct": 6.45,
+      "rsi14": 54.36,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -690,15 +690,15 @@
       "symbol": "ORCL",
       "name": "Oracle",
       "class": "stock",
-      "close": 117.98,
-      "chg_5d_pct": -6.51,
-      "chg_20d_pct": -17.61,
-      "rsi14": 40.71,
+      "close": 128.38,
+      "chg_5d_pct": 3.76,
+      "chg_20d_pct": -1.66,
+      "rsi14": 49.36,
       "regime": "bear",
-      "above_ema20": false,
+      "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -707,15 +707,15 @@
       "symbol": "NFLX",
       "name": "Netflix",
       "class": "stock",
-      "close": 63.26,
-      "chg_5d_pct": -0.25,
-      "chg_20d_pct": -10.22,
-      "rsi14": 39.85,
+      "close": 64.54,
+      "chg_5d_pct": -2.79,
+      "chg_20d_pct": -8.54,
+      "rsi14": 44.47,
       "regime": "bear",
       "above_ema20": false,
-      "candle": "-",
+      "candle": "bullish engulfing",
       "in_position": true,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -724,15 +724,15 @@
       "symbol": "JPM",
       "name": "JPMorgan Chase",
       "class": "stock",
-      "close": 342.07,
-      "chg_5d_pct": 1.21,
-      "chg_20d_pct": 3.21,
-      "rsi14": 52.67,
+      "close": 343.39,
+      "chg_5d_pct": -2.48,
+      "chg_20d_pct": 2.42,
+      "rsi14": 53.75,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -741,15 +741,15 @@
       "symbol": "LLY",
       "name": "Eli Lilly",
       "class": "stock",
-      "close": 1432.29,
-      "chg_5d_pct": 1.63,
-      "chg_20d_pct": 22.78,
-      "rsi14": 69.82,
+      "close": 1437.29,
+      "chg_5d_pct": 1.36,
+      "chg_20d_pct": 18.91,
+      "rsi14": 70.3,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -758,15 +758,15 @@
       "symbol": "WMT",
       "name": "Walmart",
       "class": "stock",
-      "close": 125.55,
-      "chg_5d_pct": 0.55,
-      "chg_20d_pct": 11.82,
-      "rsi14": 63.48,
+      "close": 125.67,
+      "chg_5d_pct": -2.71,
+      "chg_20d_pct": 8.19,
+      "rsi14": 63.68,
       "regime": "bull",
       "above_ema20": true,
-      "candle": "-",
+      "candle": "bullish engulfing",
       "in_position": true,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -775,15 +775,15 @@
       "symbol": "SPY",
       "name": "S&P 500 ETF",
       "class": "context",
-      "close": 749.92,
-      "chg_5d_pct": -0.59,
-      "chg_20d_pct": -3.61,
-      "rsi14": 44.55,
+      "close": 759.81,
+      "chg_5d_pct": -0.91,
+      "chg_20d_pct": -1.27,
+      "rsi14": 49.86,
       "regime": "bull",
-      "above_ema20": false,
+      "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -792,15 +792,15 @@
       "symbol": "QQQ",
       "name": "Nasdaq 100 ETF",
       "class": "context",
-      "close": 674.76,
-      "chg_5d_pct": -1.54,
-      "chg_20d_pct": -9.25,
-      "rsi14": 40.12,
+      "close": 690.38,
+      "chg_5d_pct": -0.23,
+      "chg_20d_pct": -5.29,
+      "rsi14": 46.06,
       "regime": "bull",
       "above_ema20": false,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
@@ -809,15 +809,15 @@
       "symbol": "DXY",
       "name": "US Dollar Index",
       "class": "context",
-      "close": 102.23,
-      "chg_5d_pct": 0.35,
-      "chg_20d_pct": 0.05,
-      "rsi14": 56.16,
+      "close": 102.91,
+      "chg_5d_pct": 1.38,
+      "chg_20d_pct": 0.35,
+      "rsi14": 62.7,
       "regime": "bull",
       "above_ema20": true,
       "candle": "-",
       "in_position": false,
-      "bar_date": "2026-11-10",
+      "bar_date": "2026-11-11",
       "bar_age_days": 1,
       "source": "yahoo",
       "stale": false
