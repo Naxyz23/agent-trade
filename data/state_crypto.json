@@ -9,6 +9,16 @@
       "sl_distance_pct": 17.862,
       "opened": "2026-11-10",
       "price_basis": "close_of_signal_bar"
+    },
+    "ETH": {
+      "side": "short",
+      "entry": 2017.15,
+      "stop": 2334.1146,
+      "size": 6.04,
+      "risk_amount": 0.95,
+      "sl_distance_pct": 15.713,
+      "opened": "2026-11-12",
+      "price_basis": "close_of_signal_bar"
     }
   },
   "closed": [
