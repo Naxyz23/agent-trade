@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-11-26T16:46:45+00:00",
-  "run_date": "2026-11-26",
+  "generated_at": "2026-11-27T16:32:39+00:00",
+  "run_date": "2026-11-27",
   "spec_version": "cngoal-6.1",
   "engine_version": "0.9.2",
   "rules_config": {
@@ -181,14 +181,14 @@
   "halts": [],
   "events": [],
   "data_health": {
-    "oldest_bar_age_days": 1,
+    "oldest_bar_age_days": 2,
     "stale_symbols": [],
     "per_symbol": [
       {
         "symbol": "XAU",
         "source": "yahoo",
         "bar_date": "2026-11-25",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -196,7 +196,7 @@
         "symbol": "SLV",
         "source": "yahoo",
         "bar_date": "2026-11-25",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       },
@@ -204,7 +204,7 @@
         "symbol": "USOIL",
         "source": "yahoo",
         "bar_date": "2026-11-25",
-        "bar_age_days": 1,
+        "bar_age_days": 2,
         "max_age_days": 5,
         "stale": false
       }
@@ -224,7 +224,7 @@
       "candle": "-",
       "in_position": true,
       "bar_date": "2026-11-25",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -241,7 +241,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-11-25",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     },
@@ -258,7 +258,7 @@
       "candle": "-",
       "in_position": false,
       "bar_date": "2026-11-25",
-      "bar_age_days": 1,
+      "bar_age_days": 2,
       "source": "yahoo",
       "stale": false
     }
